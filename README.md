@@ -41,7 +41,7 @@ FABM-PCLake is comprised of 11 Fortran modules, including:
 * fish.f90
 
 The overall tasks of individual modules are described in brief below. 
-Each module is desribed in greater detail on the Wiki pages (link).
+Each module is described in greater detail on the Wiki pages (link).
 
 ### model_library
 This module is a FABM wrapper module for initialising all the modules of FABM-PCLake.
