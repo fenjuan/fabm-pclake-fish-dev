@@ -1,102 +1,98 @@
 #include "fabm_driver.h"
-   module pclake_macrophytes
+!-----------------------------------------------------------------------
+!BOP
 !
-! !DESCRIPTION:
-!  This module describes the submerged macrophytes group, and implemented as 0d benthic
-!  module keeping most of the original PCLake methods.
-!  The state variables include: sDVeg,sNVeg,sPVeg(vegetation mass in dry-weight, nitrogen
-!  and phosphorus. The related processes are:
-!  Assimilation(only for sDVeg), nutrient updake(only for sNVeg and sPVeg),respiration
-!  (only for sDVeg), excretion(only for sNVeg and sPVeg), mortality, migration.
-!  This module also describes the processes which influence the state variables registered in
-!  other modules, including:
-!  nutrients taken up and excreted by shoots and roots: sNH4W&sNH4S<==>sNVeg,sPO4W&sPO4S<==>sPVeg
-!                                                       sNO3W&sNO3W==>sNVeg(only taken up)
-! detritus morted by shoots and roots: sDVeg==>sDDetW&sDDetS,sNVeg==>sNDetW&sNDetS,sPVeg==>sPDetW&sPDetS
-!  oxygen produced by primary production and consumed by respiration: sO2W<==>sDVeg
-!  This module also provide important diagnostic variable will be used in other modules, including:
-!  Submerged macrophytes biomass, aDSubVeg, used by module: foodweb water module
-!  macrophytes coverage percentage,aCovVeg, used by module: foodweb water module
-!  Sediment detritus change, tDBedDetS, used bymodule:auxilary
+! !INTERFACE:
+   module au_pclake_macrophytes
 ! !USES:
    use fabm_types
    use fabm_expressions
    use fabm_standard_variables
-   use pclake_utility, ONLY:uFunTmVeg
+   use au_pclake_utility, ONLY:uFunTmVeg
 
-    implicit none
+   implicit none
 
- !  default: all is private.
-    private
- !
+!  default: all is private.
+   private
+
 ! !PUBLIC DERIVED TYPES:
-   type, extends(type_base_model),public :: type_pclake_macrophytes
-!     local state variable identifiers
-!     id_sDVeg,macrophytes in dry-weight, gDW/m**2
-!     id_sPVeg,macrophytes in nitrogen element, gN/m**2
-!     id_sPVeg,macrophytes in phosphorus element, gP/m**2
-      type (type_bottom_state_variable_id)            :: id_sDVeg,id_sNVeg,id_sPVeg
-!     diagnostic variables for dependencies(without output)
-      type (type_horizontal_diagnostic_variable_id)       :: id_aDSubVeg,id_aCovVeg
-      type (type_horizontal_diagnostic_variable_id)       :: id_tDBedDetS,id_afCovSurfVeg
-!     diagonostic variables for light attenuation coefficient for plant.
-      type (type_horizontal_diagnostic_variable_id)       :: id_aDayInitVeg
-!     diagnostic variables for modular fluxes
-      type (type_horizontal_diagnostic_variable_id)       :: id_tDBedVeg,id_tNBedVeg,id_tPBedVeg
-      type (type_horizontal_diagnostic_variable_id)       :: id_wNBedNH4W,id_wNBedNO3W,id_wPBedPO4W
-      type (type_horizontal_diagnostic_variable_id)       :: id_tO2BedW,id_wDBedDetW,id_wNBedDetW
-      type (type_horizontal_diagnostic_variable_id)       :: id_wPBedDetW,id_tNBedNH4S,id_tNBedNO3S
-      type (type_horizontal_diagnostic_variable_id)       :: id_tPBedPO4S,id_tPBedDetS,id_tNBedDetS
-      type (type_horizontal_diagnostic_variable_id)       :: id_tDBedDetSflux
+   type, extends(type_base_model),public :: type_au_pclake_macrophytes
+!  local state variable identifiers
+!  id_sDVeg,macrophytes in dry-weight, gDW/m**2
+!  id_sPVeg,macrophytes in nitrogen element, gN/m**2
+!  id_sPVeg,macrophytes in phosphorus element, gP/m**2
+   type (type_bottom_state_variable_id)            :: id_sDVeg,id_sNVeg,id_sPVeg
+!  diagnostic variables for dependencies(without output)
+   type (type_horizontal_diagnostic_variable_id)       :: id_aDSubVeg,id_aCovVeg
+   type (type_horizontal_diagnostic_variable_id)       :: id_tDBedPOMS,id_afCovSurfVeg
+!  diagonostic variables for light attenuation coefficient for plant.
+   type (type_horizontal_diagnostic_variable_id)       :: id_aDayInitVeg
+   type (type_horizontal_diagnostic_variable_id)       :: id_tO2BedW,id_tDBedVeg
+#ifdef _DEVELOPMENT_
+!  diagnostic variables for modular fluxes
+   type (type_horizontal_diagnostic_variable_id)       :: id_tNBedVeg,id_tPBedVeg
+   type (type_horizontal_diagnostic_variable_id)       :: id_wNBedNH4W,id_wNBedNO3W,id_wPBedPO4W
+   type (type_horizontal_diagnostic_variable_id)       :: id_wDBedPOMW,id_wNBedPOMW
+   type (type_horizontal_diagnostic_variable_id)       :: id_wPBedPOMW,id_tNBedNH4S,id_tNBedNO3S
+   type (type_horizontal_diagnostic_variable_id)       :: id_tPBedPO4S,id_tPBedPOMS,id_tNBedPOMS
+   type (type_horizontal_diagnostic_variable_id)       :: id_tDBedPOMSflux
+#endif
+!  state dependencies identifiers
+   type (type_state_variable_id)                :: id_NH4poolW,id_NO3poolW,id_PO4poolW,id_O2poolW
+   type (type_state_variable_id)                :: id_DPOMpoolW,id_NPOMpoolW,id_PPOMpoolW
+   type (type_bottom_state_variable_id)         :: id_NH4poolS,id_NO3poolS,id_PO4poolS
+   type (type_bottom_state_variable_id)         :: id_DPOMpoolS,id_NPOMpoolS,id_PPOMpoolS
+   type (type_state_variable_id)                :: id_DDOMpoolW,id_NDOMpoolW,id_PDOMpoolW
+   type (type_bottom_state_variable_id)         :: id_DDOMpoolS,id_NDOMpoolS,id_PDOMpoolS
+!  environmental dependencies
+   type (type_global_dependency_id)         :: id_Day
+   type (type_dependency_id)                :: id_uTm,id_extc,id_dz
+   type (type_dependency_id)                :: id_par,id_meanpar
+   type (type_horizontal_dependency_id)     :: id_sDepthW
+!  output light variables
+   type (type_horizontal_diagnostic_variable_id)       :: id_aLPAR1Veg,id_aLPAR2Veg
+   type (type_horizontal_diagnostic_variable_id)       :: id_allimveg,id_aNutLimVeg
+   type (type_horizontal_diagnostic_variable_id)       :: id_macroextinction
+!  diagnostic dependencies
+   type (type_horizontal_dependency_id)     :: id_afOxySed
+!  Model parameters
+!  Primary production parameters
+   real(rk)    :: cDVegIn,kMigrVeg,cMuMaxVeg,cDCarrVeg,kDRespVeg
+   real(rk)    :: hLRefVeg
+!  nutrient ratio parameters
+   real(rk)    :: cNDVegMin,cNDVegMax,cPDVegMin,cPDVegMax
+!  vegetation shoots and roots allocation parameters
+   real(rk)    :: cDayWinVeg,cLengAllo
+   real(rk)    :: fRootVegWin,fRootVegSum,cTmInitVeg
+   real(rk)    :: fEmergVeg,fFloatVeg,cDLayerVeg,cCovSpVeg
+   real(rk)    :: kMortVegSum,cLengMort,fWinVeg
+!  temperature function parameters
+   real(rk)    :: cQ10ProdVeg,cQ10RespVeg
+!  parameters for Nitrogen and phosphorus equations
+   real(rk)    :: cPDVeg0,cNDVeg0
+   real(rk)    :: fSedUptVegMax,fSedUptVegCoef,fSedUptVegExp,cAffNUptVeg,cVNUptMaxVeg
+   integer     :: UseEmpUpt
+   real(rk)    :: cVPUptMaxVeg,cAffPUptVeg,fDissMortVeg
+!  paremters for sediment properties(pore water concentration)
+   real(rk)   :: cDepthS,bPorS,cCPerDW,hO2BOD
+   real(rk)   :: cExtSpVeg,fTOMWMortVeg
+!  plant height
+   real(rk)   :: cHeightVeg
+!  minimun state variable vaules
+   real(rk)   :: cDVegMin, cNVegMin,cPVegMin
+!  fraction of dissolved organics from macrophytes
+   real(rk)   :: fVegDOMW,fVegDOMS
+!  special local parameter aDSubVeg, borrowed from do_bottom
+!  subroutine to get_light_extinction subroutine
+   real(rk)   :: aDSubVeg
 
-!     state dependencies identifiers
-      type (type_state_variable_id)                :: id_NH4poolW,id_NO3poolW,id_PO4poolW,id_O2poolW
-      type (type_state_variable_id)                :: id_DDetpoolW,id_DNetpoolW,id_DPetpoolW
-      type (type_bottom_state_variable_id)         :: id_NH4poolS,id_NO3poolS,id_PO4poolS
-      type (type_bottom_state_variable_id)         :: id_DDetpoolS,id_DNetpoolS,id_DPetpoolS
-!     environmental dependencies
-      type (type_global_dependency_id)         :: id_Day
-      type (type_dependency_id)                :: id_uTm,id_extc,id_dz
-      type (type_dependency_id)                :: id_par,id_meanpar
-      type (type_horizontal_dependency_id)     :: id_sDepthW
-!     output light variables
-      type (type_horizontal_diagnostic_variable_id)       :: id_aLPAR1Veg,id_aLPAR2Veg
-      type (type_horizontal_diagnostic_variable_id)       :: id_allimveg,id_aNutLimVeg
-      type (type_horizontal_diagnostic_variable_id)       :: id_macroextinction
-!     diagnostic dependencies
-      type (type_horizontal_dependency_id)     :: id_afOxySed
-!    Model parameters
-!    Primary production parameters
-     real(rk)    :: cDVegIn,kMigrVeg,cMuMaxVeg,cDCarrVeg,kDRespVeg
-     real(rk)    :: hLRefVeg
-!    nutrient ratio parameters
-     real(rk)    :: cNDVegMin,cNDVegMax,cPDVegMin,cPDVegMax
-!    vegetation shoots and roots allocation parameters
-     real(rk)    :: cDayWinVeg,cLengAllo
-     real(rk)    :: fRootVegWin,fRootVegSum,cTmInitVeg
-     real(rk)    :: fEmergVeg,fFloatVeg,cDLayerVeg,cCovSpVeg
-     real(rk)    :: kMortVegSum,cLengMort,fWinVeg
-!    temperature function parameters
-     real(rk)    :: cQ10ProdVeg,cQ10RespVeg
-!    parameters for Nitrogen and phosphorus equations
-     real(rk)    :: cPDVeg0,cNDVeg0
-     real(rk)    :: fSedUptVegMax,fSedUptVegCoef,fSedUptVegExp,cAffNUptVeg,cVNUptMaxVeg
-     integer     :: UseEmpUpt
-     real(rk)    :: cVPUptMaxVeg,cAffPUptVeg,fDissMortVeg,fDetWMortVeg
-!    paremters for sediment properties(pore water concentration)
-     real(rk)   :: cDepthS,bPorS,cCPerDW,hO2BOD
-     real(rk)   :: cExtSpVeg  !,host
-!    plant height
-     real(rk)   :: cHeightVeg
-!    minimun state variable vaules
-     real(rk)   :: cDVegMin, cNVegMin,cPVegMin
    contains
 
-!     Model procedure
-      procedure :: initialize
-      procedure :: do_bottom
-      procedure :: get_light_extinction
-   end type type_pclake_macrophytes
+!  Model procedure
+   procedure :: initialize
+   procedure :: do_bottom
+   procedure :: get_light_extinction
+   end type type_au_pclake_macrophytes
 
 !  private data members(API0.92)
    real(rk),parameter :: secs_pr_day=86400.0_rk
@@ -125,7 +121,7 @@
 ! !DESCRIPTION:
 !
 ! !INPUT PARAMETERS:
-   class (type_pclake_macrophytes), intent(inout), target :: self
+   class (type_au_pclake_macrophytes), intent(inout), target :: self
    integer,                          intent(in)            :: configunit
 !EOP
 !-----------------------------------------------------------------------
@@ -139,19 +135,19 @@
    call self%get_parameter(self%cNDVegMax,     'cNDVegMax',      'mgN/mgD',             'maximum N/day ratio vegetation',                                                                          default=0.035_rk)
    call self%get_parameter(self%cPDVegMin,     'cPDVegMin',      'mgP/mg',              'minimum P/day ratio vegetation',                                                                          default=0.0008_rk)
    call self%get_parameter(self%cPDVegMax,     'cPDVegMax',      'mgP/mgD',             'maximum P/day ratio vegetation',                                                                          default=0.0035_rk)
-   call self%get_parameter(self%cMuMaxVeg,     'cMuMaxVeg',      'g/gshoot/d',          'maximum growth rate of vegetation at 20�C',                                                               default=0.2_rk,  scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%cDCarrVeg,     'cDCarrVeg',      'gDW m-2',             'max. vegetation standing crop',                                                                           default=400.0_rk)
+   call self%get_parameter(self%cMuMaxVeg,     'cMuMaxVeg',      'g/gshoot/d',          'maximum growth rate of vegetation at 20 dgree C',                                                         default=0.2_rk,  scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%cDCarrVeg,     'cDCarrVeg',      'gDW m-2',             'maximum vegetation standing crop',                                                                        default=400.0_rk)
    call self%get_parameter(self%kDRespVeg,     'kDRespVeg',      'd-1',                 'dark respiration rate of vegetation',                                                                     default=0.02_rk, scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%cDayWinVeg,    'cDayWinVeg',     'd',                   'end of growing season',                                                                                   default=259.0_rk)
-   call self%get_parameter(self%cLengAllo,     'cLengAllo',      'd',                   'duration of allocation and reallocation phase',                                                           default=15.0_rk)
+   call self%get_parameter(self%cDayWinVeg,    'cDayWinVeg',     'day of the year',     'end of growing season',                                                                                   default=259.0_rk)
+   call self%get_parameter(self%cLengAllo,     'cLengAllo',      'day of the year',     'duration of allocation and reallocation phase',                                                           default=15.0_rk)
    call self%get_parameter(self%fRootVegWin,   'fRootVegWin',    'groot/gveg',          'root fraction outside growing season',                                                                    default=0.6_rk)
    call self%get_parameter(self%fRootVegSum,   'fRootVegSum',    'groot/gveg',          'root fraction outside growing season',                                                                    default=0.1_rk)
-   call self%get_parameter(self%cTmInitVeg,    'cTmInitVeg',     '�C',                  'temperature for initial growth',                                                                          default=9.0_rk)
+   call self%get_parameter(self%cTmInitVeg,    'cTmInitVeg',     'degree C',            'temperature for initial growth',                                                                          default=9.0_rk)
    call self%get_parameter(self%fEmergVeg,     'fEmergVeg',      'gfloating/gshoot',    'emergent fraction of shoot',                                                                              default=0.0_rk)
    call self%get_parameter(self%fFloatVeg,     'fFloatVeg',      'gfloating/gshoot',    'floating fraction of shoot',                                                                              default=0.0_rk)
    call self%get_parameter(self%cDLayerVeg,    'cDLayerVeg',     'gD/m2',               'biomass of a single layer floating leaves',                                                               default=0.0_rk)
    call self%get_parameter(self%cCovSpVeg,     'cCovSpVeg',      'l/gDW/m2',            'specific cover',                                                                                          default=0.5_rk)
-   call self%get_parameter(self%hLRefVeg,      'hLRefVeg',       'W/m2PAR',             'half-sat. light at 20 �C',                                                                                default=17.0_rk)
+   call self%get_parameter(self%hLRefVeg,      'hLRefVeg',       'W/m2PAR',             'half-sat. light at 20 degree C',                                                                          default=17.0_rk)
    call self%get_parameter(self%cQ10ProdVeg,   'cQ10ProdVeg',    '[-]',                 'temperature quotient of production',                                                                      default=1.2_rk)
    call self%get_parameter(self%cQ10RespVeg,   'cQ10RespVeg',    '[-]',                 'temperature quotient of respiration',                                                                     default=2.0_rk)
    call self%get_parameter(self%kMortVegSum,   'kMortVegSum',    'day-1',               'vegetation mortality rate in Spring and Summer (low)',                                                    default=0.005_rk,scale_factor=1.0_rk/secs_pr_day)
@@ -159,30 +155,32 @@
    call self%get_parameter(self%fWinVeg,       'fWinVeg',        '[-]',                 'fraction surviving in winter',                                                                            default=0.3_rk)
    call self%get_parameter(self%cPDVeg0,       'cPDVeg0',        'gP/gD',               'initial P fraction in veg',                                                                               default=0.002_rk)
    call self%get_parameter(self%cNDVeg0,       'cNDVeg0',        'gN/gD',               'initial N fraction in veg',                                                                               default=0.02_rk)
-   call self%get_parameter(self%fSedUptVegMax, 'fSedUptVegMax',  '[-]',                 'maximum_sediment_fraction_of_nutrient_uptake',                                                            default=0.998_rk)
-   call self%get_parameter(self%fSedUptVegCoef,'fSedUptVegCoef', '[-]',                 'sigm. regr. coeff. for sediment fraction of nutrient uptake',                                             default=2.66_rk)
-   call self%get_parameter(self%fSedUptVegExp, 'fSedUptVegExp',  '[-]',                 'exponent in sigm. regr. for sediment fraction of nutrient uptake',                                        default=-0.83_rk)
+   call self%get_parameter(self%fSedUptVegMax, 'fSedUptVegMax',  '[-]',                 'maximum sediment fraction of nutrient uptake',                                                            default=0.998_rk)
+   call self%get_parameter(self%fSedUptVegCoef,'fSedUptVegCoef', '[-]',                 'sigma regression coefficient for sediment fraction of nutrient uptake',                                             default=2.66_rk)
+   call self%get_parameter(self%fSedUptVegExp, 'fSedUptVegExp',  '[-]',                 'exponent in sigma regression for sediment fraction of nutrient uptake',                                        default=-0.83_rk)
    call self%get_parameter(self%cAffNUptVeg,   'cAffNUptVeg',    'l/mgDW/d',            'initial N uptake affinity vegetation',                                                                    default=0.2_rk,  scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%cVNUptMaxVeg,  'cVNUptMaxVeg',   'mgN/mgDW/d',          'maximum N uptake capacity of vegetation',                                                                 default=0.1_rk,  scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%cDepthS,       'cDepthS',        '[m]',                 'sediment depth',                                                                                          default=0.1_rk)
-   call self%get_parameter(self%bPorS,         'bPorS',          '[m3waterm-3sediment]','porosity',                                                                                                default=0.847947_rk)
-   call self%get_parameter(self%UseEmpUpt,     'UseEmpUpt',      '[-]',                 'false=do not use this empirical relation',                                                                default=0)
+   call self%get_parameter(self%bPorS,         'bPorS',          '[m3waterm-3sediment]','sediment porosity',                                                                                                default=0.847947_rk)
+   call self%get_parameter(self%UseEmpUpt,     'UseEmpUpt',      '[-]',                 'false=do, not use this empirical relation',                                                                default=0)
    call self%get_parameter(self%cAffPUptVeg,   'cAffPUptVeg',    'l/mgDW/d',            'initial P uptake affinity vegetation',                                                                    default=0.2_rk,   scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%cVPUptMaxVeg,  'cVPUptMaxVeg',   'mgP/mgDW/d',          'maximum P uptake capacity of vegetation',                                                                 default=0.01_rk,  scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%fDissMortVeg,  'fDissMortVeg',   '[-]',                 'fraction_dissolved_nutrients_from_died_plants',                                                           default=0.25_rk)
-   call self%get_parameter(self%cCPerDW,       'cCPerDW',        'gC/gDW',              'C content of organic matte',                                                                              default=0.4_rk)
-   call self%get_parameter(self%fDetWMortVeg,  'fDetWMortVeg',   '[-]',                 'fraction of shoot mortality becoming water detritus',                                                     default=0.1_rk)
+   call self%get_parameter(self%fDissMortVeg,  'fDissMortVeg',   '[-]',                 'fraction dissolved nutrients from died plants',                                                           default=0.25_rk)
+   call self%get_parameter(self%cCPerDW,       'cCPerDW',        'gC/gDW',              'C content of organic matter',                                                                              default=0.4_rk)
+   call self%get_parameter(self%fTOMWMortVeg,  'fTOMWMortVeg',   '[-]',                 'fraction of shoot mortality becoming water organics',                                                     default=0.1_rk)
    call self%get_parameter(self%hO2BOD,        'hO2BOD',         'mgO2/l',              'half-sat. oxygen conc. for BOD',                                                                          default=1.0_rk)
    call self%get_parameter(self%cHeightVeg,    'cHeightVeg',     'm',                   'vegetation height',                                                                                       default=1.0_rk)
    call self%get_parameter(self%cExtSpVeg,     'cExtSpVeg',      'm2/gDW',              'specific extinction',                                                                                     default=0.01_rk)
 !  the user defined minumun value for state variables
-   call self%get_parameter(self%cDVegMin,      'cDVegMin',        'gDW/m2',             'minimun dry-weight macrophytes in system',                                                                default=0.00001_rk)
+   call self%get_parameter(self%cDVegMin,      'cDVegMin',        'gDW/m2',             'minimun dry weight macrophytes in system',                                                                default=0.00001_rk)
+   call self%get_parameter(self%fVegDOMS,  'fVegDOMS',      '[-]',                'dissolved organic fraction from benthic macrophytes',                                                     default=0.5_rk)
+   call self%get_parameter(self%fVegDOMW,  'fVegDOMW',      '[-]',                'dissolved organic fraction from pelagic macrophytes',                                                     default=0.5_rk)
 !  Register local state variable
-   call self%register_state_variable(self%id_sDVeg,'sDVeg','g m-2','vegetation_dry_weight',    &
+   call self%register_state_variable(self%id_sDVeg,'sDVeg','g m-2','vegetation dry weight',    &
                                     initial_value=1.0_rk,minimum=self%cDVegMin)
-   call self%register_state_variable(self%id_sNVeg,'sNVeg','g m-2','vegetation_Nitrogen',     &
+   call self%register_state_variable(self%id_sNVeg,'sNVeg','g m-2','vegetation nitrogen content',     &
                                     initial_value=0.02_rk,minimum=self%cDVegMin * self%cNDVegMin)
-   call self%register_state_variable(self%id_sPVeg,'sPVeg','g m-2','vegetation_phosphorus',     &
+   call self%register_state_variable(self%id_sPVeg,'sPVeg','g m-2','vegetation phosphorus content',     &
                                     initial_value=0.002_rk,minimum=self%cDVegMin * self%cPDVegMin)
 !  register diagnostic variables
    call self%register_diagnostic_variable(self%id_aDSubVeg,       'aDSubVeg',       'g m-2',      'aDSubVeg',                         output=output_instantaneous)
@@ -194,48 +192,55 @@
    call self%register_diagnostic_variable(self%id_allimveg,       'allimveg',       '[-]',        'light limitation faction',         output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_aLPAR1Veg,      'aLPAR1Veg',      'W m-2',      'light at top of the vegetation',   output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_aLPAR2Veg,      'aLPAR2Veg',      'W m-2',      'light at bottom of the vegetation',output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_tDBedDetS,      'tDBedDetS',      'g m-2 s-1',  'tDBedDetS',                        output=output_none)
+   call self%register_diagnostic_variable(self%id_tDBedPOMS,      'tDBedPOMS',      'g m-2 s-1',  'tDBedPOMS',                        output=output_none)
+#ifdef _DEVELOPMENT_
 !  register diagnostic variables for modular fluxes
-   call self%register_diagnostic_variable(self%id_tDBedVeg,      'tDBedVeg',      'g m-2 s-1',  'macrophytes_DVeg_exchange',output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_tNBedVeg,      'tNBedVeg',      'g m-2 s-1',  'macrophytes_NVeg_exchange',output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_tPBedVeg,      'tPBedVeg',      'g m-2 s-1',  'macrophytes_PVeg_exchange',output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_wNBedNH4W,      'wNBedNH4W',      'g m-2 s-1',  'macrophytes_NH4W_exchange',output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_wNBedNO3W,      'wNBedNO3W',      'g m-2 s-1',  'macrophytes_NO3W_exchange',output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_wPBedPO4W,      'wPBedPO4W',      'g m-2 s-1',  'macrophytes_PO4W_exchange',output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_tO2BedW,        'tO2BedW',      'g m-2 s-1',  'macrophytes_tO2BedW_exchange',output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_wDBedDetW,      'wDBedDetW',      'g m-2 s-1',  'macrophytes_wDdetW_exchange',output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_wNBedDetW,      'wNBedDetW',      'g m-2 s-1',  'macrophytes_NDetW_exchange',output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_wPBedDetW,      'wPBedDetW',      'g m-2 s-1',  'macrophytes_PDetW_exchange',output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_tNBedNH4S,      'tNBedNH4S',      'g m-2 s-1',  'macrophytes_NH4S_exchange',output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_tNBedNO3S,      'tNBedNO3S',      'g m-2 s-1',  'macrophytes_NO3S_exchange',output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_tPBedPO4S,      'tPBedPO4S',      'g m-2 s-1',  'macrophytes_PO4S_exchange',output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_tDBedDetSflux,  'tDBedDetSflux',      'g m-2 s-1',  'macrophytes_DDetS_exchange',output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_tNBedDetS,      'tNBedDetS',      'g m-2 s-1',  'macrophytes_NDetS_exchange',output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_tPBedDetS,      'tPBedDetS',      'g m-2 s-1',  'macrophytes_PDetS_exchange',output=output_instantaneous)
-
+   call self%register_diagnostic_variable(self%id_tDBedVeg,       'tDBedVeg',      'g m-2 s-1',  'macrophytes_DVeg_exchange',    output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_tNBedVeg,       'tNBedVeg',      'g m-2 s-1',  'macrophytes_NVeg_exchange',    output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_tPBedVeg,       'tPBedVeg',      'g m-2 s-1',  'macrophytes_PVeg_exchange',    output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_wNBedNH4W,      'wNBedNH4W',     'g m-2 s-1',  'macrophytes_NH4W_exchange',    output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_wNBedNO3W,      'wNBedNO3W',     'g m-2 s-1',  'macrophytes_NO3W_exchange',    output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_wPBedPO4W,      'wPBedPO4W',     'g m-2 s-1',  'macrophytes_PO4W_exchange',    output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_tO2BedW,        'tO2BedW',       'g m-2 s-1',  'macrophytes_tO2BedW_exchange', output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_wDBedPOMW,      'wDBedPOMW',     'g m-2 s-1',  'macrophytes_DPOMW_exchange',  output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_wNBedPOMW,      'wNBedPOMW',     'g m-2 s-1',  'macrophytes_NPOMW_exchange',   output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_wPBedPOMW,      'wPBedPOMW',     'g m-2 s-1',  'macrophytes_PPOMW_exchange',   output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_tNBedNH4S,      'tNBedNH4S',     'g m-2 s-1',  'macrophytes_NH4S_exchange',    output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_tNBedNO3S,      'tNBedNO3S',     'g m-2 s-1',  'macrophytes_NO3S_exchange',    output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_tPBedPO4S,      'tPBedPO4S',     'g m-2 s-1',  'macrophytes_PO4S_exchange',    output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_tDBedPOMSflux,  'tDBedPOMSflux', 'g m-2 s-1',  'macrophytes_DPOMS_exchange',   output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_tNBedPOMS,      'tNBedPOMS',     'g m-2 s-1',  'macrophytes_NPOMS_exchange',   output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_tPBedPOMS,      'tPBedPOMS',     'g m-2 s-1',  'macrophytes_PPOMS_exchange',   output=output_instantaneous)
+#endif
 
 !  Register contribution of state to global aggregate variables
    call self%add_to_aggregate_variable(standard_variables%total_nitrogen,  self%id_sNVeg)
    call self%add_to_aggregate_variable(standard_variables%total_phosphorus,self%id_sPVeg)
 !  register state variables dependencies
-   call self%register_state_dependency(self%id_NH4poolW,  'Ammonium_pool_water',      'g m-3', 'Ammonium pool for nutrient uptake')
-   call self%register_state_dependency(self%id_NO3poolW,  'Nitrate_pool_water',       'g m-3', 'Nitrate pool for nutrient uptake')
-   call self%register_state_dependency(self%id_PO4poolW,  'Phosphate_pool_water',     'g m-3', 'Phosphate pool for nutrient uptake')
-   call self%register_state_dependency(self%id_O2poolW,   'Oxygen_pool_water',        'g m-3', 'Oxygen pool in water')
-   call self%register_state_dependency(self%id_DDetpoolW, 'Detritus_DW_pool_water',   'g m-3', 'Detritus_DW_pool_water')
-   call self%register_state_dependency(self%id_DNetpoolW, 'Detritus_N_pool_water',    'g m-3', 'Detritus_N_pool_water')
-   call self%register_state_dependency(self%id_DPetpoolW, 'Detritus_P_pool_water',    'g m-3', 'Detritus_P_pool_water')
-   call self%register_state_dependency(self%id_NH4poolS,  'Ammonium_pool_sediment',   'g m-2', 'Ammonium pool for nutrient uptake')
-   call self%register_state_dependency(self%id_NO3poolS,  'Nitrate_pool_sediment',    'g m-2', 'Nitrate pool for nutrient uptake')
-   call self%register_state_dependency(self%id_PO4poolS,  'Phosphate_pool_sediment',  'g m-2', 'Phosphate pool for nutrient uptake')
-   call self%register_state_dependency(self%id_DDetpoolS, 'Detritus_DW_pool_sediment','g m-2', 'Detritus_DW_pool_sediment')
-   call self%register_state_dependency(self%id_DNetpoolS, 'Detritus_N_pool_sediment', 'g m-2', 'Detritus_N_pool_sediment')
-   call self%register_state_dependency(self%id_DPetpoolS, 'Detritus_P_pool_sediment', 'g m-2', 'Detritus_P_pool_sediment')
+   call self%register_state_dependency(self%id_NH4poolW,     'ammonium_pool_water',              'g m-3', 'ammonium pool for nutrient uptake')
+   call self%register_state_dependency(self%id_NO3poolW,     'nitrate_pool_water',               'g m-3', 'nitrate pool for nutrient uptake')
+   call self%register_state_dependency(self%id_PO4poolW,     'phosphate_pool_water',             'g m-3', 'phosphate pool for nutrient uptake')
+   call self%register_state_dependency(self%id_O2poolW,      'oxygen_pool_water',                'g m-3', 'oxygen pool in water')
+   call self%register_state_dependency(self%id_DPOMpoolW,    'POM_DW_pool_water',                'g m-3', 'POM DW pool in water')
+   call self%register_state_dependency(self%id_NPOMpoolW,    'POM_N_pool_water',                 'g m-3', 'POM N pool in water')
+   call self%register_state_dependency(self%id_PPOMpoolW,    'POM_P_pool_water',                 'g m-3', 'POM P pool in water')
+   call self%register_state_dependency(self%id_NH4poolS,     'ammonium_pool_sediment',           'g m-2', 'ammonium pool for nutrient uptake')
+   call self%register_state_dependency(self%id_NO3poolS,     'nitrate_pool_sediment',            'g m-2', 'nitrate pool for nutrient uptake')
+   call self%register_state_dependency(self%id_PO4poolS,     'phosphate_pool_sediment',          'g m-2', 'phosphate pool for nutrient uptake')
+   call self%register_state_dependency(self%id_DPOMpoolS,    'POM_DW_pool_sediment',             'g m-2', 'POM DW pool sediment')
+   call self%register_state_dependency(self%id_NPOMpoolS,    'POM_N_pool_sediment',              'g m-2', 'POM N pool sediment')
+   call self%register_state_dependency(self%id_PPOMpoolS,    'POM_P_pool_sediment',              'g m-2', 'POM P pool sediment')
+   call self%register_state_dependency(self%id_DDOMpoolW,    'DOM_DW_pool_water',                'g m-3', 'DOM DW in water')
+   call self%register_state_dependency(self%id_NDOMpoolW,    'DOM_N_pool_water',                 'g m-3', 'DOM N in water')
+   call self%register_state_dependency(self%id_PDOMpoolW,    'DOM_P_pool_water',                 'g m-3', 'DOM P in water')
+   call self%register_state_dependency(self%id_DDOMpoolS,    'DOM_DW_pool_sediment',             'g m-2', 'DOM DW in sediment')
+   call self%register_state_dependency(self%id_NDOMpoolS,    'DOM_N_pool_sediment',              'g m-2', 'DOM N in sediment')
+   call self%register_state_dependency(self%id_PDOMpoolS,    'DOM_P_pool_sediment',              'g m-2', 'DOM P in sediment')
 !------------------------------------------------------------------------------------------------------------
 !  register diagnostic dependencies
 !------------------------------------------------------------------------------------------------------------
 !  step1, Register dependencies on external diagnostic variables
-   call self%register_dependency(self%id_afOxySed,        'Oxic_layer_value',          '[-]',  'Oxic_layer_value')
+   call self%register_dependency(self%id_afOxySed,        'oxic_layer_value',          '[-]',  'oxic layer value')
 !------------------------------------------------------------------------------------------------------------
 !  register environmental dependencies
 !------------------------------------------------------------------------------------------------------------
@@ -245,8 +250,7 @@
    call self%register_dependency(self%id_sDepthW,standard_variables%bottom_depth)
    call self%register_dependency(self%id_dz,     standard_variables%cell_thickness)
    call self%register_dependency(self%id_par,    standard_variables%downwelling_photosynthetic_radiative_flux)
-   call self%register_dependency(self%id_meanpar,temporal_mean(self%id_par,period=86400._rk,resolution=3600._rk))
-
+   call self%register_dependency(self%id_meanpar,temporal_mean(self%id_par,period=86400._rk,resolution=3600._rk,missing_value=0.0_rk))
 
    return
 
@@ -264,7 +268,7 @@
    subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
 !
 ! !INPUT PARAMETERS:
-   class (type_pclake_macrophytes), intent(in)    :: self
+   class (type_au_pclake_macrophytes), intent(in)    :: self
    _DECLARE_ARGUMENTS_DO_BOTTOM_
 ! !LOCAL VARIABLES:
 !  Carriers for environment dependencies
@@ -282,7 +286,7 @@
    real(rk)     :: bfRootVeg,bfShootVeg,aDRootVeg,aDShootVeg
    real(rk)     :: aDEmergVeg,aDFloatVeg,bfSubVeg,aDSubVeg
    real(rk)     :: bkMortVeg
-   real(rk),save :: aDayInitVeg
+   real(rk),save :: aDayInitVeg = -1.0_rk
 !  variables for coverage of vegetation(light function and fish feeding)
    real(rk)     :: afCovEmergVeg,aCovVeg
 !  temperature function variables
@@ -324,15 +328,18 @@
 !  O2W
    real(rk)   :: tO2BedW,tO2ProdVegW,tO2ProdVeg,tO2ProdVegS
    real(rk)   :: tO2RespVegS,tO2RespVegW,tO2UptNO3VegW
-!  Detritus in water,DW,Nitrogen,phosphorus
-   real(rk)   :: wDBedDetW,tDMortVegW
-   real(rk)   :: wNBedDetW,tNMortVegDetW,tNMortVegDet
-   real(rk)   :: wPBedDetW,tPMortVegDetW,tPMortVegDet
-!  Detritus in sediment,DW,Nitrogen,phosphorus
-   real(rk)   :: tDBedDetS,tDMortVegS
-   real(rk)   :: tNBedDetS,tNMortVegS,tNMortVegDetS
-   real(rk)   :: tPBedDetS,tPMortVegS,tPMortVegDetS
-
+!  Orgnics in water,DW,Nitrogen,phosphorus
+   real(rk)   :: wDBedTOMW,tDMortVegW
+   real(rk)   :: wNBedTOMW,tNMortVegTOMW,tNMortVegTOM
+   real(rk)   :: wPBedTOMW,tPMortVegTOMW,tPMortVegTOM
+!  Organics in sediment,DW,Nitrogen,phosphorus
+   real(rk)   :: tDBedPOMS,tDMortVegS
+   real(rk)   :: tNBedPOMS,tNMortVegS,tNMortVegTOMS
+   real(rk)   :: tPBedPOMS,tPMortVegS,tPMortVegTOMS
+!  Dissolved organics in sediment
+   real(rk)   :: tDBedDOMS,tNBedDOMS,tPBedDOMS
+   real(rk)   :: wDBedDOMW,wNBedDOMW,wPBedDOMW
+   real(rk)   :: wDBedPOMW,wNBedPOMW,wPBedPOMW
 !
 !EOP
 !-----------------------------------------------------------------------
@@ -340,7 +347,7 @@
 !  Spatial loop
    _FABM_HORIZONTAL_LOOP_BEGIN_
 !-----------------------------------------------------------------------
-!     Retrieve current (local) state variable values.
+!  Retrieve current (local) state variable values.
 !-----------------------------------------------------------------------
    _GET_HORIZONTAL_(self%id_sDVeg,sDVeg)
    _GET_HORIZONTAL_(self%id_sNVeg,sNVeg)
@@ -391,28 +398,28 @@
 !-----------------------------------------------------------------------
 !  the germination, allocation and reallocation process
 !-----------------------------------------------------------------------
-!    Initial_growth_only_once_a_year
-      if (Day < 1) then
-         aDayInitVeg=367
-      else if (uTm >= self%cTmInitVeg .and. aDayInitVeg > 366) then
-         aDayInitVeg = Day
-      else
-         aDayInitVeg=aDayInitVeg
-      endif
-!    setting_root_fration
-      if (Day < aDayInitVeg) then
-      bfRootVeg = self%fRootVegWin
-      else if (Day < aDayInitVeg + self%cLengAllo) then
+!  Initial_growth_only_once_a_year
+!  reset every New Year (careful only NH)
+   if (Day .lt. 1._rk) then
+      aDayInitVeg = -1._rk
+   end if
+!  check for vegitation start
+   if (uTm >= self%cTmInitVeg .and. aDayInitVeg .eq. -1) then
+      aDayInitVeg = Day
+   end if
+!  cases: northern hemisphere and southern hemisphere
+
+!  setting_root_fraction, shorten the code length
+   bfRootVeg = self%fRootVegWin
+   if (Day .lt. aDayInitVeg + self%cLengAllo) then
       bfRootVeg = 0.5*(self%fRootVegWin + self%fRootVegSum) + 0.5*(self%fRootVegWin - self%fRootVegSum) * &
       &cos(Pi/self%cLengAllo * (Day - aDayInitVeg))
-      else if (Day < self%cDayWinVeg) then
+   else if (Day .lt. self%cDayWinVeg) then
       bfRootVeg = self%fRootVegSum
-      else if (Day < self%cDayWinVeg + self%cLengAllo) then
+   else if (Day .lt. self%cDayWinVeg + self%cLengAllo) then
       bfRootVeg = 0.5*(self%fRootVegWin + self%fRootVegSum) - 0.5*(self%fRootVegWin - self%fRootVegSum) * &
       &cos(Pi/self%cLengAllo * (Day - self%cDayWinVeg))
-      else
-      bfRootVeg = self%fRootVegWin
-      endif
+   endif
 !  mortality_constant
    if (Day < self%cDayWinVeg) then
    bkMortVeg = self%kMortVegSum
@@ -436,16 +443,18 @@
    aDFloatVeg = self%fFloatVeg * aDShootVeg
 !  submerged_fraction_of_shoot
    bfSubVeg = 1.0_rk - self%fFloatVeg - self%fEmergVeg
+!  put in control,telling users
+!  (self%fFloatVeg + self%fEmergVeg) should not be more than 1.0
 !  submerged_biomass
    aDSubVeg = bfSubVeg * aDShootVeg
 !-----------------------------------------------------------------------
 !  vegetation migration
 !-----------------------------------------------------------------------
-!  migration_flux
+!  migration_flux_dry_weight
    tDMigrVeg = self%kMigrVeg * (self%cDVegIn - sDVeg)
-!  net_migration_flux
+!  net_migration_flux_P
    tPMigrVeg = self%kMigrVeg * (self%cPDVeg0*self%cDVegIn - sPVeg)
-!  net_migration_flux
+!  net_migration_flux_N
    tNMigrVeg = self%kMigrVeg * (self%cNDVeg0*self%cDVegIn - sNVeg)
 !-----------------------------------------------------------------------
 !  water coverage by vegetation
@@ -477,9 +486,9 @@
 !   aLLimShootVeg = self%fEmergVeg + self%fFloatVeg * (1.0 - afCovEmergVeg) + bfSubVeg * (1.0 &
 !   &- afCovSurfVeg) * 1.0 / (extc * sDepthW) * log( (1.0 + aLPAR1Veg / uhLVeg) /&
 !   & (1.0 + aLPAR2Veg / uhLVeg))
-   aLLimShootVeg = self%fEmergVeg + self%fFloatVeg * (1.0 - afCovEmergVeg) + bfSubVeg * (1.0 &
-   &- afCovSurfVeg) * 1.0 / (extc * self%cHeightVeg) * log( (1.0 + aLPAR1Veg / uhLVeg) /&
-   & (1.0 + aLPAR2Veg / uhLVeg))
+   aLLimShootVeg = self%fEmergVeg + self%fFloatVeg * (1.0 - afCovEmergVeg) &
+                 + bfSubVeg* (1.0 - afCovSurfVeg) * 1.0 / (extc * self%cHeightVeg) &
+                 * log( (1.0 + aLPAR1Veg / uhLVeg) / (1.0 + aLPAR2Veg / uhLVeg))
 !=======================================================================
    ufDay = 0.5_rk - 0.2_rk * cos(2.0_rk*Pi*Day / 365.0_rk)
 !  max._growth_rate_at_current_temp._AND_light
@@ -501,7 +510,7 @@
 !  intrinsic_net_increase_rate_of_vegetation
    akDIncrVeg = aMuTmLVeg - self%kDRespVeg * uFunTmRespVeg -bkMortVeg
 !  logistic_correction_of_vegetation
-   tDEnvVeg = max(0.0_rk, sDVeg**2.0_rk*akDIncrVeg / (self%cDCarrVeg+NearZero) )
+   tDEnvVeg = max(0.0_rk, sDVeg**2.0_rk*akDIncrVeg / (self%cDCarrVeg+NearZero))
 !  logistic_correction_of_production
    tDEnvProdVeg = aMuVeg / self%cMuMaxVeg * tDEnvVeg
 !  vegetation_production
@@ -547,19 +556,19 @@
       aVPUptVegS = 0.0_rk
    endif
 !  P_uptake_from_water
-      if (self%UseEmpUpt==0) then
+   if (self%UseEmpUpt==0) then
       tPUptVegW = aVPUptVegW * (aDSubVeg + aDFloatVeg)
-      else
+   else
       tPUptVegW = (1.0 - afPUptVegS) * aVPUptMaxCrVeg * sPO4W / (aVPUptMaxCrVeg / self%cAff&
       &PUptVeg + sPO4W) * sDVeg
-      endif
-!    P_uptake_from_pore_water_(by_root_fraction)
-      if (self%UseEmpUpt==0) then
+   endif
+! P_uptake_from_pore_water_(by_root_fraction)
+   if (self%UseEmpUpt==0) then
       tPUptVegS = aVPUptVegS * aDRootVeg
-      else
+   else
       tPUptVegS = afPUptVegS * aVPUptMaxCrVeg * oPO4S / (aVPUptMaxCrVeg / self%cAffPUptVeg &
       &+ oPO4S) * sDVeg
-      endif
+   endif
 
 !    total_P_uptake_vegetation
       tPUptVeg = tPUptVegW + tPUptVegS
@@ -608,7 +617,7 @@
 !  P_uptake_rate_by_roots
    aVPUptVegS = oPO4S * aVPUptMaxCrVeg / (ahPUptVeg + oPO4S)
 !=======================================================================
-!  the Dissimilation part!
+!  the dissimilation part!
 !=======================================================================
 !-----------------------------------------------------------------------
 !  vegetation respiration
@@ -618,9 +627,11 @@
 !-----------------------------------------------------------------------
 !  vegetation excretion,Nitroge
 !-----------------------------------------------------------------------
+#ifdef _V509_
+   tNExcrVeg = rNDVeg / (self%cNDVegMin + rNDVeg) * rNDVeg * tDRespVeg
+#endif
 !  N_excretion_by_vegetation
-!   tNExcrVeg = rNDVeg / (self%cNDVegMin + rNDVeg) * rNDVeg * tDRespVeg, v5.09
-   tNExcrVeg = (2.0_rk * rNDVeg) / (self%cNDVegMax + rNDVeg) * rNDVeg * tDRespVeg ! pl613
+   tNExcrVeg = (2.0_rk * rNDVeg) / (self%cNDVegMax + rNDVeg) * rNDVeg * tDRespVeg
 !-----------------------------------------------------------------------
 !  vegetation excretion,phosphorus
 !-----------------------------------------------------------------------
@@ -644,7 +655,7 @@
 !  P_mortality_flux_of_vegetation
    tPMortVeg = rPDVeg * tDMortVeg
 !-----------------------------------------------------------------------
-!  derivative_of_vegetation,the bird grazing part and management part is left to discussion
+!  derivative_of_vegetation
 !-----------------------------------------------------------------------
 !  derivative_of_vegetation_biomass
    tDBedVeg = tDMigrVeg + tDProdVeg- tDMortVeg - tDRespVeg
@@ -731,8 +742,6 @@
    tO2RespVegW = molO2molC * self%cCPerDW * bfSubVeg * tDRespVeg * aCorO2BOD
 !  root_O2_respiration
    tO2RespVegS = molO2molC * self%cCPerDW * bfRootVeg * tDRespVeg * afOxySed
-!   for first time step output
-!   tO2RespVegS = molO2molC * self%cCPerDW * bfRootVeg * tDRespVeg * 0.323292
 !  vegetation_O2_production
    tO2ProdVeg = molO2molC * self%cCPerDW * tDProdVeg
 !  O2_transport_to_roots
@@ -741,41 +750,49 @@
    tO2ProdVegW = min( tO2ProdVeg - tO2ProdVegS, bfSubVeg * tO2ProdVeg)
 !  total_water_O2_flux_in_vegetation_module
    tO2BedW = tO2ProdVegW - tO2RespVegW + tO2UptNO3VegW
-
 !-----------------------------------------------------------------------
-!  Update detritus  in water, DW, N and P
+!  Update organics  in water, DW, N and P
 !-----------------------------------------------------------------------
-!  mortality_flux_becoming_water_detritus
-   tDMortVegW = self%fDetWMortVeg * (1.0_rk - bfRootVeg) * tDMortVeg
-!  total_DW_flux_from_Vegetation_module_to_water_detritus
-   wDBedDetW = tDMortVegW
-!  mortality_flux_of_vegetation_becoming_detritus_N
-   tNMortVegDet = tNMortVeg - tNMortVegNH4
-!  mortality_flux_of_vegetation_becoming_detritus_N_in_water
-   tNMortVegDetW = self%fDetWMortVeg * (1.0_rk - bfRootVeg) * tNMortVegDet
-!  total_N_flux_from_Vegetation_module_to_water_detritus
-   wNBedDetW = tNMortVegDetW
-!  mortality_flux_of_vegetation_becoming_detritus_P
-   tPMortVegDet = tPMortVeg - tPMortVegPO4
-!  mortality_flux_of_vegetation_becoming_detritus_P_in_water
-   tPMortVegDetW = self%fDetWMortVeg * (1.0_rk - bfRootVeg) * tPMortVegDet
-!  total_P_flux_from_Vegetation_module_to_water_detritus
-   wPBedDetW = tPMortVegDetW
+!  mortality_flux_becoming_water_organics
+   tDMortVegW = self%fTOMWMortVeg * (1.0_rk - bfRootVeg) * tDMortVeg
+!  total_DW_flux_from_Vegetation_module_to_water_organics
+   wDBedPOMW = tDMortVegW
+   wDBedPOMW = wDBedTOMW * (1.0_rk - self%fVegDOMW)
+   wDBedDOMW = wDBedTOMW * self%fVegDOMW
+!  mortality_flux_of_vegetation_becoming_organic_N
+   tNMortVegTOM = tNMortVeg - tNMortVegNH4
+!  mortality_flux_of_vegetation_becoming_organic_N_in_water
+   tNMortVegTOMW = self%fTOMWMortVeg * (1.0_rk - bfRootVeg) * tNMortVegTOM
+!  total_N_flux_from_Vegetation_module_to_water_organics
+   wNBedTOMW = tNMortVegTOMW
+   wNBedPOMW = wNBedTOMW * (1.0_rk - self%fVegDOMW)
+   wNBedDOMW = wNBedTOMW * self%fVegDOMW
+!  mortality_flux_of_vegetation_becoming_organics_P
+   tPMortVegTOM = tPMortVeg - tPMortVegPO4
+!  mortality_flux_of_vegetation_becoming_organic_P_in_water
+   tPMortVegTOMW = self%fTOMWMortVeg * (1.0_rk - bfRootVeg) * tPMortVegTOM
+!  total_P_flux_from_Vegetation_module_to_water_organics
+   wPBedTOMW = tPMortVegTOMW
+   wPBedPOMW = wPBedTOMW * (1.0_rk - self%fVegDOMW)
+   wPBedDOMW = wPBedTOMW * self%fVegDOMW
 !---------------------------------------------------------------------------
-!  Update detritus  in sediment, DW, N and P
+!  Update organics  in sediment, DW, N and P
 !---------------------------------------------------------------------------
-!  mortality_flux_becoming_sediment_detritus
+!  mortality_flux_becoming_sediment_organics
    tDMortVegS = tDMortVeg - tDMortVegW
-!  total_DW_flux_from_Vegetation_module_to_sediment_detritus
-   tDBedDetS = tDMortVegS
-!  mortality_flux_of_vegetation_becoming_detritus_N_in_sediment
-   tNMortVegDetS = tNMortVegDet - tNMortVegDetW
-!  total_N_flux_from_Vegetation_module_to_sediment_detritus
-   tNBedDetS = tNMortVegDetS
-!  mortality_flux_of_vegetation_becoming_detritus_P_in_sediment
-   tPMortVegDetS = tPMortVegDet - tPMortVegDetW
-!  total_P_flux_from_Vegetation_module_to_sediment_detritus
-   tPBedDetS = tPMortVegDetS
+!  total_DW_flux_from_Vegetation_module_to_sediment_organics
+   tDBedPOMS = tDMortVegS * (1.0_rk - self%fVegDOMS)
+   tDBedDOMS = tDMortVegS * self%fVegDOMS
+!  mortality_flux_of_vegetation_becoming_organic_N_in_sediment
+   tNMortVegTOMS = tNMortVegTOM - tNMortVegTOMW
+!  total_N_flux_from_Vegetation_module_to_sediment_organics
+   tNBedPOMS = tNMortVegTOMS* (1.0_rk - self%fVegDOMS)
+   tNBedDOMS = tNMortVegTOMS * self%fVegDOMS
+!  mortality_flux_of_vegetation_becoming_organic_P_in_sediment
+   tPMortVegTOMS = tPMortVegTOM - tPMortVegTOMW
+!  total_P_flux_from_Vegetation_module_to_sediment_organics
+   tPBedPOMS = tPMortVegTOMS * (1.0_rk - self%fVegDOMS)
+   tPBedDOMS = tPMortVegTOMS * self%fVegDOMS
 !-----------------------------------------------------------------------
 !  Update local state variables
 !-----------------------------------------------------------------------
@@ -793,54 +810,58 @@
    _SET_BOTTOM_EXCHANGE_(self%id_NO3poolW,wNBedNO3W)
    _SET_BOTTOM_EXCHANGE_(self%id_PO4poolW,wPBedPO4W)
    _SET_BOTTOM_EXCHANGE_(self%id_O2poolW,tO2BedW)
-   _SET_BOTTOM_EXCHANGE_(self%id_DDetpoolW,wDBedDetW)
-   _SET_BOTTOM_EXCHANGE_(self%id_DNetpoolW,wNBedDetW)
-   _SET_BOTTOM_EXCHANGE_(self%id_DPetpoolW,wPBedDetW)
+   _SET_BOTTOM_EXCHANGE_(self%id_DPOMpoolW,wDBedPOMW)
+   _SET_BOTTOM_EXCHANGE_(self%id_NPOMpoolW,wNBedPOMW)
+   _SET_BOTTOM_EXCHANGE_(self%id_PPOMpoolW,wPBedPOMW)
+   _SET_BOTTOM_EXCHANGE_(self%id_DDOMpoolW,wDBedDOMW)
+   _SET_BOTTOM_EXCHANGE_(self%id_NDOMpoolW,wNBedDOMW)
+   _SET_BOTTOM_EXCHANGE_(self%id_PDOMpoolW,wPBedDOMW)
 !  in the sediment
    _SET_ODE_BEN_(self%id_NH4poolS,tNBedNH4S)
    _SET_ODE_BEN_(self%id_NO3poolS,tNBedNO3S)
    _SET_ODE_BEN_(self%id_PO4poolS,tPBedPO4S)
-   _SET_ODE_BEN_(self%id_DDetpoolS,tDBedDetS)
-   _SET_ODE_BEN_(self%id_DNetpoolS,tNBedDetS)
-   _SET_ODE_BEN_(self%id_DPetpoolS,tPBedDetS)
+   _SET_ODE_BEN_(self%id_DPOMpoolS,tDBedPOMS)
+   _SET_ODE_BEN_(self%id_NPOMpoolS,tNBedPOMS)
+   _SET_ODE_BEN_(self%id_PPOMpoolS,tPBedPOMS)
+   _SET_ODE_BEN_(self%id_DDOMpoolS,tDBedDOMS)
+   _SET_ODE_BEN_(self%id_NDOMpoolS,tNBedDOMS)
+   _SET_ODE_BEN_(self%id_PDOMpoolS,tPBedDOMS)
 !-----------------------------------------------------------------------
 !  output diagnostic variables for external links
 !-----------------------------------------------------------------------
 !  Export diagnostic variables
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_aDSubVeg,aDSubVeg)
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_aCovVeg,aCovVeg)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tDBedDetS,tDBedDetS)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tDBedPOMS,tDBedPOMS)
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_afCovSurfVeg,afCovSurfVeg)
-
 !  for vegetation light attenutaion output
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_aDayInitVeg,aDayInitVeg)
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tDBedVeg,tDBedVeg)
-
-!  light output
+!  light variables output
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_macroextinction,extc)
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_aLPAR1Veg,aLPAR1Veg)
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_aLPAR2Veg,aLPAR2Veg)
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_allimveg,aLLimShootVeg)
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_aNutLimVeg,aNutLimVeg)
+#ifdef _DEVELOPMENT_
 !  Output diagnostic variables for modular fluxes
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tDBedVeg,tDBedVeg*86400.0_rk)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tNBedVeg,tNBedVeg*86400.0_rk)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tPBedVeg,tPBedVeg*86400.0_rk)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_wNBedNH4W,wNBedNH4W/dz*86400.0_rk)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_wNBedNO3W,wNBedNO3W/dz*86400.0_rk)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_wPBedPO4W,wPBedPO4W/dz*86400.0_rk)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tO2BedW,tO2BedW/dz*86400.0_rk)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_wDBedDetW,wDBedDetW/dz*86400.0_rk)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_wNBedDetW,wNBedDetW/dz*86400.0_rk)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_wPBedDetW,wPBedDetW/dz*86400.0_rk)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tNBedNH4S,tNBedNH4S*86400.0_rk)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tNBedNO3S,tNBedNO3S*86400.0_rk)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tPBedPO4S,tPBedPO4S*86400.0_rk)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tDBedDetSflux,tDBedDetS*86400.0_rk)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tNBedDetS,tNBedDetS*86400.0_rk)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tPBedDetS,tPBedDetS*86400.0_rk)
-
-
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tDBedVeg,tDBedVeg*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tNBedVeg,tNBedVeg*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tPBedVeg,tPBedVeg*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_wNBedNH4W,wNBedNH4W/dz*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_wNBedNO3W,wNBedNO3W/dz*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_wPBedPO4W,wPBedPO4W/dz*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tO2BedW,tO2BedW/dz*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_wDBedPOMW,wDBedPOMW/dz*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_wNBedPOMW,wNBedPOMW/dz*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_wPBedPOMW,wPBedPOMW/dz*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tNBedNH4S,tNBedNH4S*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tNBedNO3S,tNBedNO3S*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tPBedPO4S,tPBedPO4S*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tDBedPOMSflux,tDBedPOMS*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tNBedPOMS,tNBedPOMS*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tPBedPOMS,tPBedPOMS*secs_pr_day)
+#endif
    _FABM_HORIZONTAL_LOOP_END_
 !
 ! Spatial loop end
@@ -854,77 +875,30 @@
 !-----------------------------------------------------------------------
 !BOP
 !
-! !IROUTINE: Get the light extinction coefficient due to biogeochemical
-! variables
+! !IROUTINE: Get the light extinction coefficient due to macrophytes
 !
 ! !INTERFACE:
    subroutine get_light_extinction(self,_ARGUMENTS_GET_EXTINCTION_)
 !
 ! !INPUT PARAMETERS:
-   class (type_pclake_macrophytes), intent(in) :: self
+   class (type_au_pclake_macrophytes), intent(in) :: self
    _DECLARE_ARGUMENTS_GET_EXTINCTION_
 !
 ! !REVISION HISTORY:
-!  Original author(s): Jorn Bruggeman
+!  Original author(s): Fenjuan Hu
 !
 ! !LOCAL VARIABLES:
-   real(rk) :: sDVeg,uTm,sDepthW
-   real(rk) :: Day
-   real(rk),save :: aDayInitVeg
-   real(rk) :: bfRootVeg,bfShootVeg,aDShootVeg
-   real(rk) :: bfSubVeg,aDSubVeg
 !
 !EOP
 !-----------------------------------------------------------------------
 !BOC
-   ! Enter spatial loops (if any)
+!  Enter spatial loop
    _LOOP_BEGIN_
 
-   ! Retrieve current (local) state variable values.
-   _GET_HORIZONTAL_(self%id_sDVeg,sDVeg)
-   _GET_GLOBAL_(self%id_Day,Day)
-   _GET_(self%id_uTm,uTm)
-   _GET_HORIZONTAL_(self%id_sDepthW,sDepthW)
 
 !  Self-shading with explicit contribution from background phytoplankton concentration.
-!    Initial_growth_only_once_a_year
-   if (Day < 1) then
-      aDayInitVeg=367
-   else if (uTm >= self%cTmInitVeg .and. aDayInitVeg > 366) then
-      aDayInitVeg = Day
-   else
-      aDayInitVeg=aDayInitVeg
-   endif
-
-! setting_root_fration
-   if (Day < aDayInitVeg) then
-   bfRootVeg = self%fRootVegWin
-   else if (Day < aDayInitVeg + self%cLengAllo) then
-   bfRootVeg = 0.5*(self%fRootVegWin + self%fRootVegSum) + 0.5*(self%fRootVegWin - self%fRootVegSum) * &
-   &cos(Pi/self%cLengAllo * (Day - aDayInitVeg))
-   else if (Day < self%cDayWinVeg) then
-   bfRootVeg = self%fRootVegSum
-   else if (Day < self%cDayWinVeg + self%cLengAllo) then
-   bfRootVeg = 0.5*(self%fRootVegWin + self%fRootVegSum) - 0.5*(self%fRootVegWin - self%fRootVegSum) * &
-   &cos(Pi/self%cLengAllo * (Day - self%cDayWinVeg))
-   else
-   bfRootVeg = self%fRootVegWin
-   endif
-!-----------------------------------------------------------------------
-!  fractions of roots and shoots
-!-----------------------------------------------------------------------
-!  shoot_fraction
-   bfShootVeg = 1.0_rk - bfRootVeg
-!  shoot_biomass
-   aDShootVeg = bfShootVeg * sDVeg
-!  submerged_fraction_of_shoot
-   bfSubVeg = 1.0_rk - self%fFloatVeg - self%fEmergVeg
-!  submerged_biomass
-   aDSubVeg = bfSubVeg * aDShootVeg
-!  convert unit from area loading to concentration
-   aDSubVeg=aDSubVeg/sDepthW
-
-   _SET_EXTINCTION_(self%cExtSpVeg*aDSubVeg)
+!!!UPDATE, FEH, Dec. 14th, 2016
+   _SET_EXTINCTION_(self%cExtSpVeg*self%aDSubVeg)
 
    ! Leave spatial loops (if any)
    _LOOP_END_
@@ -936,7 +910,7 @@
 !EOP
 !-----------------------------------------------------------------------
 
-   end module pclake_macrophytes
+   end module au_pclake_macrophytes
 
 !------------------------------------------------------------------------------
 ! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org
