@@ -3,11 +3,11 @@
 !BOP
 !
 ! !INTERFACE:
-   module au_pclake_abiotic_water
+   module pclake_abiotic_water
 ! !USES:
    use fabm_types
    use fabm_standard_variables
-   use au_pclake_utility, ONLY: uFunTmAbio
+   use pclake_utility, ONLY: uFunTmAbio
 
    implicit none
 
@@ -15,7 +15,7 @@
    private
 !
 ! !PUBLIC DERIVED TYPES:
-   type, extends(type_base_model),public :: type_au_pclake_abiotic_water
+   type, extends(type_base_model),public :: type_pclake_abiotic_water
 !  local state variable identifiers
 !  sDIMW: inorganic matter concentration, in dry-weight, gDW/m**3
 !  sDPOMW, partical organic matter concentration, in dry-weight, gDW/m**3
@@ -86,7 +86,7 @@
    procedure :: get_light_extinction
    procedure :: do_surface
 
-   end type type_au_pclake_abiotic_water
+   end type type_pclake_abiotic_water
 
 !  private data members
    real(rk),parameter :: secs_pr_day=86400.0_rk
@@ -114,7 +114,7 @@
 !
 
 ! !INPUT PARAMETERS:
-   class (type_au_pclake_abiotic_water), intent(inout), target  :: self
+   class (type_pclake_abiotic_water), intent(inout), target  :: self
    integer,                          intent(in)            :: configunit
 
 !EOP
@@ -256,7 +256,7 @@
    subroutine do(self,_ARGUMENTS_DO_)
 !
 ! !INPUT PARAMETERS:
-   class (type_au_pclake_abiotic_water), intent(in)    :: self
+   class (type_pclake_abiotic_water), intent(in)    :: self
    _DECLARE_ARGUMENTS_DO_
 ! !LOCAL VARIABLES:
 !  carriers for local state variables
@@ -490,7 +490,7 @@
    subroutine get_light_extinction(self,_ARGUMENTS_GET_EXTINCTION_)
 !
 ! !INPUT PARAMETERS:
-   class (type_au_pclake_abiotic_water), intent(in) :: self
+   class (type_pclake_abiotic_water), intent(in) :: self
    _DECLARE_ARGUMENTS_GET_EXTINCTION_
 !
 ! !REVISION HISTORY:
@@ -530,7 +530,7 @@
 !
 ! !INTERFACE:
    subroutine do_surface(self,_ARGUMENTS_DO_SURFACE_)
-   class (type_au_pclake_abiotic_water),intent(in) :: self
+   class (type_pclake_abiotic_water),intent(in) :: self
    _DECLARE_ARGUMENTS_DO_SURFACE_
 !  local variables
    real(rk)                   :: uVWind,sO2W,uTm
@@ -573,7 +573,7 @@
 !EOC
 
 !-----------------------------------------------------------------------
-   end module au_pclake_abiotic_water
+   end module pclake_abiotic_water
 !------------------------------------------------------------------------------
 ! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org
 !------------------------------------------------------------------------------

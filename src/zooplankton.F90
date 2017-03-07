@@ -3,10 +3,10 @@
 !BOP
 !
 ! !INTERFACE:
-   module au_pclake_zooplankton
+   module pclake_zooplankton
 ! !USES:
    use fabm_types
-   use au_pclake_utility, ONLY:uFunTmBio
+   use pclake_utility, ONLY:uFunTmBio
 
    implicit none
 
@@ -14,7 +14,7 @@
    private
 !
 ! !PUBLIC DERIVED TYPES:
-   type, extends(type_base_model),public :: type_au_pclake_zooplankton
+   type, extends(type_base_model),public :: type_pclake_zooplankton
 !  local state variable identifiers
 !  id_sDZoo,zooplankton concentration in dry-weight, gDW/m**3
 !  id_sPZoo,zooplankton concentration in nitrogen element, gN/m**3
@@ -65,7 +65,7 @@
    procedure :: initialize
    procedure :: do
 
-   end type type_au_pclake_zooplankton
+   end type type_pclake_zooplankton
 
 !  private data members(API0.92)
    real(rk),parameter :: secs_pr_day=86400.0_rk
@@ -89,7 +89,7 @@
 ! !DESCRIPTION:
 !
 ! !INPUT PARAMETERS:
-   class (type_au_pclake_zooplankton), intent(inout), target :: self
+   class (type_pclake_zooplankton), intent(inout), target :: self
    integer,                     intent(in)            :: configunit
 !
 !EOP
@@ -205,7 +205,7 @@
    subroutine do(self,_ARGUMENTS_DO_)
 !
 !  INPUT PARAMETERS:
-   class (type_au_pclake_zooplankton), intent(in)    :: self
+   class (type_pclake_zooplankton), intent(in)    :: self
    _DECLARE_ARGUMENTS_DO_
 !  LOCAL VARIABLES:
 !  Carriers for environment dependencies
@@ -637,7 +637,7 @@
 !EOC
 !-----------------------------------------------------------------------
 !
-   end module au_pclake_zooplankton
+   end module pclake_zooplankton
 
 !------------------------------------------------------------------------------
 ! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org

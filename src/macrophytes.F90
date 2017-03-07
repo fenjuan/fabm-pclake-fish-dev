@@ -3,12 +3,12 @@
 !BOP
 !
 ! !INTERFACE:
-   module au_pclake_macrophytes
+   module pclake_macrophytes
 ! !USES:
    use fabm_types
    use fabm_expressions
    use fabm_standard_variables
-   use au_pclake_utility, ONLY:uFunTmVeg
+   use pclake_utility, ONLY:uFunTmVeg
 
    implicit none
 
@@ -16,7 +16,7 @@
    private
 
 ! !PUBLIC DERIVED TYPES:
-   type, extends(type_base_model),public :: type_au_pclake_macrophytes
+   type, extends(type_base_model),public :: type_pclake_macrophytes
 !  local state variable identifiers
 !  id_sDVeg,macrophytes in dry-weight, gDW/m**2
 !  id_sPVeg,macrophytes in nitrogen element, gN/m**2
@@ -92,7 +92,7 @@
    procedure :: initialize
    procedure :: do_bottom
    procedure :: get_light_extinction
-   end type type_au_pclake_macrophytes
+   end type type_pclake_macrophytes
 
 !  private data members(API0.92)
    real(rk),parameter :: secs_pr_day=86400.0_rk
@@ -121,7 +121,7 @@
 ! !DESCRIPTION:
 !
 ! !INPUT PARAMETERS:
-   class (type_au_pclake_macrophytes), intent(inout), target :: self
+   class (type_pclake_macrophytes), intent(inout), target :: self
    integer,                          intent(in)            :: configunit
 !EOP
 !-----------------------------------------------------------------------
@@ -268,7 +268,7 @@
    subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
 !
 ! !INPUT PARAMETERS:
-   class (type_au_pclake_macrophytes), intent(in)    :: self
+   class (type_pclake_macrophytes), intent(in)    :: self
    _DECLARE_ARGUMENTS_DO_BOTTOM_
 ! !LOCAL VARIABLES:
 !  Carriers for environment dependencies
@@ -881,7 +881,7 @@
    subroutine get_light_extinction(self,_ARGUMENTS_GET_EXTINCTION_)
 !
 ! !INPUT PARAMETERS:
-   class (type_au_pclake_macrophytes), intent(in) :: self
+   class (type_pclake_macrophytes), intent(in) :: self
    _DECLARE_ARGUMENTS_GET_EXTINCTION_
 !
 ! !REVISION HISTORY:
@@ -910,7 +910,7 @@
 !EOP
 !-----------------------------------------------------------------------
 
-   end module au_pclake_macrophytes
+   end module pclake_macrophytes
 
 !------------------------------------------------------------------------------
 ! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org

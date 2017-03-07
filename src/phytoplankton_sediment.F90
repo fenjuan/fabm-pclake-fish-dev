@@ -3,10 +3,10 @@
 !BOP
 !
 ! !INTERFACE:
-   module au_pclake_phytoplankton_sediment
+   module pclake_phytoplankton_sediment
 ! !USES:
    use fabm_types
-   use au_pclake_utility, ONLY:uFunTmBio
+   use pclake_utility, ONLY:uFunTmBio
 
    implicit none
 
@@ -14,7 +14,7 @@
    private
 
 ! !PUBLIC DERIVED TYPES:
-   type, extends(type_base_model),public :: type_au_pclake_phytoplankton_sediment
+   type, extends(type_base_model),public :: type_pclake_phytoplankton_sediment
 !  local state variable identifiers
 !  local state variable identifiers
 !  id_sDDiatS,id_sDGrenS,id_sDBlueS: phytoplankton concentration in dry-weight, gDW/m**2
@@ -73,7 +73,7 @@
 
 
 
-   end type type_au_pclake_phytoplankton_sediment
+   end type type_pclake_phytoplankton_sediment
 
 
 !  private data members(API0.92)
@@ -95,7 +95,7 @@
    subroutine initialize(self,configunit)
 !
 ! !INPUT PARAMETERS:
-   class (type_au_pclake_phytoplankton_sediment), intent(inout), target :: self
+   class (type_pclake_phytoplankton_sediment), intent(inout), target :: self
    integer,                     intent(in)            :: configunit
 
 !EOP
@@ -220,7 +220,7 @@
    subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
 !
 ! !INPUT PARAMETERS:
-   class (type_au_pclake_phytoplankton_sediment), intent(in)    :: self
+   class (type_pclake_phytoplankton_sediment), intent(in)    :: self
    _DECLARE_ARGUMENTS_DO_BOTTOM_
 ! !LOCAL VARIABLES:
 !  state variables value carriers
@@ -552,7 +552,7 @@
 !EOP
 !-----------------------------------------------------------------------
 
-   end module au_pclake_phytoplankton_sediment
+   end module pclake_phytoplankton_sediment
 
 !------------------------------------------------------------------------------
 ! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org

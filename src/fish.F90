@@ -3,11 +3,11 @@
 !BOP
 !
 ! !INTERFACE:
-   module au_pclake_fish
+   module pclake_fish
 
 ! !USES:
    use fabm_types
-   use au_pclake_utility, ONLY:uFunTmBio
+   use pclake_utility, ONLY:uFunTmBio
 
    implicit none
 
@@ -15,7 +15,7 @@
    private
 !
 ! !PUBLIC DERIVED TYPES:
-   type, extends(type_base_model),public :: type_au_pclake_fish
+   type, extends(type_base_model),public :: type_pclake_fish
 !  local state variable identifiers
 !  id_sDFiJv,zooplanktivorous fish concentration in dry-weight, gDW/m**2
 !  id_sPFiJv,zooplanktivorous fish concentration in nitrogen element, gN/m**2
@@ -86,7 +86,7 @@
    procedure :: initialize
    procedure :: do_bottom
 
-   end type type_au_pclake_fish
+   end type type_pclake_fish
 
 !  private data members(API0.92)
    real(rk),parameter :: secs_pr_day=86400.0_rk
@@ -110,7 +110,7 @@
 ! !DESCRIPTION:
 !
 ! !INPUT PARAMETERS:
-   class (type_au_pclake_fish), intent(inout), target :: self
+   class (type_pclake_fish), intent(inout), target :: self
    integer,                     intent(in)            :: configunit
 !EOP
 !-----------------------------------------------------------------------
@@ -285,7 +285,7 @@
    subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
 !
 !  INPUT PARAMETERS:
-   class (type_au_pclake_fish), intent(in)    :: self
+   class (type_pclake_fish), intent(in)    :: self
    _DECLARE_ARGUMENTS_DO_BOTTOM_
 !  LOCAL VARIABLES:
 !  Carriers for environment dependencies
@@ -1105,7 +1105,7 @@
 
 !EOC
 !-----------------------------------------------------------------------
-   end module au_pclake_fish
+   end module pclake_fish
 
 !------------------------------------------------------------------------------
 ! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org

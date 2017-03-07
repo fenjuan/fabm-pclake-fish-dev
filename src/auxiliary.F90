@@ -4,11 +4,11 @@
 !BOP
 !
 ! !INTERFACE:
-   module au_pclake_auxiliary
+   module pclake_auxiliary
 ! !USES:
    use fabm_types
    use fabm_expressions
-   use au_pclake_utility, ONLY: uFunTmAbio,uFunTmBio
+   use pclake_utility, ONLY: uFunTmAbio,uFunTmBio
 
    implicit none
 
@@ -16,7 +16,7 @@
       private
 !
 ! !PUBLIC DERIVED TYPES:
-   type, extends(type_base_model),public :: type_au_pclake_auxiliary
+   type, extends(type_base_model),public :: type_pclake_auxiliary
 !  diagnostic variables for local output(should be discussed and added later???)
 !  state dependencies identifiers
 !  SW:Sediment to Water
@@ -105,7 +105,7 @@
    procedure ::  initialize
    procedure ::  do_bottom
    PROCEDURE ::  do_surface
-   end type type_au_pclake_auxiliary
+   end type type_pclake_auxiliary
 
 !  private data members(API0.92)
    real(rk),parameter :: secs_pr_day=86400.0_rk
@@ -128,7 +128,7 @@
 ! !DESCRIPTION:
 !
 ! !INPUT PARAMETERS:
-   class (type_au_pclake_auxiliary), intent(inout), target :: self
+   class (type_pclake_auxiliary), intent(inout), target :: self
    integer,                     intent(in)            :: configunit
 
 !  Store parameter values in our own derived type
@@ -316,7 +316,7 @@
    subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
 !
 ! !INPUT PARAMETERS:
-   class (type_au_pclake_auxiliary), intent(in)    :: self
+   class (type_pclake_auxiliary), intent(in)    :: self
    _DECLARE_ARGUMENTS_DO_BOTTOM_
 ! !LOCAL VARIABLES:
 !  carriers for state dependencies in different modules
@@ -837,7 +837,7 @@
 !  including POM nitrogen, ammonium, nitrate, phosphate,
 !  POM phosphorus
  subroutine do_surface(self,_ARGUMENTS_DO_SURFACE_)
-   class (type_au_pclake_auxiliary),intent(in) :: self
+   class (type_pclake_auxiliary),intent(in) :: self
    _DECLARE_ARGUMENTS_DO_SURFACE_
 !  local variables
 
@@ -859,7 +859,7 @@
 !EOC
 
 !------------------------------------------------------------------------------
-   end module au_pclake_auxiliary
+   end module pclake_auxiliary
 !------------------------------------------------------------------------------
 ! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org
 !------------------------------------------------------------------------------

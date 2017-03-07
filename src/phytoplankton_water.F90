@@ -1,13 +1,13 @@
 #include "fabm_driver.h"
 !-----------------------------------------------------------------------
 !BOP
-   module au_pclake_phytoplankton_water
+   module pclake_phytoplankton_water
 !
 ! !USES:
    use fabm_types
    use fabm_expressions
    use fabm_standard_variables
-   use au_pclake_utility, ONLY:uFunTmBio
+   use pclake_utility, ONLY:uFunTmBio
 
    implicit none
 
@@ -15,7 +15,7 @@
    private
 !
 ! !PUBLIC DERIVED TYPES:
-   type, extends(type_base_model),public :: type_au_pclake_phytoplankton_water
+   type, extends(type_base_model),public :: type_pclake_phytoplankton_water
 !  local state variable identifiers
 !  id_sDDiatW,id_sDGrenW,id_sDBlueW: phytoplankton concentration in dry-weight, gDW m-**3
 !  id_sPDiatW,id_sPGrenW,id_sPBlueW: phytoplankton concentration in nitrogen element, gN m-**3
@@ -105,7 +105,7 @@
    procedure :: initialize
    procedure :: do
    procedure :: get_light_extinction
-   end type type_au_pclake_phytoplankton_water
+   end type type_pclake_phytoplankton_water
 
 !  private data members(API0.92)
    real(rk),parameter :: secs_pr_day=86400.0_rk
@@ -133,7 +133,7 @@
    subroutine initialize(self,configunit)
 !
 ! !INPUT PARAMETERS:
-   class (type_au_pclake_phytoplankton_water), intent(inout), target :: self
+   class (type_pclake_phytoplankton_water), intent(inout), target :: self
    integer,                     intent(in)            :: configunit
 !  Store parameter values in our own derived type
 !  NB: all rates must be provided in values per day,
@@ -333,7 +333,7 @@
    subroutine do(self,_ARGUMENTS_DO_)
 !
 ! !INPUT PARAMETERS:
-   class (type_au_pclake_phytoplankton_water), intent(in)    :: self
+   class (type_pclake_phytoplankton_water), intent(in)    :: self
    _DECLARE_ARGUMENTS_DO_
 ! !LOCAL VARIABLES:
 !  environmental dependency variables
@@ -956,7 +956,7 @@
    subroutine get_light_extinction(self,_ARGUMENTS_GET_EXTINCTION_)
 !
 ! !INPUT PARAMETERS:
-   class (type_au_pclake_phytoplankton_water), intent(in) :: self
+   class (type_pclake_phytoplankton_water), intent(in) :: self
    _DECLARE_ARGUMENTS_GET_EXTINCTION_
 !
 ! !REVISION HISTORY:
@@ -993,7 +993,7 @@
 
    end subroutine get_light_extinction
 !EOC
-   end module au_pclake_phytoplankton_water
+   end module pclake_phytoplankton_water
 
 !------------------------------------------------------------------------------
 ! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org

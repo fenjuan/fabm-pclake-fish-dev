@@ -3,17 +3,17 @@
 !BOP
 !
 ! !INTERFACE:
-   module au_pclake_abiotic_sediment
+   module pclake_abiotic_sediment
 
 ! !USES:
    use fabm_types
-   use au_pclake_utility, ONLY: uFunTmAbio
+   use pclake_utility, ONLY: uFunTmAbio
    implicit none
 !  default: all is private.
    private
 !
 ! !PUBLIC DERIVED TYPES:
-   type, extends(type_base_model),public :: type_au_pclake_abiotic_sediment
+   type, extends(type_base_model),public :: type_pclake_abiotic_sediment
 !  local state variable identifers
 !  sDIMS: inorganic matter concentration, in dry-weight,gDW/m**2
 !  sDPOMS, partical orgaincs, in dry-weight,gDW/m**2
@@ -101,7 +101,7 @@
 !
    procedure initialize
    procedure do_bottom
-   end type type_au_pclake_abiotic_sediment
+   end type type_pclake_abiotic_sediment
 
 !  private data members(API0.92)
    real(rk),parameter :: secs_pr_day= 86400.0_rk
@@ -125,7 +125,7 @@
 ! !INTERFACE:
    subroutine initialize(self,configunit)
 ! !INPUT PARAMETERS:
-   class (type_au_pclake_abiotic_sediment), intent(inout), target :: self
+   class (type_pclake_abiotic_sediment), intent(inout), target :: self
    integer,                              intent(in)            :: configunit
 !  Store parameter values in our own derived type
 !  NB: all rates must be provided in values per day,
@@ -272,7 +272,7 @@
    subroutine do_bottom(self,_ARGUMENTS_DO_BOTTOM_)
 !
 ! ! INPUT PARAMETERS:
-   class (type_au_pclake_abiotic_sediment), intent(in)    :: self
+   class (type_pclake_abiotic_sediment), intent(in)    :: self
    _DECLARE_ARGUMENTS_DO_BOTTOM_
 !
 ! !LOCAL VARIABLES:
@@ -618,7 +618,7 @@
 !EOC
 !-----------------------------------------------------------------------
 
-   end module au_pclake_abiotic_sediment
+   end module pclake_abiotic_sediment
 
 !------------------------------------------------------------------------------
 ! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org

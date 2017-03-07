@@ -5,7 +5,7 @@
 ! !MODULE: fabm_pclake_utility
 !
 ! !INTERFACE:
-   module au_pclake_utility
+   module pclake_utility
 !
 !  Originally implemented by Fenjuan Hu (fenjuan@bios.au.dk)
 !
@@ -90,7 +90,7 @@
 
 !-----------------------------------------------------------------------
 
-   end module au_pclake_utility
+   end module pclake_utility
 
 !------------------------------------------------------------------------------
 ! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org
