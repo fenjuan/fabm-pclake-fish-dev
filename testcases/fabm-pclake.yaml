@@ -1,7 +1,7 @@
 instances:
   abiotic_water:
     long_name: abiotic_process_in_water
-    model: au/pclake/abiotic_water
+    model: pclake/abiotic_water
     parameters:
       cCPerDW: 0.4                                               # C content of organic matter (gC/gDW), default = 0.4
       cExtSpPOM: 0.15                                            # specific extinction organics (m2/gDW), default = 0.15
@@ -53,7 +53,7 @@ instances:
       sSiDOMW: 0.025                                          # organics silica in water (g m-3)
   abiotic_sediment:
     long_name: abiotic_process_in_sediment
-    model: au/pclake/abiotic_sediment
+    model: pclake/abiotic_sediment
     parameters:
       cDepthS: 0.3                                               # sediment depth (m), default = 0.1
       fRefrPOMS: 0.15                                            # refractory fraction of sediment orgainic matters ([-]), default = 0.15
@@ -128,7 +128,7 @@ instances:
       SiDOM_diffusion_flux: abiotic_water/sSiDOMW           # SiDOM_diffusion_flux (g m-3)
   phytoplankton_water:
     long_name: phytoplankton_in_water
-    model: au/pclake/phytoplankton_water
+    model: pclake/phytoplankton_water
     parameters:
       cSigTmDiat: 20.0                                           # temperature constant diatoms (sigma in Gaussian curve) (�C), default = 20.0
       cTmOptDiat: 18.0                                           # optimum temp. diatoms (�C), default = 18.0
@@ -229,7 +229,7 @@ instances:
       surface_vegetation_coverage: macrophytes/afCovSurfVeg      # Surface_vegetation_coverage ([-])
   phytoplankton_sediment:
     long_name: phytoplankton_in_sediment
-    model: au/pclake/phytoplankton_sediment
+    model: pclake/phytoplankton_sediment
     parameters:
       cSigTmDiat: 20.0                                           # temperature constant diatoms (sigma in Gaussian curve) (�C), default = 20.0
       cTmOptDiat: 18.0                                           # optimum temp. diatoms (�C), default = 18.0
@@ -287,7 +287,7 @@ instances:
       DOM_Si_pool_sediment: abiotic_sediment/sSiDOMS
   macrophytes:
     long_name: macrophytes
-    model: au/pclake/macrophytes
+    model: pclake/macrophytes
     parameters:
       cDVegIn: 1.0                                               # external vegetation density (gD/m2), default = 1.0
       kMigrVeg: 0.001                                            # vegetation migration rate (d-1), default = 0.001
@@ -362,7 +362,7 @@ instances:
       oxic_layer_value: abiotic_sediment/afOxySed                # Oxic_layer_value ([-])
   zooplankton:
     long_name: zooplankton
-    model: au/pclake/zooplankton
+    model: pclake/zooplankton
     parameters:
       cSigTmZoo: 13.0                                            # temperature constant zooplankton(sigma in Gaussian curve) (�C), default = 13.0
       cTmOptZoo: 25.0                                            # optimum temp. zooplankton (�C), default = 25.0
@@ -423,7 +423,7 @@ instances:
       DOM_Si_pool_water: abiotic_water/sSiDOMW
   fish:
     long_name: fish
-    model: au/pclake/fish
+    model: pclake/fish
     parameters:
       kMigrFish: 0.001                                           # fish migration rate (d-1), default = 0.001
       cDFiJvIn: 0.005                                            # external fish density (gDW m-2), default = 0.005
@@ -580,7 +580,7 @@ instances:
       weights: fish_habitat/weights
   zoobenthos:
     long_name: zoobenthos
-    model: au/pclake/zoobenthos
+    model: pclake/zoobenthos
     parameters:
       cDBentIn: 0.01                                             # external zoobenthos density (gDW m-2), default = 0.01
       kMigrBent: 0.001                                           # zoobenthos migration rate (d-1), default = 0.001
@@ -639,7 +639,7 @@ instances:
       DOM_Si_pool_sediment: abiotic_sediment/sSiDOMS
   auxiliary:
     long_name: extra_processes
-    model: au/pclake/auxiliary
+    model: pclake/auxiliary
     parameters:
       cDepthS: 0.3                                               # sediment depth (m), default = 0.1
       cThetaSet: 1.01                                            # temp. parameter of sedimentation (1/e^oC), default = 1.01
