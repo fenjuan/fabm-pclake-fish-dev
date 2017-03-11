@@ -49,7 +49,7 @@
    real(rk)   :: cNDDiatMax,cPDDiatMax,cNDGrenMax,cPDGrenMax,cNDBlueMax,cPDBlueMax
 !  minimum state variable values
    real(rk)   :: cDBentMin
-!  fraction of dissolved organics from zoobenthos
+!  fraction of dissolved organic matter from zoobenthos
    real(rk)   :: fBenDOMS
 !  parameters before changed fish to nonlocal
 !   type (type_bottom_state_variable_id)            :: id_DAdFish,id_NAdFish,id_PAdFish,id_DJvFish
@@ -84,8 +84,8 @@
 !EOP
 !-----------------------------------------------------------------------
 !BOC
-!  Store parameter values in our own derived type
-!  NB: all rates must be provided in values per day,
+!  Store parameter values in derived type
+!  NB: all rates must be provided in values per day in .yaml input,
 !  and are converted here to values per second.
    call self%get_parameter(self%cDBentIn,     'cDBentIn',     'gDW m-2',  'external zoobenthos density',                                default=0.01_rk)
    call self%get_parameter(self%kMigrBent,    'kMigrBent',    'd-1',      'zoobenthos migration rate',                                  default=0.001_rk,  scale_factor=1.0_rk/secs_pr_day)
@@ -96,12 +96,12 @@
    call self%get_parameter(self%fDissEgesBent,'fDissEgesBent','[-]',      'soluble nutrient fraction of by zoobenthos egested food',    default=0.25_rk)
    call self%get_parameter(self%kDRespBent,   'kDRespBent',   'd-1',      'respiration constant of zoobenthos',                         default=0.005_rk,  scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%kMortBent,    'kMortBent',    'd-1',      'mortality constant of zoobenthos',                           default=0.005_rk,  scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%fDissMortBent,'fDissMortBent','[-]',      'soluble P fraction of died zoobenthos P',                    default=0.1_rk)
-   call self%get_parameter(self%cTmOptBent,   'cTmOptBent',   'degreee C','optimal temperature of zoobenthos',                          default=25.0_rk)
-   call self%get_parameter(self%cSigTmBent,   'cSigTmBent',   'degreee C','temperature constant of zoobenthos(sigma in Gaussian curve)',default=16.0_rk)
+   call self%get_parameter(self%fDissMortBent,'fDissMortBent','[-]',      'soluble P fraction of dead zoobenthos P',                    default=0.1_rk)
+   call self%get_parameter(self%cTmOptBent,   'cTmOptBent',   'degreee C','optimal temperature for zoobenthos',                         default=25.0_rk)
+   call self%get_parameter(self%cSigTmBent,   'cSigTmBent',   'degreee C','temperature constant for zoobenthos (sigma)',                default=16.0_rk)
    call self%get_parameter(self%cPDBentRef,   'cPDBentRef',   'mgP/mgDW', 'reference P/C ratio of zoobenthos',                          default=0.01_rk)
    call self%get_parameter(self%cNDBentRef,   'cNDBentRef',   'mgN/mgDW', 'reference N/C ratio of zoobenthos',                          default=0.07_rk)
-   call self%get_parameter(self%cSiDDiat,     'cSiDDiat',     'mgSi/mgDW','Si/DW ratio of daitoms',                                     default=0.15_rk)
+   call self%get_parameter(self%cSiDDiat,     'cSiDDiat',     'mgSi/mgDW','Si/DW ratio of diatoms',                                     default=0.15_rk)
 !  parameters before changed fish to nonlocal
 !   call self%get_parameter(self%fDAssFiAd,    'fDAssFiAd',    '[-]',      'C assimilation efficiency of adult fish',                    default=0.4_rk)
 !   call self%get_parameter(self%cPDFishRef,   'cPDFishRef',   'mgP/mgDW', 'reference P/C ratio of fish',                                default=0.022_rk)
@@ -109,33 +109,33 @@
 !   call self%get_parameter(self%fDissEgesFish,'fDissEgesFish','[-]',      'soluble nutrient fraction of by fish egested food',          default=0.25_rk)
 !   call self%get_parameter(self%cTmOptFish,   'cTmOptFish',   'degree C', 'optimum temp. of fish',                                      default=25.0_rk)
 !   call self%get_parameter(self%cSigTmFish,   'cSigTmFish',   'degree C', 'temperature constant of fish(sigma in Gaussian curve)',      default=10.0_rk)
-!   call self%get_parameter(self%cRelVegFish,  'cRelVegFish',  '[-]',      'decrease of fish feeding per vegetation cover(max. 0.01)',   default=0.009_rk)
+!   call self%get_parameter(self%cRelVegFish,  'cRelVegFish',  '[-]',      'decrease of fish feeding per macrophytes cover(max. 0.01)',   default=0.009_rk)
 !   call self%get_parameter(self%kDAssFiAd,    'kDAssFiAd',    'd-1',      'maximum assimilation rate of adult fish',                    default=0.06_rk,   scale_factor=1.0_rk/secs_pr_day)
 !   call self%get_parameter(self%hDBentFiAd,   'hDBentFiAd',   'g m-2',    'half saturation zoobenthos biomass for adult fish predation',default=2.5_rk)
 !   call self%get_parameter(self%kDRespFiAd,   'kDRespFiAd',   'd-1',      'maintenance respiration constant of adult fish',             default=0.004_rk,  scale_factor=1.0_rk/secs_pr_day)
 !   call self%get_parameter(self%kMortFiAd,    'kMortFiAd',    'd-1',      'specific mortality of adult fish',                           default=0.00027_rk,scale_factor=1.0_rk/secs_pr_day)
 !   call self%get_parameter(self%cDCarrFish,   'cDCarrFish',   'gDW m-2',  'carrying capacity of fish',                                  default=15.0_rk)
-   call self%get_parameter(self%cNDDiatMin,   'cNDDiatMin',   'mgN/mgDW', 'minimum N/day ratio Diatoms',                                default=0.01_rk)
-   call self%get_parameter(self%cPDDiatMin,   'cPDDiatMin',   'mgP/mgDW', 'minimum P/day ratio Diatoms',                                default=0.0005_rk)
-   call self%get_parameter(self%cNDGrenMin,   'cNDGrenMin',   'mgN/mgDW', 'minimum N/day ratio greens',                                 default=0.02_rk)
-   call self%get_parameter(self%cPDGrenMin,   'cPDGrenMin',   'mgP/mgDW', 'minimum P/day ratio greens',                                 default=0.0015_rk)
-   call self%get_parameter(self%cNDBlueMin,   'cNDBlueMin',   'mgN/mgDW', 'minimum N/day ratio Bluegreens',                             default=0.03_rk)
-   call self%get_parameter(self%cPDBlueMin,   'cPDBlueMin',   'mgP/mgDW', 'minimum P/day ratio Bluegreens',                             default=0.0025_rk)
-   call self%get_parameter(self%cNDBlueMax,   'cNDBlueMax',   'mgN/mgDW', 'maximum N/day ratio Bluegreens',                                default=0.15_rk)
-   call self%get_parameter(self%cNDDiatMax,   'cNDDiatMax',   'mgN/mgDW', 'maximum N/day ratio Diatoms',                                   default=0.005_rk)
-   call self%get_parameter(self%cNDGrenMax,   'cNDGrenMax',   'mgN/mgDW', 'maximum N/day ratio greens',                                    default=0.1_rk)
-   call self%get_parameter(self%cPDBlueMax,   'cPDBlueMax',   'mgP/mgDW', 'maximum P/day ratio blue-greens',                               default=0.025_rk)
-   call self%get_parameter(self%cPDDiatMax,   'cPDDiatMax',   'mgP/mgDW', 'maximum P/day ratio Diatoms',                                   default=0.05_rk)
-   call self%get_parameter(self%cPDGrenMax,   'cPDGrenMax',   'mgP/mgDW', 'maximum P/day ratio greens',                                    default=0.015_rk)
+   call self%get_parameter(self%cNDDiatMin,   'cNDDiatMin',   'mgN/mgDW', 'minimum N/DW ratio diatoms',                                default=0.01_rk)
+   call self%get_parameter(self%cPDDiatMin,   'cPDDiatMin',   'mgP/mgDW', 'minimum P/DW ratio diatoms',                                default=0.0005_rk)
+   call self%get_parameter(self%cNDGrenMin,   'cNDGrenMin',   'mgN/mgDW', 'minimum N/DW ratio greens',                                 default=0.02_rk)
+   call self%get_parameter(self%cPDGrenMin,   'cPDGrenMin',   'mgP/mgDW', 'minimum P/DW ratio greens',                                 default=0.0015_rk)
+   call self%get_parameter(self%cNDBlueMin,   'cNDBlueMin',   'mgN/mgDW', 'minimum N/DW ratio blue-greens',                             default=0.03_rk)
+   call self%get_parameter(self%cPDBlueMin,   'cPDBlueMin',   'mgP/mgDW', 'minimum P/DW ratio blue-greens',                             default=0.0025_rk)
+   call self%get_parameter(self%cNDBlueMax,   'cNDBlueMax',   'mgN/mgDW', 'maximum N/DW ratio blue-greens',                                default=0.15_rk)
+   call self%get_parameter(self%cNDDiatMax,   'cNDDiatMax',   'mgN/mgDW', 'maximum N/DW ratio diatoms',                                   default=0.005_rk)
+   call self%get_parameter(self%cNDGrenMax,   'cNDGrenMax',   'mgN/mgDW', 'maximum N/DW ratio greens',                                    default=0.1_rk)
+   call self%get_parameter(self%cPDBlueMax,   'cPDBlueMax',   'mgP/mgDW', 'maximum P/DW ratio blue-greens',                               default=0.025_rk)
+   call self%get_parameter(self%cPDDiatMax,   'cPDDiatMax',   'mgP/mgDW', 'maximum P/DW ratio diatoms',                                   default=0.05_rk)
+   call self%get_parameter(self%cPDGrenMax,   'cPDGrenMax',   'mgP/mgDW', 'maximum P/DW ratio greens',                                    default=0.015_rk)
 !  the user defined minumun value for state variables
-   call self%get_parameter(self%cDBentMin,    'cDBentMin',    'gDW/m2',   'minimun zoobenthos biomass in system',                       default=0.00001_rk)
+   call self%get_parameter(self%cDBentMin,    'cDBentMin',    'gDW/m2',   'minimum zoobenthos concentration in system',                       default=0.00001_rk)
    call self%get_parameter(self%fBenDOMS,  'fBenDOMS',   '[-]',     'dissolved organic fraction from zoobenthos',                 default=0.5_rk)
 !  Register local state variable
-   call self%register_state_variable(self%id_sDBent,'sDBent','g m-2','zoobenthos dry weight',     &
+   call self%register_state_variable(self%id_sDBent,'sDBent','gDW m-2','zoobenthos dry weight',     &
                                     initial_value=1.0_rk,minimum=self%cDBentMin)
-   call self%register_state_variable(self%id_sPBent,'sPBent','g m-2','zoobenthos phosphorus content',     &
+   call self%register_state_variable(self%id_sPBent,'sPBent','gP m-2','zoobenthos phosphorus content',     &
                                     initial_value=0.1_rk,minimum=self%cDBentMin * self%cPDBentRef)
-   call self%register_state_variable(self%id_sNBent,'sNBent','g m-2','zoobenthos nitrogen content',     &
+   call self%register_state_variable(self%id_sNBent,'sNBent','gn m-2','zoobenthos nitrogen content',     &
                                     initial_value=0.01_rk,minimum=self%cDBentMin * self%cNDBentRef)
 !  Register diagnostic variables for dependencies in other modules
    call self%register_diagnostic_variable(self%id_tDBenPOMS,     'tDBenPOMS',    'g m-2 s-1', 'tDBenPOMS',                output=output_none)
@@ -178,24 +178,24 @@
 !  register state variables dependencies
    call self%register_state_dependency(self%id_DfoodDiatS,   'diatom_as_food_DW',                'g m-2', 'diatom as food DW')
    call self%register_state_dependency(self%id_DfoodGrenS,   'green_as_food_DW',                 'g m-2', 'green as food DW')
-   call self%register_state_dependency(self%id_DfoodBlueS,   'blue_as_food_DW',                  'g m-2', 'blue as food DW')
+   call self%register_state_dependency(self%id_DfoodBlueS,   'blue_as_food_DW',                  'g m-2', 'blue-green as food DW')
    call self%register_state_dependency(self%id_NfoodDiatS,   'diatom_as_food_N',                 'g m-2', 'diatom as food N')
    call self%register_state_dependency(self%id_NfoodGrenS,   'green_as_food_N',                  'g m-2', 'green as food N')
-   call self%register_state_dependency(self%id_NfoodBlueS,   'blue_as_food_N',                   'g m-2', 'blue as food N')
+   call self%register_state_dependency(self%id_NfoodBlueS,   'blue_as_food_N',                   'g m-2', 'blue-green as food N')
    call self%register_state_dependency(self%id_PfoodDiatS,   'diatom_as_food_P',                 'g m-2', 'diatom as food P')
    call self%register_state_dependency(self%id_PfoodGrenS,   'green_as_food_P',                  'g m-2', 'green as food P')
-   call self%register_state_dependency(self%id_PfoodBlueS,   'blue_as_food_P',                   'g m-2', 'blue as food P')
-   call self%register_state_dependency(self%id_DPOMpoolS,    'POM_DW_pool_sediment',        'g m-2', 'partical organics DW pool in sediment')
-   call self%register_state_dependency(self%id_PPOMpoolS,    'POM_P_pool_sediment',         'g m-2', 'partical organics P pool in sediment')
-   call self%register_state_dependency(self%id_NPOMpoolS,    'POM_N_pool_sediment',         'g m-2', 'partical organics N pool in sediment')
-   call self%register_state_dependency(self%id_SiPOMpoolS,   'POM_Si_pool_sediment',        'g m-2', 'partical organics Si pool sediment')
+   call self%register_state_dependency(self%id_PfoodBlueS,   'blue_as_food_P',                   'g m-2', 'blue-green as food P')
+   call self%register_state_dependency(self%id_DPOMpoolS,    'POM_DW_pool_sediment',        'g m-2', 'particulate organic matter DW pool in sediment')
+   call self%register_state_dependency(self%id_PPOMpoolS,    'POM_P_pool_sediment',         'g m-2', 'particulate organic matter P pool in sediment')
+   call self%register_state_dependency(self%id_NPOMpoolS,    'POM_N_pool_sediment',         'g m-2', 'particulate organic matter N pool in sediment')
+   call self%register_state_dependency(self%id_SiPOMpoolS,   'POM_Si_pool_sediment',        'g m-2', 'particulate organic matter Si pool sediment')
    call self%register_state_dependency(self%id_NH4poolS,     'NH4_pool_sediment',                'g m-2', 'NH4 pool in sediment')
    call self%register_state_dependency(self%id_NO3poolS,     'NO3_pool_sediment',                'g m-2', 'NO3 pool in sediment')
    call self%register_state_dependency(self%id_PO4poolS,     'PO4_pool_sediment',                'g m-2', 'PO4 pool in sediment')
-   call self%register_state_dependency(self%id_DDOMpoolS,    'DOM_DW_pool_sediment',   'g m-2', 'dissolved organics DW in sediment')
-   call self%register_state_dependency(self%id_NDOMpoolS,    'DOM_N_pool_sediment',    'g m-2', 'dissolved organics N in sediment')
-   call self%register_state_dependency(self%id_PDOMpoolS,    'DOM_P_pool_sediment',    'g m-2', 'dissolved organics P in sediment')
-   call self%register_state_dependency(self%id_SiDOMpoolS,   'DOM_Si_pool_sediment',   'g m-2', 'dissolved organics Si in sediment')
+   call self%register_state_dependency(self%id_DDOMpoolS,    'DOM_DW_pool_sediment',   'g m-2', 'dissolved organic matter DW in sediment')
+   call self%register_state_dependency(self%id_NDOMpoolS,    'DOM_N_pool_sediment',    'g m-2', 'dissolved organic matter N in sediment')
+   call self%register_state_dependency(self%id_PDOMpoolS,    'DOM_P_pool_sediment',    'g m-2', 'dissolved organic matter P in sediment')
+   call self%register_state_dependency(self%id_SiDOMpoolS,   'DOM_Si_pool_sediment',   'g m-2', 'dissolved organic matter Si in sediment')
 !  parameters before changed fish to nonlocal
 !   call self%register_state_dependency(self%id_DAdFish,      'adult_fish_biomass',               'g m-3', 'adult fish biomass')
 !   call self%register_state_dependency(self%id_NAdFish,      'adult_fish_nitrogen',              'g m-3', 'adult fish nitrogen')
@@ -207,7 +207,7 @@
 !   call self%register_state_dependency(self%id_PPOMpoolW,    'POM_P_pool_water',                  'g m-3', 'PDet pool in water')
 !   call self%register_state_dependency(self%id_DJvFish,      'young_fish_biomass',               'g m-3', 'young fish biomass')
 !!  register diagnostic dependencies
-!   call self%register_dependency(self%id_aCovVeg,          'vegetation_coverage',       '[-]',  'vegetation coverage')
+!   call self%register_dependency(self%id_aCovVeg,          'macrophytes_coverage',       '[-]',  'macrophytes coverage')
 !   call self%register_dependency(self%id_sDepthW,standard_variables%bottom_depth)
 
 !  register environmental dependencies
@@ -267,7 +267,7 @@
    real(rk)          :: tNBenNO3S
 !  variables for exchange of PO4S
    real(rk)          :: tPBenPO4S,tPEgesBentPO4,tPEgesBent,tPMortBentPO4
-!  variables for exchange for organics
+!  variables for exchange for organic matter
    real(rk)          :: tDBenPOMS,tDEgesBent,tNBenPOMS,tNEgesBentTOM
    real(rk)          :: tNMortBentTOM,tPBenPOMS,tPEgesBentTOM,tPMortBentTOM
    real(rk)          :: tSiBenPOMS,tSiConsDiatBent
@@ -331,7 +331,7 @@
    _GET_(self%id_uTm,uTm)
    _GET_(self%id_dz,dz)
 !----------------------------------------------------------------------
-!  Current local nutrients ratios in zoobenthos(check the current state)
+!  Current local nutrients ratios in zoobenthos (check the current state)
 !----------------------------------------------------------------------
    rPDBent=sPBent/(sDBent+NearZero)
    rNDBent=sNBent/(sDBent+NearZero)
@@ -400,7 +400,7 @@
 !-----------------------------------------------------------------------
 !  temperature function
 !-----------------------------------------------------------------------
-!  temp._function_of_zoobenthos
+!  temp._function_for_zoobenthos
    uFunTmBent = uFunTmBio(uTm,self%cSigTmBent,self%cTmOptBent)
 !-----------------------------------------------------------------------
 !  zoobenthos migration
@@ -512,7 +512,7 @@
 !!-----------------------------------------------------------------------
 !!  adult fish assimilation_DW
 !!-----------------------------------------------------------------------
-!!  vegetation_dependence_of_fish_feeding
+!!  macrophytes_dependence_of_fish_feeding
 !   aFunVegFish = max(0.0_rk,1.0_rk - self%cRelVegFish * aCovVeg)
 !!   for first time step check out
 !!   aFunVegFish = max(0.0_rk,1.0_rk - self%cRelVegFish * 0.2_rk)
@@ -602,9 +602,9 @@
 !  total_flux_of_P_in_Pore_water_P_in_lake_sediment
    tPBenPO4S = tPExcrBent + tPEgesBentPO4 + tPMortBentPO4
 !-----------------------------------------------------------------------
-!  Update organics in sediment(DW,N,P)
+!  Update organic matter in sediment(DW,N,P)
 !-----------------------------------------------------------------------
-!  total_flux_of_DW_in_Sediment_organics_in_lake
+!  total_flux_of_DW_in_Sediment_organic matter_in_lake
    tDBenTOMS = - tDConsPOMBent + tDEgesBent + tDMortBent
    tDBenPOMS = tDBenTOMS * (1.0_rk -self%fBenDOMS)
    tDBenDOMS = tDBenTOMS * self%fBenDOMS
@@ -626,7 +626,7 @@
    tPBenDOMS = tPBenTOMS * self%fBenDOMS
 !  diatom_consumption_by_zoobenthos
    tSiConsDiatBent = self%cSiDDiat * tDConsDiatBent
-!  total_flux_of_silica_in_sediment_organics
+!  total_flux_of_silica_in_sediment_organic matter
    tSiBenPOMS = tSiConsDiatBent * (1.0_rk - self%fBenDOMS)
    tSiBenDOMS = tSiConsDiatBent * self%fBenDOMS
 !-----------------------------------------------------------------------
@@ -750,5 +750,5 @@
 !-----------------------------------------------------------------------
    end module pclake_zoobenthos
 !------------------------------------------------------------------------------
-! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org
+! Copyright by the FABM-PCLake-team under the GNU Public License - www.gnu.org
 !------------------------------------------------------------------------------

@@ -15,19 +15,19 @@
 ! !PUBLIC DERIVED TYPES:
    type, extends(type_base_model),public :: type_pclake_abiotic_sediment
 !  local state variable identifers
-!  sDIMS: inorganic matter concentration, in dry-weight,gDW/m**2
-!  sDPOMS, partical orgaincs, in dry-weight,gDW/m**2
-!  sNPOMS, partical orgaincs, in nitrogen element,gN/m**2
-!  sPPOMS, partical orgaincs, in phosphorus element,gP/m**2
-!  sSiPOMS, partical orgaincs, in silicon element,gSi/m**2
-!  sDDOMS, dissolved orgaincs, in dry-weight,gDW/m**2
-!  sNDOMS, dissolved orgaincs, in nitrogen element,gN/m**2
-!  sPDOMS, dissolved orgaincs, in phosphorus element,gP/m**2
-!  sSiDOMS, dissolved orgaincs, in silicon element,gSi/m**2
-!  sNH4S,  ammonia concentration, in nitrogen element,gN/m**2
-!  sNO3S, nitrate concentration, in nitrogen element,gN/m**2
-!  sPO4S, phosphate concentration, in phosphorus element,gP/m**2
-!  sPAIMS, absorbed phosphorus concentration, in phosphorus element,gP/m**2
+!  sDIMS: inorganic matter concentration, in dry-weight, gDW/m**2
+!  sDPOMS, particulate organic matter, in dry-weight, gDW/m**2
+!  sNPOMS, particulate organic matter, in nitrogen element, gN/m**2
+!  sPPOMS, particulate organic matter, in phosphorus element, gP/m**2
+!  sSiPOMS, particulate organic matter, in silicon element, gSi/m**2
+!  sDDOMS, dissolved organic matter, in dry-weight, gDW/m**2
+!  sNDOMS, dissolved organic matter, in nitrogen element, gN/m**2
+!  sPDOMS, dissolved organic matter, in phosphorus element, gP/m**2
+!  sSiDOMS, dissolved organic matter, in silicon element, gSi/m**2
+!  sNH4S, ammonium concentration, in nitrogen element, gN/m**2
+!  sNO3S, nitrate concentration, in nitrogen element, gN/m**2
+!  sPO4S, phosphate concentration, in phosphorus element, gP/m**2
+!  sPAIMS, absorbed phosphorus concentration, in phosphorus element, gP/m**2
    type (type_bottom_state_variable_id) :: id_sDIMS,id_sDPOMS,id_sNPOMS
    type (type_bottom_state_variable_id) :: id_sPPOMS,id_sSiPOMS
    type (type_bottom_state_variable_id) :: id_sDDOMS,id_sNDOMS
@@ -36,13 +36,13 @@
    type (type_bottom_state_variable_id) :: id_sNO3S
    type (type_bottom_state_variable_id) :: id_sDHumS,id_sNHumS,id_sPHumS
 !  diagnostic variables for local output
-!  rPDPOMS: P/D ratio of partical organics
-!  rNDPOMS: N/D ratio of partical organics
-!  rPDDOMS: P/D ratio of dissolved organics
-!  rNDDOMS: N/D ratio of dissolved organics
+!  rPDPOMS: P/D ratio of particulate organic matter
+!  rNDPOMS: N/D ratio of particulate organic matter
+!  rPDDOMS: P/D ratio of dissolved organic matter
+!  rNDDOMS: N/D ratio of dissolved organic matter
    type (type_horizontal_diagnostic_variable_id) :: id_rPDPOMS,id_rNDPOMS
    type (type_horizontal_diagnostic_variable_id) :: id_rPDDOMS,id_rNDDOMS
-!  aPEqIMS: equilibrium absorbed phosphrus concentration
+!  aPEqIMS: equilibrium absorbed phosphorus concentration
    type (type_horizontal_diagnostic_variable_id) :: id_aPEqIMS,id_afOxySed
 !  diagnostic variable for external dependencies: 
    type (type_horizontal_diagnostic_variable_id) :: id_tDAbioHumS,id_tDAbioPOMS,id_tDAbioO2S
@@ -54,17 +54,17 @@
    type (type_horizontal_diagnostic_variable_id) :: id_tNAbioNO3S,id_tPAbioPO4S,id_tPAbioAIMS
    type (type_horizontal_diagnostic_variable_id) :: id_tPAbioHumS,id_tNAbioHumS
    type (type_horizontal_diagnostic_variable_id) :: id_tSiAbioSiO2S
-!  partical organic matter and humus fluxes will be named differently due to they are used by 
+!  particulate organic matter and humus fluxes will be named differently as they are used by 
 !  external dependencies
    type (type_horizontal_diagnostic_variable_id) :: id_tDAbioHumSflux,id_tDAbioPOMSflux
 #endif
 !  state dependencies identifiers
-!  MinSiO2Sed: Mineralization generated SiO2 from sediment
+!  MinSiO2Sed: mineralization generated SiO2 from sediment
 !  O2ConsumpSed: O2 consumption in sediment
 !  diff+nut: diffusion fluxes of nutrients between water and sediment
    type (type_state_variable_id) :: id_MinSiO2Sed ,id_O2ConsumpSed
    type (type_state_variable_id) :: id_diffNH4,id_diffNO3,id_diffPO4
-!  added dissolved organics fluxes dependencies
+!  added dissolved organic matter fluxes dependencies
    type (type_state_variable_id) :: id_diffDDOM,id_diffNDOM
    type (type_state_variable_id) :: id_diffPDOM,id_diffSiDOM
 !  environmental dependencies
@@ -82,7 +82,7 @@
    real(rk)                   :: NO3PerC,hNO3Denit
    real(rk)                   :: fRefrPOMS
    real(rk)                   :: kNitrS,cThetaNitr
-!  Humus related parameters
+!  humus related parameters
    real(rk)                   :: kDMinHum
 !  diffusion parameters
    real(rk)                   :: fDepthDifS,cThetaDif,cTurbDifNut
@@ -127,14 +127,14 @@
 ! !INPUT PARAMETERS:
    class (type_pclake_abiotic_sediment), intent(inout), target :: self
    integer,                              intent(in)            :: configunit
-!  Store parameter values in our own derived type
-!  NB: all rates must be provided in values per day,
+!  Store parameter values in derived type
+!  NB: all rates must be provided in values per day in .yaml input,
 !  and are converted here to values per second.
    call self%get_parameter(self%cDepthS,    'cDepthS',     'm',                    'sediment depth',                                           default=0.1_rk)
-   call self%get_parameter(self%fRefrPOMS,  'fRefrPOMS',   '[-]',                  'refractory fraction of sediment orgainic matters',         default=0.15_rk)
+   call self%get_parameter(self%fRefrPOMS,  'fRefrPOMS',   '[-]',                  'refractory fraction of sediment POM',                      default=0.15_rk)
    call self%get_parameter(self%cCPerDW,    'cCPerDW',     'gC/gDW',               'C content of organic matter',                              default=0.4_rk)
    call self%get_parameter(self%O2PerNH4,   'O2PerNH4',    'mol',                  'O2 used per mol NH4+ nitrified',                           default=2.0_rk)
-   call self%get_parameter(self%kNitrS,     'kNitrS',      'd-1',                  'nitrification rate constant in sediment',                  default=1.0_rk,    scale_factor =1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kNitrS,     'kNitrS',      'd-1',                  'nitrification rate constant',                              default=1.0_rk,    scale_factor =1.0_rk/secs_pr_day)
    call self%get_parameter(self%cThetaNitr, 'cThetaNitr',  '[-]',                  'temperature coefficient for nitrification',                default=1.08_rk)
    call self%get_parameter(self%NO3PerC,    'NO3PerC',     '[-]',                  'NO3 denitrified per mol C mineralised',                    default=0.8_rk)
    call self%get_parameter(self%hNO3Denit,  'hNO3Denit',   'mgN/l',                'quadratic half-sat. NO3 conc. for denitrification',        default=2.0_rk)
@@ -143,7 +143,7 @@
    call self%get_parameter(self%cRelPAdsFe, 'cRelPAdsFe',  'gP/gFe',               'max. P adsorption per g Fe',                               default=0.065_rk)
    call self%get_parameter(self%fFeDIM,     'fFeDIM',      'gFe/gD',               'Fe content of inorg. matter',                              default=0.01_rk)
    call self%get_parameter(self%cRelPAdsAl, 'cRelPAdsAl',  'gP/gAl',               'max. P adsorption per g Al',                               default=0.134_rk)
-   call self%get_parameter(self%fAlDIM,     'fAlDIM',      'gAl/gD',               'Al content of inorganic matter',                              default=0.01_rk)
+   call self%get_parameter(self%fAlDIM,     'fAlDIM',      'gAl/gD',               'Al content of inorganic matter',                           default=0.01_rk)
    call self%get_parameter(self%fRedMax,    'fRedMax',     '[-]',                  'max. reduction factor of P adsorption affinity',           default=0.9_rk)
    call self%get_parameter(self%cKPAdsOx,   'cKPAdsOx',    'm3/gP',                'P adsorption affinity at oxidized conditions',             default=0.6_rk)
    call self%get_parameter(self%kPChemPO4,  'kPChemPO4',   'd-1',                  'chem. PO4 loss rate',                                      default=0.03_rk,    scale_factor=1.0_rk/secs_pr_day)
@@ -151,45 +151,45 @@
    call self%get_parameter(self%bPorS,      'bPorS',       'm3 water m-3 sediment','sediment porosity',                                        default=0.847947_rk)
    call self%get_parameter(self%cThetaDif,  'cThetaDif',   '[-]',                  'temperature coefficient for diffusion',                    default=1.02_rk)
    call self%get_parameter(self%fDepthDifS, 'fDepthDifS',  '[-]',                  'nutrient diffusion distance as fraction of sediment depth', default=0.5_rk)
-   call self%get_parameter(self%kNDifNH4,   'kNDifNH4',    'm2/day',               'molecular NH4 diffusion constant',                              default=0.000112_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kNDifNH4,   'kNDifNH4',    'm2/day',               'molecular NH4 diffusion constant',                         default=0.000112_rk, scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%cTurbDifNut,'cTurbDifNut', '[-]',                  'bioturbation factor for diffusion',                        default=5.0_rk)
    call self%get_parameter(self%bPorCorS,   'bPorCorS',    'm3 water m-3 sediment','sediment porosity, corrected for tortuosity',              default=0.737275_rk)
-   call self%get_parameter(self%kNDifNO3,   'kNDifNO3',    'm2/day',               'molecular NO3 diffusion constant',                              default=0.000086_rk, scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kPDifPO4,   'kPDifPO4',    'm2/day',               'molecular PO4 diffusion constant',                              default=0.000072_rk, scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kO2Dif,     'kO2Dif',      'm2/day',               'molecular O2 diffusion constant',                               default=0.000026_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kNDifNO3,   'kNDifNO3',    'm2/day',               'molecular NO3 diffusion constant',                         default=0.000086_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kPDifPO4,   'kPDifPO4',    'm2/day',               'molecular PO4 diffusion constant',                         default=0.000072_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kO2Dif,     'kO2Dif',      'm2/day',               'molecular O2 diffusion constant',                          default=0.000026_rk, scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%cTurbDifO2, 'cTurbDifO2',  '[-]',                  'bioturbation factor for diffusion',                        default=5.0_rk)
    call self%get_parameter(self%kDMinHum,   'kDMinHum',    'd-1',                  'maximum decomposition constant of humic material (1D-5)',  default=0.00001_rk , scale_factor=1.0_rk/secs_pr_day)
 !  organic matter mineralization parameters
 !  POM to DOM
-   call self%get_parameter(self%cThetaMinPOMS,'cThetaMinPOMS','[-]',           'temperature coeff. of sediment for mineraliztion from POM to DOM',              default=1.07_rk)
-   call self%get_parameter(self%kDMinPOMS,  'kDMinPOMS',   'd-1',              'decomposition constant in sediment from POM-DW to DOM-DW',                default=0.002_rk,  scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kNMinPOMS,  'kNMinPOMS',   'd-1',              'decomposition constant in sediment from POM-N to DOM-N',                default=0.002_rk,  scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kPMinPOMS,  'kPMinPOMS',   'd-1',              'decomposition constant in sediment from POM-P to DOM-P',                default=0.002_rk,  scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kSiMinPOMS, 'kSiMinPOMS',  'd-1',              'decomposition constant in sediment from POM-Si to DOM-Si',              default=0.002_rk,  scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%cThetaMinPOMS,'cThetaMinPOMS','[-]',           'temperature coeff. for sediment mineralization of POM to DOM',  default=1.07_rk)
+   call self%get_parameter(self%kDMinPOMS,  'kDMinPOMS',   'd-1',              'mineralization constant in sediment from POM-DW to DOM-DW',     default=0.002_rk,  scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kNMinPOMS,  'kNMinPOMS',   'd-1',              'mineralization constant in sediment from POM-N to DOM-N',       default=0.002_rk,  scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kPMinPOMS,  'kPMinPOMS',   'd-1',              'mineralization constant in sediment from POM-P to DOM-P',       default=0.002_rk,  scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kSiMinPOMS, 'kSiMinPOMS',  'd-1',              'mineralization constant in sediment from POM-Si to DOM-Si',     default=0.002_rk,  scale_factor=1.0_rk/secs_pr_day)
 !  added step 2. min. pars
-   call self%get_parameter(self%cThetaMinDOMS, 'cThetaMinDOMS',  '[-]',                  'exponational temperature constant of sediment mineralization',         default=1.07_rk)
-   call self%get_parameter(self%kDMinDOMS,  'kDMinDOMS',  'day-1',             'decomposition constant of sediment dissolved organics',    default=0.002_rk,    scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kNMinDOMS,  'kNMinDOMS',  'day-1',             'decomposition constant of sediment organic-N',             default=0.002_rk,    scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kPMinDOMS,  'kPMinDOMS',  'day-1',             'decomposition constant of sediment organic-P',             default=0.002_rk,    scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kSiMinDOMS, 'kSiMinDOMS', 'day-1',             'decomposition constant of sediment organic-Si',            default=0.002_rk,    scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%cThetaMinDOMS, 'cThetaMinDOMS',  '[-]',        'exp. temperature constant of sediment mineralization', default=1.07_rk)
+   call self%get_parameter(self%kDMinDOMS,  'kDMinDOMS',  'day-1',             'mineralization constant for sediment dissolved organic matter',  default=0.002_rk,    scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kNMinDOMS,  'kNMinDOMS',  'day-1',             'mineralization constant for sediment dissolved organic N',       default=0.002_rk,    scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kPMinDOMS,  'kPMinDOMS',  'day-1',             'mineralization constant for sediment dissolvedorganic P',        default=0.002_rk,    scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kSiMinDOMS, 'kSiMinDOMS', 'day-1',             'mineralization constant for sediment dissolved organic Si',      default=0.002_rk,    scale_factor=1.0_rk/secs_pr_day)
 !  added diffusion pars
-   call self%get_parameter(self%kDDifDOM,    'kDDifDOM',     'm2/day',             'molecular dissolved organics diffusion constant',               default=0.000112_rk, scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kNDifDOM,    'kNDifDOM',     'm2/day',             'molecular dissolved organic_N diffusion constant',              default=0.000112_rk, scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kPDifDOM,    'kPDifDOM',     'm2/day',             'molecular dissolved organic_P diffusion constant',              default=0.000112_rk, scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kSiDifDOM,   'kSiDifDOM',    'm2/day',             'molecular dissolved organic_Si diffusion constant',             default=0.000112_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kDDifDOM,    'kDDifDOM',     'm2/day',             'molecular diffusion constant for dissolved organic matter', default=0.000112_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kNDifDOM,    'kNDifDOM',     'm2/day',             'molecular diffusion constant for dissolved organic N',     default=0.000112_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kPDifDOM,    'kPDifDOM',     'm2/day',             'molecular diffusion constant for dissolved organic P',     default=0.000112_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kSiDifDOM,   'kSiDifDOM',    'm2/day',             'molecular diffusion constant for dissolved organic Si',    default=0.000112_rk, scale_factor=1.0_rk/secs_pr_day)
 !  Register local state variable
 !  Inorganic matter
    call self%register_state_variable(self%id_sDIMS,  'sDIMS',  'g m-2','sediment inorganic matter',  initial_value=39611.3_rk, minimum=_ZERO_)
-!  Partical organic matters
-   call self%register_state_variable(self%id_sDPOMS, 'sDPOMS', 'g m-2','sediment partical organic DW',   initial_value=181.7_rk,   minimum=_ZERO_)
-   call self%register_state_variable(self%id_sNPOMS, 'sNPOMS', 'g m-2','sediment partical organic N',    initial_value=4.54_rk,    minimum=_ZERO_)
-   call self%register_state_variable(self%id_sPPOMS, 'sPPOMS', 'g m-2','sediment partical organic P',    initial_value=0.454_rk,   minimum=_ZERO_)
-   call self%register_state_variable(self%id_sSiPOMS,'sSiPOMS','g m-2','sediment partical organic Si',   initial_value=1.82_rk,    minimum=_ZERO_)
-!  dissolved organic matters
-   call self%register_state_variable(self%id_sDDOMS, 'sDDOMS', 'g m-2','dissolved sediment organics',   initial_value=0.01_rk,   minimum=_ZERO_)
-   call self%register_state_variable(self%id_sNDOMS, 'sNDOMS', 'g m-2','dissolved sediment organic N',  initial_value=0.01_rk,    minimum=_ZERO_)
-   call self%register_state_variable(self%id_sPDOMS, 'sPDOMS', 'g m-2','dissolved sediment organic P',  initial_value=0.01_rk,   minimum=_ZERO_)
-   call self%register_state_variable(self%id_sSiDOMS,'sSiDOMS','g m-2','dissolved sediment organic Si', initial_value=1.82_rk,    minimum=_ZERO_)
+!  Particulate organic matter
+   call self%register_state_variable(self%id_sDPOMS, 'sDPOMS', 'g m-2','sediment particulate organic DW',   initial_value=181.7_rk,   minimum=_ZERO_)
+   call self%register_state_variable(self%id_sNPOMS, 'sNPOMS', 'g m-2','sediment particulate organic N',    initial_value=4.54_rk,    minimum=_ZERO_)
+   call self%register_state_variable(self%id_sPPOMS, 'sPPOMS', 'g m-2','sediment particulate organic P',    initial_value=0.454_rk,   minimum=_ZERO_)
+   call self%register_state_variable(self%id_sSiPOMS,'sSiPOMS','g m-2','sediment particulate organic Si',   initial_value=1.82_rk,    minimum=_ZERO_)
+!  Dissolved organic matter
+   call self%register_state_variable(self%id_sDDOMS, 'sDDOMS', 'g m-2','sediment dissolved organic matter',   initial_value=0.01_rk,   minimum=_ZERO_)
+   call self%register_state_variable(self%id_sNDOMS, 'sNDOMS', 'g m-2','sediment dissolved organic N',  initial_value=0.01_rk,    minimum=_ZERO_)
+   call self%register_state_variable(self%id_sPDOMS, 'sPDOMS', 'g m-2','sediment dissolved organic P',  initial_value=0.01_rk,   minimum=_ZERO_)
+   call self%register_state_variable(self%id_sSiDOMS,'sSiDOMS','g m-2','sediment dissolved organic Si', initial_value=1.82_rk,    minimum=_ZERO_)
 !  Dissolved nutrients
    call self%register_state_variable(self%id_sPO4S,  'sPO4S',   'g m-2','sediment phosphate',    initial_value=0.182_rk,   minimum=_ZERO_)
    call self%register_state_variable(self%id_sPAIMS, 'sPAIMS',  'g m-2','sediment absorbed phosphate',initial_value=17.99_rk,   minimum=_ZERO_)
@@ -224,12 +224,12 @@
    call self%register_state_dependency(self%id_diffPDOM,     'PDOM_diffusion_flux',             'g m-3', 'PDOM diffusion flux')
    call self%register_state_dependency(self%id_diffSiDOM,    'SiDOM_diffusion_flux',            'g m-3', 'SiDOM diffusion flux')
 !  Register diagnostic variables
-   call self%register_diagnostic_variable(self%id_afOxySed,       'afOxySed',       '[-]',       'fraction of aerobic sediment',            output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_aPEqIMS,        'aPEqIMS',        '[-]',       'equilibrium_absorbed_PO4',                output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_rPDPOMS,        'rPDPOMS',        '[-]',       'partical organics P/D_ratio in sediment', output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_rNDPOMS,        'rNDPOMS',        '[-]',       'partical organics N/D_ratio in sediment', output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_rPDDOMS,        'rPDDOMS',        '[-]',       'dissolved organics P/D_ratio in sediment', output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_rNDDOMS,        'rNDDOMS',        '[-]',       'dissolved organics N/D_ratio in sediment', output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_afOxySed,       'afOxySed',       '[-]',       'fraction of aerobic sediment',        output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aPEqIMS,        'aPEqIMS',        '[-]',       'equilibrium_absorbed_PO4',            output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_rPDPOMS,        'rPDPOMS',        '[-]',       'particulate organic matter P/D_ratio',output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_rNDPOMS,        'rNDPOMS',        '[-]',       'particulate organic matter N/D_ratio',output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_rPDDOMS,        'rPDDOMS',        '[-]',       'dissolved organic matter P/D_ratio',  output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_rNDDOMS,        'rNDDOMS',        '[-]',       'dissolved organic matter N/D_ratio',  output=output_instantaneous)
 #ifdef _DEVELOPMENT_
 !  Register diagnostic variables for modular fluxes
 !  Total fluxes to local state variables
@@ -252,8 +252,8 @@
    call self%register_diagnostic_variable(self%id_tNdifNO3,       'tNdifNO3',       'g m-2 s-1', 'abiotic_sediment_NO3W_diffusion',     output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_tDAbioO2S,      'tDAbioO2S',      'g m-2 s-1', 'abiotic_sediment_O2_consumption',     output=output_instantaneous)
 !  Register diagnostic variable for external dependencies
-   call self%register_diagnostic_variable(self%id_tDAbioPOMS,     'tDAbioPOMS',     'g m-2 s-1', 'partical organics change in abiotic sediment', output=output_none)
-   call self%register_diagnostic_variable(self%id_tDAbioHumS,     'tDAbioHumS',     'g m-2 s-1', 'Humus change in abiotic sediment',    output=output_none)
+   call self%register_diagnostic_variable(self%id_tDAbioPOMS,     'tDAbioPOMS',     'g m-2 s-1', 'particulate organic matter change',   output=output_none)
+   call self%register_diagnostic_variable(self%id_tDAbioHumS,     'tDAbioHumS',     'g m-2 s-1', 'Humus change',                        output=output_none)
 !  Register environmental dependencies
    call self%register_dependency(self%id_uTm,standard_variables%temperature)
    call self%register_dependency(self%id_depth,standard_variables%bottom_depth)
@@ -280,7 +280,7 @@
    real(rk)                   :: sNH4S,sNO3S,sPO4S,sPAIMS,sDIMS
    real(rk)                   :: sDPOMS,sNPOMS,sPPOMS,sSiPOMS
    real(rk)                   :: sDHumS,sNHumS,sPHumS
-!  carriers for dissolved organics
+!  carriers for dissolved organic matter
    real(rk)                   :: sDDOMS,sNDOMS,sPDOMS,sSiDOMS
    real(rk)                   :: sDDOMW,sNDOMW,sPDOMW,sSiDOMW
 !  nutrients ratios
@@ -301,17 +301,17 @@
    real(rk)                   :: tPAbioPO4S,tPSorpIMS,aPEqIMS
    real(rk)                   :: aPIsoAdsS,aPAdsMaxS,aKPAdsS,tPChemPO4,tPAbioAIMS
    real(rk)                   :: tDAbioIMS
-!  variables for diffusion(in the order of apperance)
+!  variables for diffusion (in the order of appearance)
    real(rk)                   :: aDepthDif,tNDifNH4,tNDifNO3,tPDifPO4
    real(rk)                   :: akO2DifCor,tO2Dif,uFunTmDif
 !  Variables for humus
    real(rk)    :: tDMinHumS,tNMinHumS,tPMinHumS
    real(rk)    :: tDAbioHumS,tNAbioHumS,tPAbioHumS
 !  variables for mineralization
-!  step 1 min. variables
+!  step 1 min. variables (POM mineralization)
    real(rk)                   :: uFunTmMinPOMS
    real(rk)                   :: tDMinPOMS,tNMinPOMS,tPMinPOMS,tSiMinPOMS
-!  step 2 min. variables
+!  step 2 min. variables (DOM mineralization)
    real(rk)                   :: uFunTmMinDOMS
    real(rk)                   :: tDMinDOMS,tNMinDOMS, tPMinDOMS,tSiMinDOMS
 !  dissolved organic matter diffusion variables
@@ -319,13 +319,13 @@
    real(rk)                   :: tDDifDOM,tNDifDOM,tPDifDOM,tSiDifDOM
 !  sediment oxygen consumption variables
    real(rk)                   :: tO2MinPOMS, tDMinOxyPOMS
-!  sediment oxygen consumption variables for dissolved organics
+!  sediment oxygen consumption variables for dissolved organic matter
    real(rk)                   :: tDMinOxyDOMS,tO2MinDOMS
 !  total sediment oxygen consumpution
    real(rk)                   :: tO2MinTOMS
 !  total fluxes for sediment change
    real(rk)                   :: tDAbioPOMS,tNAbioPOMS,tPAbioPOMS,tSiAbioPOMS
-!  total fluxes for dissolved organics
+!  total fluxes for dissolved organic matter
    real(rk)                   :: tDAbioDOMS,tNAbioDOMS,tPAbioDOMS,tSiAbioDOMS
    
 !EOP
@@ -359,7 +359,7 @@
    _GET_(self%id_diffNH4,sNH4W)
    _GET_(self%id_diffNO3,sNO3W)
    _GET_(self%id_diffPO4,sPO4W)
-!  retrieve dissolved organics in the water column
+!  retrieve dissolved organic matter in the water column
    _GET_(self%id_diffDDOM, sDDOMW)
    _GET_(self%id_diffNDOM, sNDOMW)
    _GET_(self%id_diffPDOM, sPDOMW)
@@ -369,7 +369,7 @@
    _GET_HORIZONTAL_(self%id_depth,depth)
    _GET_(self%id_dz,dz)
 !-----------------------------------------------------------------------
-!  Current local nutrients ratios(check the curent state)
+!  Current local nutrients ratios (check the current state)
 !-----------------------------------------------------------------------
    rPDDOMS=sPDOMS/(sDDOMS+NearZero)
    rNDDOMS=sNDOMS/(sDDOMS+NearZero)
@@ -383,7 +383,7 @@
 !  temperature_function_of_diffusion
    uFunTmDif= uFunTmAbio(uTm,self%cThetaDif)
 !-----------------------------------------------------------------------
-!  dissolved nutrients concentration in sediment(converting)
+!  dissolved nutrients concentration in sediment (converting)
 !-----------------------------------------------------------------------
 !  conc._dissolved_N-NO3_in_interstitial_water
    oNO3S = sNO3S / self%cDepthS / self%bPorS
@@ -392,7 +392,7 @@
 !  conc._dissolved_P_in_interstitial_water
    oPO4S = sPO4S / self%cDepthS / self%bPorS
 !-----------------------------------------------------------------------
-!  Mineralization from POM to DOM
+!  mineralization from POM to DOM
 !-----------------------------------------------------------------------
 !  temperature function from POM to DOM
    uFunTmMinPOMS=uFunTmAbio(uTm,self%cThetaMinPOMS)
@@ -405,7 +405,7 @@
 !  mineralization_of_Si_in_upper_sediment
    tSiMinPOMS=self%kSiMinPOMS*uFunTmMinPOMS*sSiPOMS
 !-----------------------------------------------------------------------
-!  Mineralization DOM to dissolved nut.
+!  mineralization DOM to dissolved nutrients
 !-----------------------------------------------------------------------
 !  temp._function_of_mineralization
    uFunTmMinDOMS=uFunTmAbio(uTm,self%cThetaMinDOMS)
@@ -418,7 +418,7 @@
 !  mineralization_of_Si_in_upper_sediment
    tSiMinDOMS=self%kSiMinDOMS*uFunTmMinDOMS*sSiDOMS
 !-----------------------------------------------------------------------
-!  diffusion process
+!  Diffusion process
 !-----------------------------------------------------------------------
 !  average_diffusion_distance
    aDepthDif=self%fDepthDifS*self%cDepthS
@@ -433,14 +433,14 @@
 !  O2_diffusion_(water_->_sediment)
    tO2Dif= akO2DifCor*sO2W/aDepthDif
 !-----------------------------------------------------------------------
-!  diffusion process for dissolved organics
+!  diffusion process for dissolved organic matter
 !-----------------------------------------------------------------------
-!  conc._dissolved_organics_in_interstitial_water
+!  conc._dissolved_organic matter_in_interstitial_water
    oDDOMS  = sDDOMS  / self%cDepthS / self%bPorS
    oNDOMS  = sNDOMS  / self%cDepthS / self%bPorS
    oPDOMS  = sPDOMS  / self%cDepthS / self%bPorS
    oSiDOMS = sSiDOMS / self%cDepthS / self%bPorS
-!  diffusion fluxes of dissolved organics
+!  diffusion fluxes of dissolved organic matter
    tDDifDOM =self%kDDifDOM *uFunTmDif*self%cTurbDifNut*self%bPorCorS*(oDDOMS-sDDOMW)/aDepthDif
    tNDifDOM =self%kNDifDOM *uFunTmDif*self%cTurbDifNut*self%bPorCorS*(oNDOMS-sNDOMW)/aDepthDif
    tPDifDOM =self%kPDifDOM *uFunTmDif*self%cTurbDifNut*self%bPorCorS*(oPDOMS-sPDOMW)/aDepthDif
@@ -449,26 +449,26 @@
 !  Oxygen conditions in sediment
 !-----------------------------------------------------------------------
 !  sediment_oxygen_demand
-!   The original equation
+!   The original equation (before splitting OM in POM and DOM fraction)
 !   tSOD=(molO2molC*self%cCPerDW*(1.0_rk-self%fRefrDetS)*tDMinDetS+self%O2PerNH4*molO2molN*self%kNitrS*uFunTmNitr*sNH4S)/self%cDepthS
    tSOD=(molO2molC*self%cCPerDW*((1.0_rk-self%fRefrPOMS)*tDMinPOMS+tDMinDOMS)+self%O2PerNH4*molO2molN*self%kNitrS*uFunTmNitr*sNH4S)/self%cDepthS
 !  oxygen_penetration_depth
    aDepthOxySed=(((2.0_rk * sO2W * akO2DifCor / tSOD) )** (0.5_rk))
 !  fraction_aerobic_sediment
    afOxySed=aDepthOxySed/self%cDepthS
-!  aerobic_mineralisation_of POM
+!  aerobic_mineralization_of POM
    tDMinOxyPOMS=afOxySed*(1.0_rk-self%fRefrPOMS)*tDMinPOMS
-!  aerobic_mineralisation
+!  aerobic_mineralization
    tDMinOxyDOMS=afOxySed*tDMinDOMS
 !  sediment_oxygen_demand
-!  The original equation
+!  The original equation (before splitting OM in POM and DOM fraction)
 !   tO2MinTOMS=molO2molC*self%cCPerDW*tDMinOxyDetS
    tO2MinTOMS=molO2molC*self%cCPerDW*(tDMinOxyDOMS+tDMinOxyDOMS)
 !-----------------------------------------------------------------------
 !  denitrification flux
 !-----------------------------------------------------------------------
-!  mineralisation_flux_by_denitrification
-!  The original equation_
+!  mineralization_flux_by_denitrification
+!  The original equation (before splitting OM in POM and DOM fraction)
 !   tDDenitS=oNO3S*oNO3S/(self%hNO3Denit*self%hNO3Denit+oNO3S*oNO3S)*(1.0-afOxySed)*(1.0_rk-self%fRefrDetS)*tDMinDetS
    tDDenitS=oNO3S*oNO3S/(self%hNO3Denit*self%hNO3Denit+oNO3S*oNO3S)*(1.0-afOxySed)*(tDMinDOMS+(1.0_rk-self%fRefrPOMS)*tDMinPOMS)
 !  Denitrification_flux
@@ -481,7 +481,7 @@
 !  O2_flux_due_to_nitrification
    tO2NitrS=self%O2PerNH4*molO2molN*tNNitrS
 !-----------------------------------------------------------------------
-!  absorbed P in sediment,oxygen dependent
+!  absorbed P in sediment, oxygen dependent
 !-----------------------------------------------------------------------
 !  max._P_adsorption_per_g_inorg._matter_in_sediment
    aPAdsMaxS =self%cRelPAdsD+afOxySed*self%cRelPAdsFe*self%fFeDIM+self%cRelPAdsAl*self%fAlDIM
@@ -529,7 +529,7 @@
    tNAbioHumS = self%fRefrPOMS * tNMinPOMS - tNMinHumS
 !  total_abiotic/microbial_P_humus_flux_in_sediment
    tPAbioHumS = self%fRefrPOMS * tPMinPOMS - tPMinHumS
-!  total abiotic fluxes for dissolved organics
+!  total abiotic fluxes for dissolved organic matter
    tDAbioDOMS  = tDMinPOMS -tDMinDOMS - tDDifDOM
    tNAbioDOMS  = tNMinPOMS -tNMinDOMS - tNDifDOM
    tPAbioDOMS  = tPMinPOMS -tPMinDOMS - tPDifDOM
@@ -550,7 +550,7 @@
    _SET_ODE_BEN_(self%id_sPHumS,tPAbioHumS)
    _SET_ODE_BEN_(self%id_sNHumS,tNAbioHumS)
 !-----------------------------------------------------------------------
-!  update the state variables for dissolved organics
+!  update the state variables for dissolved organic matter
 !-----------------------------------------------------------------------
    _SET_ODE_BEN_(self%id_sDDOMS, tDAbioDOMS)
    _SET_ODE_BEN_(self%id_sPDOMS, tPAbioDOMS)
@@ -565,7 +565,7 @@
    _SET_BOTTOM_EXCHANGE_(self%id_diffPO4,tPdifPO4)
    _SET_BOTTOM_EXCHANGE_(self%id_O2ConsumpSed,-tO2MinTOMS - tO2NitrS)
 !-----------------------------------------------------------------------
-!  Update external state variables for dissolved organics
+!  Update external state variables for dissolved organic matter
 !-----------------------------------------------------------------------
    _SET_BOTTOM_EXCHANGE_(self%id_diffDDOM,tDDifDOM)
    _SET_BOTTOM_EXCHANGE_(self%id_diffNDOM,tNDifDOM)
@@ -621,5 +621,5 @@
    end module pclake_abiotic_sediment
 
 !------------------------------------------------------------------------------
-! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org
+! Copyright by the FABM-PCLake-team under the GNU Public License - www.gnu.org
 !------------------------------------------------------------------------------

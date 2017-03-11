@@ -36,7 +36,7 @@
    type (type_diagnostic_variable_id)       :: id_oChlaDiat,id_oChlaGren,id_oChlaBlue
    type (type_diagnostic_variable_id)       :: id_rPDDiatW,id_rPDGrenW,id_rPDBlueW,id_rPDPhytW
    type (type_diagnostic_variable_id)       :: id_rNDDiatW,id_rNDGrenW,id_rNDBlueW,id_rNDPhytW
-!  diagnostic variables relating light limitation function
+!  diagnostic variables relating to light limitation function
    type (type_diagnostic_variable_id)       :: id_extDiat,id_extGren,id_extBlue
    type (type_diagnostic_variable_id)       :: id_phypar,id_phytoextinction
    type (type_diagnostic_variable_id)       :: id_aLLimDiat,id_aLLimGren,id_aLLimBlue
@@ -67,7 +67,7 @@
 !  nutrient parameters
    real(rk)   :: cPDDiatMin,cPDDiatMax,cNDDiatMin,cNDDiatMax,hSiAssDiat  ! Diatoms
    real(rk)   :: cPDGrenMin,cPDGrenMax,cNDGrenMin,cNDGrenMax,hSiAssGren  ! Green algae
-   real(rk)   :: cPDBlueMin,cPDBlueMax,cNDBlueMin,cNDBlueMax,hSiAssBlue  ! Blue algae
+   real(rk)   :: cPDBlueMin,cPDBlueMax,cNDBlueMin,cNDBlueMax,hSiAssBlue  ! Blue-green algae
 !  light function parameters
    integer    :: UseLightMethodGren,UseLightMethodBlue,UseLightMethodDiat
    real(rk)   :: hLRefGren,hLRefDiat,hLRefBlue
@@ -96,7 +96,7 @@
    real(rk)   :: cExtSpDiat,cExtSpGren,cExtSpBlue
 !  minimum state variable values
    real(rk)   :: cDBlueMinW,cDGrenMinW,cDDiatMinW
-!  fraction of dissolved organics from phytoplankton
+!  fraction of dissolved organic matter from phytoplankton
    real(rk)   :: fPrimDOMW
 
    contains
@@ -139,35 +139,38 @@
 !  NB: all rates must be provided in values per day,
 !  and are converted here to values per second.
    call self%get_parameter(self%cSigTmDiat,        'cSigTmDiat',        'degree C',  'temperature constant diatoms (sigma in Gaussian curve)',                                                                     default=20.0_rk)
-   call self%get_parameter(self%cTmOptDiat,        'cTmOptDiat',        'degree C',  'optimum temp. diatoms',                                                                                                      default=18.0_rk)
+   call self%get_parameter(self%cTmOptDiat,        'cTmOptDiat',        'degree C',  'optimum temperature of diatoms',                                                                                                      default=18.0_rk)
    call self%get_parameter(self%cSigTmBlue,        'cSigTmBlue',        'degree C',  'temperature constant blue-greens (sigma in Gaussian curve)',                                                                 default=12.0_rk)
-   call self%get_parameter(self%cTmOptBlue,        'cTmOptBlue',        'degree C',  'optimum temp. blue-greens',                                                                                                  default=25.0_rk)
+   call self%get_parameter(self%cTmOptBlue,        'cTmOptBlue',        'degree C',  'optimum temperature of blue-greens',                                                                                                  default=25.0_rk)
    call self%get_parameter(self%cSigTmGren,        'cSigTmGren',        'degree C',  'temperature constant greens (sigma in Gaussian curve)',                                                                      default=15.0_rk)
-   call self%get_parameter(self%cTmOptGren,        'cTmOptGren',        'degree C',  'optimum temp. of greens',                                                                                                    default=25.0_rk)
-   call self%get_parameter(self%cPDDiatMin,        'cPDDiatMin',        'mgP/mgDW',  'minimum P/day ratio for diatoms',                                                                                            default=0.0005_rk)
-   call self%get_parameter(self%cPDDiatMax,        'cPDDiatMax',        'mgP/mgDW',  'max. P/day ratio for diatoms',                                                                                               default=0.005_rk)
-   call self%get_parameter(self%cNDDiatMin,        'cNDDiatMin',        'mgN/mgDW',  'minimum N/day ratio for diatoms',                                                                                            default=0.01_rk)
-   call self%get_parameter(self%cNDDiatMax,        'cNDDiatMax',        'mgN/mgDW',  'max. N/day ratio for diatoms',                                                                                               default=0.05_rk)
-   call self%get_parameter(self%hSiAssDiat,        'hSiAssDiat',        'mgSi/l',    'half-sat. Si for diatoms',                                                                                                   default=0.09_rk)
-   call self%get_parameter(self%cPDGrenMin,        'cPDGrenMin',        'mgP/mgDW',  'minimum P/day ratio greens',                                                                                                 default=0.0015_rk)
-   call self%get_parameter(self%cPDGrenMax,        'cPDGrenMax',        'mgP/mgDW',  'max. P/day ratio greens',                                                                                                    default=0.015_rk)
-   call self%get_parameter(self%cNDGrenMin,        'cNDGrenMin',        'mgN/mgDW',  'minimum N/day ratio greens',                                                                                                 default=0.02_rk)
-   call self%get_parameter(self%cNDGrenMax,        'cNDGrenMax',        'mgN/mgDW',  'max. N/day ratio greens',                                                                                                    default=0.1_rk)
-   call self%get_parameter(self%hSiAssGren,        'hSiAssGren',        'mgSi/l',    'half-sat. Si conc. for growth of green algae',                                                                               default=0.0_rk)
+   call self%get_parameter(self%cTmOptGren,        'cTmOptGren',        'degree C',  'optimum temperature of greens',                                                                                                    default=25.0_rk)
+   call self%get_parameter(self%cPDDiatMin,        'cPDDiatMin',        'mgP/mgDW',  'minimum P/DW ratio for diatoms',                                                                                            default=0.0005_rk)
+   call self%get_parameter(self%cPDDiatMax,        'cPDDiatMax',        'mgP/mgDW',  'maximum P/DW ratio for diatoms',                                                                                               default=0.005_rk)
+   call self%get_parameter(self%cNDDiatMin,        'cNDDiatMin',        'mgN/mgDW',  'minimum N/DW ratio for diatoms',                                                                                            default=0.01_rk)
+   call self%get_parameter(self%cNDDiatMax,        'cNDDiatMax',        'mgN/mgDW',  'maximum N/DW ratio for diatoms',                                                                                               default=0.05_rk)
+   call self%get_parameter(self%hSiAssDiat,        'hSiAssDiat',        'mgSi/l',    'half-saturation constant for Si influence on diatoms',                                                                                                   default=0.09_rk)
+   call self%get_parameter(self%cPDGrenMin,        'cPDGrenMin',        'mgP/mgDW',  'minimum P/DW ratio greens',                                                                                                 default=0.0015_rk)
+   call self%get_parameter(self%cPDGrenMax,        'cPDGrenMax',        'mgP/mgDW',  'maximum P/DW ratio greens',                                                                                                    default=0.015_rk)
+   call self%get_parameter(self%cNDGrenMin,        'cNDGrenMin',        'mgN/mgDW',  'minimum N/DW ratio greens',                                                                                                 default=0.02_rk)
+   call self%get_parameter(self%cNDGrenMax,        'cNDGrenMax',        'mgN/mgDW',  'maximum N/DW ratio greens',                                                                                                    default=0.1_rk)
+   call self%get_parameter(self%hSiAssGren,        'hSiAssGren',        'mgSi/l',    'half-saturation constant for Si influence on green algae',                                                                               default=0.0_rk)
    call self%get_parameter(self%cPDBlueMin,        'cPDBlueMin',        'mgP/mgDW',  'minimum P/day ratio Bluegreens',                                                                                             default=0.0025_rk)
-   call self%get_parameter(self%cPDBlueMax,        'cPDBlueMax',        'mgP/mgDW',  'max. P/day ratio blue-greens',                                                                                               default=0.025_rk)
+   call self%get_parameter(self%cPDBlueMax,        'cPDBlueMax',        'mgP/mgDW',  'maximum P/day ratio blue-greens',                                                                                               default=0.025_rk)
    call self%get_parameter(self%cNDBlueMin,        'cNDBlueMin',        'mgN/mgDW',  'minimum N/day ratio blue-greens',                                                                                            default=0.03_rk)
-   call self%get_parameter(self%cNDBlueMax,        'cNDBlueMax',        'mgN/mgDW',  'max. N/day ratio blue-greens',                                                                                               default=0.15_rk)
-   call self%get_parameter(self%hSiAssBlue,        'hSiAssBlue',        'mgSi/l',    'half-sat. Si conc. for growth of blue-greens',                                                                               default=0.0_rk)
-   call self%get_parameter(self%hLRefGren,         'hLRefGren',         'W m-2',     'half-sat. PAR for green algae at 20 degree C (Lehmann function)',                                                            default=17.0_rk)
+   call self%get_parameter(self%cNDBlueMax,        'cNDBlueMax',        'mgN/mgDW',  'maximum N/day ratio blue-greens',                                                                                               default=0.15_rk)
+   call self%get_parameter(self%hSiAssBlue,        'hSiAssBlue',        'mgSi/l',    'half-saturation constant for Si influence on blue-greens',                                                                               default=0.0_rk)
+   call self%get_parameter(self%hLRefGren,         'hLRefGren',         'W m-2',     'half-saturation constant for PAR influence on green algae (Lehmann function)',                                                            default=17.0_rk)
+   call self%get_parameter(self%hLRefDiat,         'hLRefDiat',         'W m-2',     'half-saturation constant for PAR influence on diatoms (Lehmann function)',                                                                default=6.5_rk)
+   call self%get_parameter(self%hLRefBlue,         'hLRefBlue',         'W m-2',     'half-saturation constant for PAR influence on blue-greens (Lehmann function)',                                                            default=34.0_rk)
+   call self%get_parameter(self%cLOptRefDiat,      'cLOptRefDiat',      'W m-2',     'optimum PAR for diatoms at 20 degree C (Steele function)',                                                                   default=54.0_rk)
+   call self%get_parameter(self%cLOptRefGren,      'cLOptRefGren',      'W m-2',     'optimum PAR for greens at 20 degree C (Steele function)',                                                                    default=30.0_rk)
    call self%get_parameter(self%cLOptRefBlue,      'cLOptRefBlue',      'W m-2',     'optimum PAR for blue-greens at 20 degree C (Steele function)',                                                               default=13.6_rk)
-   call self%get_parameter(self%cLOptRefDiat,      'cLOptRefDiat',      'W m-2',     'optimum PAR for Diatoms at 20 degree C (Steele function)',                                                                   default=54.0_rk)
    call self%get_parameter(self%cMuMaxBlue,        'cMuMaxBlue',        'd-1',       'maximum growth rate blue-greens',                                                                                            default=0.6_rk, scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%cMuMaxGren,        'cMuMaxGren',        'd-1',       'maximum growth rate greens',                                                                                                 default=1.5_rk, scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%cMuMaxDiat,        'cMuMaxDiat',        'd-1',       'maximum growth rate diatoms',                                                                                                default=2.0_rk, scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kDRespDiat,        'kDRespDiat',        'd-1',       'maintenance respiration constant diatoms ',                                                                                  default=0.1_rk, scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kDRespGren,        'kDRespGren',        'd-1',       'maintenance respiration constant greens ',                                                                                   default=0.075_rk, scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kDRespBlue,        'kDRespBlue',        'd-1',       'maintenance respiration constant blue-greens ',                                                                              default=0.03_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kDRespDiat,        'kDRespDiat',        'd-1',       'maintenance respiration constant diatoms',                                                                                  default=0.1_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kDRespGren,        'kDRespGren',        'd-1',       'maintenance respiration constant greens',                                                                                   default=0.075_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kDRespBlue,        'kDRespBlue',        'd-1',       'maintenance respiration constant blue-greens',                                                                              default=0.03_rk, scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%kMortDiatW,        'kMortDiatW',        'd-1',       'mortality constant of diatoms in water',                                                                                     default=0.01_rk, scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%kMortGrenW,        'kMortGrenW',        'd-1',       'mortality constant of diatoms in water',                                                                                     default=0.01_rk, scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%kMortBlueW,        'kMortBlueW',        'd-1',       'mortality constant of blue-greens in water',                                                                                 default=0.01_rk, scale_factor=1.0_rk/secs_pr_day)
@@ -184,77 +187,74 @@
    call self%get_parameter(self%cAffNUptGren,      'cAffNUptGren',      'l/mgDW/d',  'initial N uptake affinity greens',                                                                                           default=0.2_rk, scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%cAffNUptBlue,      'cAffNUptBlue',      'l/mgDW/d',  'initial N uptake affinity bluegreens',                                                                                       default=0.2_rk, scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%fDissMortPhyt,     'fDissMortPhyt',     '[-]',       'soluble nutrient fraction of died algae',                                                                                    default=0.2_rk)
-   call self%get_parameter(self%cSiDDiat,          'cSiDDiat',          'mgSi/mgDW', 'Si/D ratio of diatoms',                                                                                                      default=0.15_rk)
+   call self%get_parameter(self%cSiDDiat,          'cSiDDiat',          'mgSi/mgDW', 'Si/DW ratio of diatoms',                                                                                                      default=0.15_rk)
    call self%get_parameter(self%cCPerDW,           'cCPerDW',           'gC/gDW',    'C content of organic matter',                                                                                                default=0.4_rk)
-   call self%get_parameter(self%hO2BOD,            'hO2BOD',            'mgO2/l',    'half-sat. oxygen conc. for BOD',                                                                                             default=1.0_rk)
+   call self%get_parameter(self%hO2BOD,            'hO2BOD',            'mgO2/l',    'half-sat. constant of oxygen conc. for BOD',                                                                                             default=1.0_rk)
    call self%get_parameter(self%cChDDiatMin,       'cChDDiatMin',       'mgChl/mgDW','minimum chlorophyll/C ratio for diatoms',                                                                                    default=0.004_rk)
    call self%get_parameter(self%cChDDiatMax,       'cChDDiatMax',       'mgChl/mgDW','maximum chlorophyll/C ratio for diatoms',                                                                                    default=0.012_rk)
    call self%get_parameter(self%cChDGrenMin,       'cChDGrenMin',       'mgChl/mgDW','minimum chlorophyll/C ratio for greens',                                                                                     default=0.01_rk)
    call self%get_parameter(self%cChDGrenMax,       'cChDGrenMax',       'mgChl/mgDW','maximum chlorophyll/C ratio for greens',                                                                                     default=0.02_rk)
-   call self%get_parameter(self%cChDBlueMin,       'cChDBlueMin',       'mgChl/mgDW','minimum chlorophyll/C ratio for blueg-reens',                                                                                default=0.005_rk)
-   call self%get_parameter(self%cChDBlueMax,       'cChDBlueMax',       'mgChl/mgDW','maximum chlorophyll/C ratio for blueg-reens',                                                                                default=0.015_rk)
+   call self%get_parameter(self%cChDBlueMin,       'cChDBlueMin',       'mgChl/mgDW','minimum chlorophyll/C ratio for blue-greens',                                                                                default=0.005_rk)
+   call self%get_parameter(self%cChDBlueMax,       'cChDBlueMax',       'mgChl/mgDW','maximum chlorophyll/C ratio for blue-greens',                                                                                default=0.015_rk)
    call self%get_parameter(self%cVSetDiat,         'cVSetDiat',         'm/d',       'sedimentation velocity diatoms',                                                                                             default=-0.5_rk,scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%cVSetGren,         'cVSetGren',         'm/d',       'sedimentation velocity of greens',                                                                                           default=-0.2_rk,scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%cVSetGren,         'cVSetGren',         'm/d',       'sedimentation velocity greens',                                                                                           default=-0.2_rk,scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%cVSetBlue,         'cVSetBlue',         'm/d',       'sedimentation velocity blue-greens',                                                                                         default=-0.06_rk,scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%cExtSpDiat,        'cExtSpDiat',        'm2/gDW',    'specific_extinction_diatoms"',                                                                                               default=0.25_rk)
-   call self%get_parameter(self%cExtSpGren,        'cExtSpGren',        'm2/gDW',    'specific_extinction_greens"',                                                                                                default=0.25_rk)
-   call self%get_parameter(self%cExtSpBlue,        'cExtSpBlue',        'm2/gDW',    'specific_extinction_bluegreens"',                                                                                            default=0.35_rk)
-   call self%get_parameter(self%hLRefDiat,         'hLRefDiat',         'W m-2',     'half-sat. PAR for diatoms at 20 degree C (Lehmann function)',                                                                default=6.5_rk)
-   call self%get_parameter(self%hLRefBlue,         'hLRefBlue',         'W m-2',     'half-sat. PAR for blue-greens at 20 degree C (Lehmann function)',                                                            default=34.0_rk)
-   call self%get_parameter(self%cLOptRefGren,      'cLOptRefGren',      'W m-2',     'optimum PAR for greens at 20 degree C (Steele function)',                                                                    default=30.0_rk)
+   call self%get_parameter(self%cExtSpDiat,        'cExtSpDiat',        'm2/gDW',    'specific extinction of diatoms',                                                                                               default=0.25_rk)
+   call self%get_parameter(self%cExtSpGren,        'cExtSpGren',        'm2/gDW',    'specific_extinction of greens',                                                                                                default=0.25_rk)
+   call self%get_parameter(self%cExtSpBlue,        'cExtSpBlue',        'm2/gDW',    'specific extinction of blue-greens',                                                                                            default=0.35_rk)
    call self%get_parameter(self%UseLightMethodGren,'UseLightMethodGren','[-]',       'lightmethod,1,without photoinhibition,Chalker(1980)model,2,with photoinhibition,Klepperetal.(1988)/Ebenhohetal.(1997)model.',default=1)
    call self%get_parameter(self%UseLightMethodBlue,'UseLightMethodBlue','[-]',       'lightmethod,1,without photoinhibition,Chalker(1980)model,2,with photoinhibition,Klepperetal.(1988)/Ebenhohetal.(1997)model.',default=2)
    call self%get_parameter(self%UseLightMethodDiat,'UseLightMethodDiat','[-]',       'lightmethod,1,without photoinhibition,Chalker(1980)model,2,with photoinhibition,Klepperetal.(1988)/Ebenhohetal.(1997)model.',default=2)
 !  the user defined minumun value for state variables
-   call self%get_parameter(self%cDBlueMinW,        'cDBlueMinW',        'gDW/m3',    'minimum blue-green algae biomass in system',                                                                               default=0.00001_rk)
-   call self%get_parameter(self%cDGrenMinW,        'cDGrenMinW',        'gDW/m3',    'minimum green algae biomass in system',                                                                                    default=0.00001_rk)
-   call self%get_parameter(self%cDDiatMinW,        'cDDiatMinW',        'gDW/m3',    'minimum diatom biomass in system',                                                                                         default=0.00001_rk)
-!  user defiend dissolved organics fraction                                        
-   call self%get_parameter(self%fPrimDOMW,      'fPrimDOMW',      '[-]',       'fraction of dissolved organics from water column phytoplankton',                                                           default=0.5_rk)
+   call self%get_parameter(self%cDBlueMinW,        'cDBlueMinW',        'gDW/m3',    'minimum blue-green algae concentration in system',                                                                               default=0.00001_rk)
+   call self%get_parameter(self%cDGrenMinW,        'cDGrenMinW',        'gDW/m3',    'minimum green algae concentration in system',                                                                                    default=0.00001_rk)
+   call self%get_parameter(self%cDDiatMinW,        'cDDiatMinW',        'gDW/m3',    'minimum diatom concentration in system',                                                                                         default=0.00001_rk)
+!  user defiend dissolved organic matter fraction                                        
+   call self%get_parameter(self%fPrimDOMW,      'fPrimDOMW',      '[-]',       'fraction of dissolved organic matter from water column phytoplankton',                                                           default=0.5_rk)
 !  Register local state variable
 !  all phytoplankton has vertical movement activated,normally netgative, meaning settling.
-   call self%register_state_variable(self%id_sDDiatW,'sDDiatW','g m-3','diatom dry weight in water',    &
+   call self%register_state_variable(self%id_sDDiatW,'sDDiatW','gDW m-3','diatom dry weight',    &
                                     initial_value=0.5_rk,minimum=self%cDDiatMinW,vertical_movement= self%cVSetDiat,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sPDiatW,'sPDiatW','g m-3','diatom phosphorus content in water',     &
+   call self%register_state_variable(self%id_sPDiatW,'sPDiatW','gP m-3','diatom phosphorus content',     &
                                     initial_value=0.005_rk,minimum=self%cDDiatMinW* self%cPDDiatMin,vertical_movement= self%cVSetDiat,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sNDiatW,'sNDiatW','g m-3','diatom nitrogen content in water',     &
+   call self%register_state_variable(self%id_sNDiatW,'sNDiatW','gN m-3','diatom nitrogen content',     &
                                     initial_value=0.05_rk,minimum=self%cDDiatMinW * self%cNDDiatMin,vertical_movement= self%cVSetDiat,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sDGrenW,'sDGrenW','g m-3','green dry weight in water',    &
+   call self%register_state_variable(self%id_sDGrenW,'sDGrenW','gDW m-3','green dry weight',    &
                                     initial_value=0.5_rk,minimum=NearZero,vertical_movement= self%cVSetGren,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sPGrenW,'sPGrenW','g m-3','green phosphorus content in water',     &
+   call self%register_state_variable(self%id_sPGrenW,'sPGrenW','gP m-3','green phosphorus content',     &
                                     initial_value=0.005_rk,minimum=self%cDGrenMinW * self%cPDGrenMin,vertical_movement= self%cVSetGren,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sNGrenW,'sNGrenW','g m-3','green nitrogen content in water',     &
+   call self%register_state_variable(self%id_sNGrenW,'sNGrenW','gN m-3','green nitrogen content',     &
                                     initial_value=0.05_rk,minimum=self%cDGrenMinW * self%cNDGrenMin,vertical_movement= self%cVSetGren,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sDBlueW,'sDBlueW','g m-3','blue dry weight in water',     &
+   call self%register_state_variable(self%id_sDBlueW,'sDBlueW','gDW m-3','blue-green dry weight',     &
                                     initial_value=3.0_rk,minimum=self%cDBlueMinW,vertical_movement= self%cVSetBlue,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sPBlueW,'sPBlueW','g m-3','blue phosphorus content in water',     &
+   call self%register_state_variable(self%id_sPBlueW,'sPBlueW','gP m-3','blue-green phosphorus content',     &
                                     initial_value=0.03_rk,minimum=self%cDBlueMinW * self%cPDBlueMin,vertical_movement= self%cVSetBlue,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sNBlueW,'sNBlueW','g m-3','blue nitrogen content in water',     &
+   call self%register_state_variable(self%id_sNBlueW,'sNBlueW','gN m-3','blue-green nitrogen content',     &
                                     initial_value=0.3_rk,minimum=self%cDBlueMinW * self%cNDBlueMin,vertical_movement= self%cVSetBlue,no_river_dilution=.TRUE.)
 !     register diagnostic variables
-   call self%register_diagnostic_variable(self%id_oSiDiatW,       'oSiDiatW',       'g m-3 ',   'diatom Si content in water',                           output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_oSiDiatW,       'oSiDiatW',       'g m-3 ',   'diatom Si content',                           output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_oChlaDiat,      'oChlaDiat',      'mg m-3',   'diatom chlorophyll a',                                  output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_oChlaGren,      'oChlaGren',      'mg m-3',   'green algae chlorophyll a',                             output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_oChlaBlue,      'oChlaBlue',      'mg m-3',   'blue_algae_chla',                              output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_rPDDiatW,       'rPDDiatW',       '[-]',      'diatom P/D ration in water',                        output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_rPDGrenW,       'rPDGrenW',       '[-]',      'green_P/D_ration_wat',                         output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_rPDBlueW,       'rPDBlueW',       '[-]',      'blue_P/D_ration_wat',                          output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_rNDDiatW,       'rNDDiatW',       '[-]',      'diatom_N/D_ration_wat',                        output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_rNDGrenW,       'rNDGrenW',       '[-]',      'green_N/D_ration_wat',                         output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_rNDBlueW,       'rNDBlueW',       '[-]',      'blue_N/D_ration_wat',                          output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_rPDPhytW,       'rPDPhytW',       '[-]',      'Phyt_P/D_ration_wat',                          output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_rNDPhytW,       'rNDPhytW',       '[-]',      'Phyt_N/D_ration_wat',                          output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_extDiat,        'extDiat',        '[-]',      'extinction factor caused by diatom',           output=output_instantaneous, source=source_get_light_extinction)
-   call self%register_diagnostic_variable(self%id_extGren,        'extGren',        '[-]',      'extinction factor caused by green algae',      output=output_instantaneous, source=source_get_light_extinction)
-   call self%register_diagnostic_variable(self%id_extBlue,        'extBlue',        '[-]',      'extinction factor caused by blue green algae', output=output_instantaneous, source=source_get_light_extinction)
+   call self%register_diagnostic_variable(self%id_oChlaBlue,      'oChlaBlue',      'mg m-3',   'blue-green algae chlorophyll a',                              output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_rPDDiatW,       'rPDDiatW',       '[-]',      'diatom P/D ratio',                        output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_rPDGrenW,       'rPDGrenW',       '[-]',      'greens P/D ratio',                         output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_rPDBlueW,       'rPDBlueW',       '[-]',      'blue-greens P/D ratio',                          output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_rNDDiatW,       'rNDDiatW',       '[-]',      'diatoms N/D ratio',                        output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_rNDGrenW,       'rNDGrenW',       '[-]',      'greens N/D ratio',                         output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_rNDBlueW,       'rNDBlueW',       '[-]',      'blue-greens N/D ratio',                          output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_rPDPhytW,       'rPDPhytW',       '[-]',      'phytoplankton P/D ratio',                          output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_rNDPhytW,       'rNDPhytW',       '[-]',      'phytoplankton N/D ratio',                          output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_extDiat,        'extDiat',        '[-]',      'extinction factor caused by diatoms',          output=output_instantaneous)!, source=source_get_light_extinction)
+   call self%register_diagnostic_variable(self%id_extGren,        'extGren',        '[-]',      'extinction factor caused by green algae',      output=output_instantaneous)!, source=source_get_light_extinction)
+   call self%register_diagnostic_variable(self%id_extBlue,        'extBlue',        '[-]',      'extinction factor caused by blue-green algae', output=output_instantaneous)!, source=source_get_light_extinction)
    call self%register_diagnostic_variable(self%id_phytoextinction,'phytoextinction','[-]',      'phytoextinction',                              output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_phypar,         'phypar',         '[-]',      'local PAR',                                    output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_aLLimDiat,      'aLLimDiat',      '[-]',      'diatoms light limitation factor',              output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_aLLimGren,      'aLLimGren',      '[-]',      'green algae light limitation factor',          output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_aLLimBlue,      'aLLimBlue',      '[-]',      'green blue algae light limitation factor',     output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_aNutLimDiat,    'aNutLimDiat',    '[-]',      'diatoms nutrients limitation factor',          output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_aNutLimGren,    'aNutLimGren',    '[-]',      'green algae  nutrients limitation factor',     output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_aNutLimBlue,    'aNutLimBlue',    '[-]',      'green blue algae nutrients limitation factor', output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aLLimBlue,      'aLLimBlue',      '[-]',      'blue-green algae light limitation factor',     output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aNutLimDiat,    'aNutLimDiat',    '[-]',      'diatoms nutrient limitation factor',          output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aNutLimGren,    'aNutLimGren',    '[-]',      'green algae nutrient limitation factor',     output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aNutLimBlue,    'aNutLimBlue',    '[-]',      'blue-green algae nutrient limitation factor', output=output_instantaneous)
 #ifdef _DEVELOPMENT_
 !  diagnostic variables for modular fluexes
 !  modular fluxes regarding other modules, mainly abiotic water module
@@ -310,7 +310,7 @@
    call self%register_state_dependency(self%id_PDOMpoolW,    'DOM_P_pool_water',            'g m-3', 'DOM P water')
    call self%register_state_dependency(self%id_SiDOMpoolW,   'DOM_Si_pool_water',           'g m-3', 'DOM Si water')
 !  register diagnostic dependencies
-   call self%register_dependency(self%id_afCovSurfVeg,    'surface_vegetation_coverage','[-]',   'surface vegetation coverage')
+   call self%register_dependency(self%id_afCovSurfVeg,    'surface_macrophytes_coverage','[-]',   'surface macrophytes coverage')
 !  register environmental dependencies
    call self%register_dependency(self%id_uTm, standard_variables%temperature)
    call self%register_dependency(self%id_dz,  standard_variables%cell_thickness)
@@ -451,7 +451,7 @@
 !-----------------------------------------------------------------------
    oSiDiatW=self%cSiDDiat*sDDiatW
 !-----------------------------------------------------------------------
-!  Current local nutrients ratios(check the current state)
+!  Current local nutrient ratios (check the current state)
 !-----------------------------------------------------------------------
 !  Local status
 !  P/D_ratio_of_Diatom
@@ -485,20 +485,20 @@
 !-----------------------------------------------------------------------
 !  Light functions for pelagic phytoplankton
 !-----------------------------------------------------------------------
-!  Light function in PCLake include 2 motheds: 1)with depth depended
-!  PAR(botthom par and top par), originally from PCLake
-!  mannual with self-shading. For the monod type,we use the
-!  functions from Jef Huisman & Franz J. 1994. ,equation 7.
+!  Light functions currently include 2 methods: 1) with depth dependent
+!  PAR(bottom par and top par), originally from PCLake with self-shading. 
+!  For the monod type, we use the functions from Jef Huisman & Franz J. 1994. (eq. 7.)
 !  The steele function is simplified. 2) Use layer-centered PAR
-!  with Monod type for non-photpinhibiton and Klepper et al. (1988)
-!   / Ebenhoh et al. (1997) model with photoinhibition
-!  light_at_the_surface,in FABM it's at the top of the current layer
+!  with Monod type for non-photoinhibition based on Klepper et al. (1988)
+!  and Ebenhoh et al. (1997) with photoinhibition
+   
+!  light_at_the_surface, in FABM it is at the top of the local layer
    uLPARSurf = meanpar / EXP( -extc * dz/2.0_rk )
-!  light_at_the_bottom,in FABM it's at the bottom of the current layer
+!  light_at_the_bottom, in FABM it is at the bottom of the local layer
    aLPARBot = meanpar * EXP( -extc * dz/2.0_rk )
-!  light limitation function for each group, each group has two different types
+!  light limitation function for each group, each group has two different options
    select case(self%UseLightMethodGren)
-!  case 1, without photoinhibition,Chalker (1980) model
+!  case 1, without photoinhibition, Chalker (1980) model
    case(1)
 !  half-saturation light intensity at current temperature
        uhLGren=self%hLRefGren*uFunTmGren
@@ -511,7 +511,7 @@
    end select
 
    select case(self%UseLightMethodBlue)
-!  case 1, without photoinhibition,Chalker (1980) model
+!  case 1, without photoinhibition, Chalker (1980) model
       case(1)
 !  half-saturation light intensity at current temperature
        uhLBlue=self%hLRefGren*uFunTmGren
@@ -524,7 +524,7 @@
    end select
 
    select case(self%UseLightMethodDiat)
-!  case 1, without photoinhibition,Chalker (1980) model
+!  case 1, without photoinhibition, Chalker (1980) model
       case(1)
 !  half-saturation light intensity at current temperature
        uhLDiat=self%hLRefDiat*uFunTmDiat
@@ -671,7 +671,7 @@
 !-----------------------------------------------------------------------
 !  Algae uptake_N
 !-----------------------------------------------------------------------
-!  maximum_N_uptake_rate_of_Algae,corrected_for_N/D_ratio
+!  maximum_N_uptake_rate_of_algae, corrected_for_N/D_ratio
    aVNUptMaxCrDiat = max(0.0_rk,self%cVNUptMaxDiat * uFunTmDiat * (self%cNDDiatMax - rNDDiatW) &
                     & /(self%cNDDiatMax - self%cNDDiatMin))
 !  half-sat._NDissW_for_uptake_by_Algae
@@ -811,24 +811,24 @@
 !  O2_flux_by_water_algae
    wO2PrimW = wO2ProdPhyt - wO2RespPhytW + wO2UptNO3Phyt
 !-----------------------------------------------------------------------
-!  Organics exchange with abiotic module
+!  organic matter exchange with abiotic module
 !-----------------------------------------------------------------------
-!  Flux_to_water_organics, POM and DOM
+!  Flux_to_water_organic matter, POM and DOM
    wDPrimPOMW = wDMortPhytW * (1.0_rk - self%fPrimDOMW)
    wDPrimDOMW = wDMortPhytW * self%fPrimDOMW
 !  organic_N_flux_from_died_Algae
    wNMortPhytTOMW = wNMortPhytW - wNMortPhytNH4W
-!  organics_in_water
+!  organic matter_in_water
    wNPrimPOMW = wNMortPhytTOMW * (1.0_rk - self%fPrimDOMW)
    wNPrimDOMW = wNMortPhytTOMW * self%fPrimDOMW
-!  organics_P_flux_from_died_Algae
+!  organic matter_P_flux_from_died_Algae
    wPMortPhytTOMW = wPMortPhytW - wPMortPhytPO4W
-!  organics_in_water
+!  organic matter_in_water
    wPPrimPOMW = wPMortPhytTOMW * (1.0_rk - self%fPrimDOMW)
    wPPrimDOMW = wPMortPhytTOMW * self%fPrimDOMW
 !  Diatoms_mortality_in_water
    wSiMortDiatW = self%cSiDDiat * wDMortDiatW
-!  total_Si_flux_to_sed._organics_in_PRIM_module
+!  total_Si_flux_to_sed._organic matter_in_PRIM_module
    wSiPrimPOMW = wSiMortDiatW * (1.0_rk - self%fPrimDOMW)
    wSiPrimDOMW = wSiMortDiatW * self%fPrimDOMW
 !-----------------------------------------------------------------------
@@ -996,5 +996,5 @@
    end module pclake_phytoplankton_water
 
 !------------------------------------------------------------------------------
-! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org
+! Copyright by the FABM-PCLake-team under the GNU Public License - www.gnu.org
 !------------------------------------------------------------------------------

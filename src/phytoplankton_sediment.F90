@@ -16,7 +16,6 @@
 ! !PUBLIC DERIVED TYPES:
    type, extends(type_base_model),public :: type_pclake_phytoplankton_sediment
 !  local state variable identifiers
-!  local state variable identifiers
 !  id_sDDiatS,id_sDGrenS,id_sDBlueS: phytoplankton concentration in dry-weight, gDW/m**2
 !  id_sPDiatS,id_sPGrenS,id_sPBlueS: phytoplankton concentration in nitrogen element, gN/m**2
 !  id_sNDiatS,id_sNGrenS,id_sNBlueS: phytoplankton concentration in phosphorus element, gP/m**2
@@ -62,7 +61,7 @@
    real(rk)   :: fDissMortPhyt,cSiDDiat
 !  minimum state variable values
    real(rk)   :: cDBlueMinS,cDGrenMinS,cDDiatMinS
-!  fraction of dissolved organics from phytoplankton
+!  fraction of dissolved organic matter from phytoplankton
    real(rk)   :: fPrimDOMS
 
 
@@ -71,12 +70,9 @@
    procedure initialize
    procedure do_bottom
 
-
-
    end type type_pclake_phytoplankton_sediment
 
-
-!  private data members(API0.92)
+!  private data members (API0.92)
    real(rk),parameter :: secs_pr_day=86400.0_rk
    real(rk),parameter :: NearZero=0.000000000000000000000000000000001_rk
 !  Lowest phytoplankton value in sediment
@@ -104,62 +100,62 @@
 !  Store parameter values in our own derived type
 !  NB: all rates must be provided in values per day,
 !  and are converted here to values per second.
-   call self%get_parameter(self%cSigTmDiat,   'cSigTmDiat',   'degree C', 'temperature constant diatoms (sigma in Gaussian curve)',    default=20.0_rk)
+   call self%get_parameter(self%cSigTmDiat,   'cSigTmDiat',   'degree C', 'temperature constant for diatoms (sigma)',                  default=20.0_rk)
    call self%get_parameter(self%cTmOptDiat,   'cTmOptDiat',   'degree C', 'optimal temperature for diatoms',                           default=18.0_rk)
-   call self%get_parameter(self%cSigTmBlue,   'cSigTmBlue',   'degree C', 'temperature constant blue-greens (sigma in Gaussian curve)',default=12.0_rk)
+   call self%get_parameter(self%cSigTmBlue,   'cSigTmBlue',   'degree C', 'temperature constant for blue-greens (sigma)',              default=12.0_rk)
    call self%get_parameter(self%cTmOptBlue,   'cTmOptBlue',   'degree C', 'optimal temperature for blue-greens',                       default=25.0_rk)
-   call self%get_parameter(self%cSigTmGren,   'cSigTmGren',   'degree C', 'temperature constant greens (sigma in Gaussian curve)',     default=15.0_rk)
+   call self%get_parameter(self%cSigTmGren,   'cSigTmGren',   'degree C', 'temperature constant for greens (sigma)',                   default=15.0_rk)
    call self%get_parameter(self%cTmOptGren,   'cTmOptGren',   'degree C', 'optimal temperature for greens',                            default=25.0_rk)
-   call self%get_parameter(self%kMortDiatS,   'kMortDiatS',   'd-1',      'mortality constant of sediment diatoms',                    default=0.05_rk, scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kDRespDiat,   'kDRespDiat',   'd-1',      'maintenance respiration constant diatoms',                  default=0.1_rk,  scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%cNDDiatMin,   'cNDDiatMin',   'mgN/mgDW', 'minimum N/day ratio diatoms',                               default=0.01_rk)
-   call self%get_parameter(self%cPDDiatMin,   'cPDDiatMin',   'mgP/mgDW', 'minimum P/day ratio diatoms',                               default=0.0005_rk)
-   call self%get_parameter(self%kMortGrenS,   'kMortGrenS',   'd-1',      'mortality constant greens',                                 default=0.05_rk, scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kDRespGren,   'kDRespGren',   'd-1',      'maintenance respiration constant greens ',                  default=0.075_rk,scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%cNDGrenMin,   'cNDGrenMin',   'mgN/mgDW', 'minimum N/day ratio greens',                                default=0.02_rk)
-   call self%get_parameter(self%cPDGrenMin,   'cPDGrenMin',   'mgP/mgDW', 'minimum P/day ratio greens',                                default=0.0015_rk)
-   call self%get_parameter(self%kMortBlueS,   'kMortBlueS',   'd-1',      'mortality constant blue-greens',                            default=0.2_rk,  scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kDRespBlue,   'kDRespBlue',   'd-1',      'maintenance respiration constant blue-greens',              default=0.03_rk, scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%cNDBlueMin,   'cNDBlueMin',   'mgN/mgDW', 'minimum N/day ratio blue-greens',                           default=0.03_rk)
-   call self%get_parameter(self%cPDBlueMin,   'cPDBlueMin',   'mgP/mgDW', 'minimum P/day ratio blue-greens',                           default=0.0025_rk)
+   call self%get_parameter(self%kMortDiatS,   'kMortDiatS',   'd-1',      'mortality rate of settled diatoms',                         default=0.05_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kDRespDiat,   'kDRespDiat',   'd-1',      'maintenance respiration constant for diatoms',              default=0.1_rk,  scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%cNDDiatMin,   'cNDDiatMin',   'mgN/mgDW', 'minimum N/DW ratio diatoms',                                default=0.01_rk)
+   call self%get_parameter(self%cPDDiatMin,   'cPDDiatMin',   'mgP/mgDW', 'minimum P/DW ratio diatoms',                                default=0.0005_rk)
+   call self%get_parameter(self%kMortGrenS,   'kMortGrenS',   'd-1',      'mortality rate of settled greens',                          default=0.05_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kDRespGren,   'kDRespGren',   'd-1',      'maintenance respiration constant for greens',               default=0.075_rk,scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%cNDGrenMin,   'cNDGrenMin',   'mgN/mgDW', 'minimum N/DW ratio greens',                                 default=0.02_rk)
+   call self%get_parameter(self%cPDGrenMin,   'cPDGrenMin',   'mgP/mgDW', 'minimum P/DW ratio greens',                                 default=0.0015_rk)
+   call self%get_parameter(self%kMortBlueS,   'kMortBlueS',   'd-1',      'mortality rate of settled blue-greens',                     default=0.2_rk,  scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kDRespBlue,   'kDRespBlue',   'd-1',      'maintenance respiration constant for blue-greens',          default=0.03_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%cNDBlueMin,   'cNDBlueMin',   'mgN/mgDW', 'minimum N/DW ratio blue-greens',                            default=0.03_rk)
+   call self%get_parameter(self%cPDBlueMin,   'cPDBlueMin',   'mgP/mgDW', 'minimum P/DW ratio blue-greens',                            default=0.0025_rk)
    call self%get_parameter(self%fDissMortPhyt,'fDissMortPhyt','[-]',      'soluble nutrient fraction of died algae',                   default=0.2_rk)
    call self%get_parameter(self%cSiDDiat,     'cSiDDiat',     'mgSi/mgDW','Si/D ratio of diatoms',                                     default=0.15_rk)
-   call self%get_parameter(self%cNDBlueMax,   'cNDBlueMax',   'mgN/mgDW', 'maximum N/day ratio blue-greens',                           default=0.15_rk)
-   call self%get_parameter(self%cNDDiatMax,   'cNDDiatMax',   'mgN/mgDW', 'maximum N/day ratio diatoms',                               default=0.05_rk)
-   call self%get_parameter(self%cNDGrenMax,   'cNDGrenMax',   'mgN/mgDW', 'maximum N/day ratio greens',                                default=0.1_rk)
-   call self%get_parameter(self%cPDBlueMax,   'cPDBlueMax',   'mgP/mgDW', 'maximum P/day ratio blue-greens',                           default=0.025_rk)
-   call self%get_parameter(self%cPDDiatMax,   'cPDDiatMax',   'mgP/mgDW', 'maximum P/day ratio diatoms',                               default=0.005_rk)
-   call self%get_parameter(self%cPDGrenMax,   'cPDGrenMax',   'mgP/mgDW', 'maximum P/day ratio greens',                                default=0.015_rk)
+   call self%get_parameter(self%cNDBlueMax,   'cNDBlueMax',   'mgN/mgDW', 'maximum N/DW ratio blue-greens',                            default=0.15_rk)
+   call self%get_parameter(self%cNDDiatMax,   'cNDDiatMax',   'mgN/mgDW', 'maximum N/DW ratio diatoms',                                default=0.05_rk)
+   call self%get_parameter(self%cNDGrenMax,   'cNDGrenMax',   'mgN/mgDW', 'maximum N/DW ratio greens',                                 default=0.1_rk)
+   call self%get_parameter(self%cPDBlueMax,   'cPDBlueMax',   'mgP/mgDW', 'maximum P/DW ratio blue-greens',                            default=0.025_rk)
+   call self%get_parameter(self%cPDDiatMax,   'cPDDiatMax',   'mgP/mgDW', 'maximum P/DW ratio diatoms',                                default=0.005_rk)
+   call self%get_parameter(self%cPDGrenMax,   'cPDGrenMax',   'mgP/mgDW', 'maximum P/DW ratio greens',                                 default=0.015_rk)
 !  the user defined minumun value for state variables
    call self%get_parameter(self%cDBlueMinS,   'cDBlueMinS',   'gDW/m2',   'minimum blue-green algae biomass in system',                default=0.00001_rk)
    call self%get_parameter(self%cDGrenMinS,   'cDGrenMinS',   'gDW/m2',   'minimum green algae biomass in system',                     default=0.00001_rk)
    call self%get_parameter(self%cDDiatMinS,   'cDDiatMinS',   'gDW/m2',   'minimum diatom biomass in system',                          default=0.00001_rk)
-   call self%get_parameter(self%fPrimDOMS, 'fPrimDOMS', '[-]',      'fraction of dissolved organics from sediment phytoplankton',default=0.5_rk)
+   call self%get_parameter(self%fPrimDOMS, 'fPrimDOMS', '[-]',      'fraction of DOM from settled phytoplankton',                      default=0.5_rk)
 !  Register local state variable
-   call self%register_state_variable(self%id_sDDiatS,'sDDiatS','g m-2','diatom dry weight in sediment',     &
+   call self%register_state_variable(self%id_sDDiatS,'sDDiatS','gDW m-2','diatom dry weight',     &
                                     initial_value=0.001_rk,minimum= self%cDDiatMinS)
-   call self%register_state_variable(self%id_sPDiatS,'sPDiatS','g m-2','diatom phosphorus content in sediment',     &
+   call self%register_state_variable(self%id_sPDiatS,'sPDiatS','gP m-2','diatom phosphorus content',     &
                                     initial_value=0.00001_rk,minimum= self%cDDiatMinS * self%cPDDiatMin)
-   call self%register_state_variable(self%id_sNDiatS,'sNDiatS','g m-2','diatom nitrogen content in sediment',     &
+   call self%register_state_variable(self%id_sNDiatS,'sNDiatS','gN m-2','diatom nitrogen content',     &
                                     initial_value=0.0001_rk,minimum= self%cDDiatMinS * self%cNDDiatMin)
-   call self%register_state_variable(self%id_sDGrenS,'sDGrenS','g m-2','green dry weight in sediment',     &
+   call self%register_state_variable(self%id_sDGrenS,'sDGrenS','gDW m-2','green dry weight',     &
                                     initial_value=0.001_rk,minimum= self%cDGrenMinS)
-   call self%register_state_variable(self%id_sPGrenS,'sPGrenS','g m-2','green phosphorus content in sediment',     &
+   call self%register_state_variable(self%id_sPGrenS,'sPGrenS','gP m-2','green phosphorus content',     &
                                     initial_value=0.00001_rk,minimum= self%cDGrenMinS * self%cPDGrenMin)
-   call self%register_state_variable(self%id_sNGrenS,'sNGrenS','g m-2','green nitrogen content in sediment',     &
+   call self%register_state_variable(self%id_sNGrenS,'sNGrenS','gN m-2','green nitrogen content',     &
                                     initial_value=0.0001_rk,minimum=self%cDGrenMinS * self%cNDGrenMin)
-   call self%register_state_variable(self%id_sDBlueS,'sDBlueS','g m-2','blue dry weight in sediment',     &
+   call self%register_state_variable(self%id_sDBlueS,'sDBlueS','gDW m-2','blue-green dry weight',     &
                                     initial_value=0.001_rk,minimum=self%cDBlueMinS)
-   call self%register_state_variable(self%id_sPBlueS,'sPBlueS','g m-2','blue phosphorus content in sediment',     &
+   call self%register_state_variable(self%id_sPBlueS,'sPBlueS','gP m-2','blue-green phosphorus content',     &
                                     initial_value=0.00001_rk,minimum=self%cDBlueMinS * self%cPDBlueMin)
-   call self%register_state_variable(self%id_sNBlueS,'sNBlueS','g m-2','blue nitrogen content in sediment',     &
+   call self%register_state_variable(self%id_sNBlueS,'sNBlueS','gN m-2','blue-green nitrogen content',     &
                                     initial_value=0.0001_rk,minimum=self%cDBlueMinS * self%cNDBlueMin)
 !  register diagnostic variables
    call self%register_diagnostic_variable(self%id_oSiDiatS,  'oSiDiatS',  'g m-2 s-1','oSiDiatS',  output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_rPDPhytS,  'rPDPhytS',  '[-]',      'rPDPhytS',  output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_rNDPhytS,  'rNDPhytS',  '[-]',      'rNDPhytS',  output=output_instantaneous)
 !  register diagnostic variable for external usage
-   call self%register_diagnostic_variable(self%id_tDPrimPOMS,'tDPrimPOMS','g m-2 s-1', 'partical organics change in phytoplankton sediment',  output=output_none)
+   call self%register_diagnostic_variable(self%id_tDPrimPOMS,'tDPrimPOMS','gDW m-2 s-1', 'POM from settled phytoplankton',  output=output_none)
 #ifdef _DEVELOPMENT_
 !  register diagnostic variables for modular fluxes
 !  fluxes for local state variables
@@ -241,7 +237,7 @@
    real(rk)   :: uFunTmDiat,uFunTmBlue,uFunTmGren
 !  Diatom dry-weight variables
    real(rk)   :: tDPrimDiatS,tDMortDiatS,tDRespDiatS,ukDRespTmDiat
-!  Diatom Nitrogen variables
+!  Diatom nitrogen variables
    real(rk)   :: tNPrimDiatS,tNMortDiatS,tNExcrDiatS
 !  Diatom phosphorus variables
    real(rk)   :: tPPrimDiatS,tPMortDiatS,tPExcrDiatS
@@ -251,11 +247,11 @@
    real(rk)   :: tNPrimGrenS,tNMortGrenS,tNExcrGrenS
 !  Green algae phosphorus variables
    real(rk)   :: tPPrimGrenS,tPMortGrenS,tPExcrGrenS
-!  Blue algae dry-weight variables
+!  Blue-green algae dry-weight variables
    real(rk)   :: tDPrimBlueS,tDMortBlueS,tDRespBlueS,ukDRespTmBlue
-!  Blue algae Nitrogen variables
+!  Blue-green algae nitrogen variables
    real(rk)   :: tNPrimBlueS,tNMortBlueS,tNExcrBlueS
-!  Blue algae phosphorus variables
+!  Blue-green algae phosphorus variables
    real(rk)   :: tPPrimBlueS,tPMortBlueS,tPExcrBlueS
 !  Exchange related variables
    real(rk)   :: tNPrimNH4S,tNExcrPhytS,tNMortPhytNH4S,tNMortPhytS
@@ -297,7 +293,7 @@
    _GET_(self%id_uTm,uTm)
    _GET_(self%id_dz,dz)
 !-----------------------------------------------------------------------
-!  Current local nutrients ratios(check the current state)
+!  Current local nutrients ratios (check the current state)
 !-----------------------------------------------------------------------
 !  Local status
 !  P/D_ratio_of_Diatom
@@ -327,7 +323,7 @@
 !  temperature_function_of_Green_Algae
    uFunTmGren = uFunTmBio(uTm,self%cSigTmGren,self%cTmOptGren)
 !-----------------------------------------------------------------------
-!  Dry-weight change of Diatoms in sediment
+!  Dry-weight change of diatoms in sediment
 !-----------------------------------------------------------------------
 !  temp._corrected_respiration_constant_of_Algae
    ukDRespTmDiat = self%kDRespDiat * uFunTmDiat
@@ -338,7 +334,7 @@
 !  total_flux_from_PRIM_module_to_sediment_Algae
    tDPrimDiatS = - tDMortDiatS - tDRespDiatS
 !-----------------------------------------------------------------------
-!  Nitrogen change of Diatoms in sediment
+!  Nitrogen change of diatoms in sediment
 !-----------------------------------------------------------------------
 #ifdef _V509_
    tNExcrDiatS = rNDDiatS /(self%cNDDiatMin + rNDDiatS) * rNDDiatS * tDRespDiatS
@@ -355,7 +351,7 @@
 !  total_flux_from_PRIM_module_to_sediment_Algae
    tNPrimDiatS = - tNMortDiatS - tNExcrDiatS
 !-----------------------------------------------------------------------
-!  phosphorus change of Diatoms in sediment
+!  phosphorus change of diatoms in sediment
 !-----------------------------------------------------------------------
 !  P_excretion_of_algae_in_sediment 
    tPExcrDiatS = (2.0_rk * rPDDiatS) /(self%cPDDiatMax + rPDDiatS) * rPDDiatS * tDRespDiatS
@@ -384,7 +380,7 @@
 !  total_flux_from_PRIM_module_to_sediment_Algae
    tNPrimGrenS = - tNMortGrenS - tNExcrGrenS
 !-----------------------------------------------------------------------
-!  phosphorus change of green algae in sediment
+!  Phosphorus change of green algae in sediment
 !-----------------------------------------------------------------------
 !  P_excretion_of_algae_in_sediment
    tPExcrGrenS = (2.0_rk * rPDGrenS) /(self%cPDGrenMax + rPDGrenS) * rPDGrenS * tDRespGrenS
@@ -393,7 +389,7 @@
 !  total_flux_from_PRIM_module_to_sediment_Algae
    tPPrimGrenS = - tPMortGrenS - tPExcrGrenS
 !-----------------------------------------------------------------------
-!  Dry-weight change of blue algae in sediment
+!  Dry-weight change of blue-green algae in sediment
 !-----------------------------------------------------------------------
 !  temp._corrected_respiration_constant_of_Algae
    ukDRespTmBlue = self%kDRespBlue * uFunTmBlue
@@ -404,7 +400,7 @@
 !  total_flux_from_PRIM_module_to_sediment_Algae
    tDPrimBlueS = - tDMortBlueS - tDRespBlueS
 !-----------------------------------------------------------------------
-!  Nitrogen change of blue algae in sediment
+!  Nitrogen change of blue-green algae in sediment
 !-----------------------------------------------------------------------
 !  N_excretion_of_algae_in_sediment
    tNExcrBlueS = (2.0_rk * rNDBlueS) /(self%cNDBlueMax + rNDBlueS) * rNDBlueS * tDRespBlueS
@@ -413,7 +409,7 @@
 !  total_flux_from_PRIM_module_to_sediment_Algae
    tNPrimBlueS = - tNMortBlueS - tNExcrBlueS
 !-----------------------------------------------------------------------
-!  phosphorus change of blue algae in sediment
+!  Phosphorus change of blue-green algae in sediment
 !-----------------------------------------------------------------------
 !  P_excretion_of_algae_in_sediment
    tPExcrBlueS = (rPDBlueS *2.0_rk)/(self%cPDBlueMax + rPDBlueS) * rPDBlueS * tDRespBlueS
@@ -452,35 +448,35 @@
 !  Pore_water_P
    tPPrimPO4S = tPExcrPhytS + tPMortPhytPO4S
 !-----------------------------------------------------------------------
-!  sediment organics exchange, DW
+!  sediment organic matter exchange, DW
 !-----------------------------------------------------------------------
 !  mortality_of_algae_on_bottom
    tDMortPhytS = tDMortDiatS + tDMortGrenS + tDMortBlueS
-!  Flux_to_sediment_organics
+!  Flux_to_sediment_organic matter
    tDPrimPOMS = tDMortPhytS * (1.0_rk - self%fPrimDOMS)
    tDPrimDOMS = tDMortPhytS * self%fPrimDOMS
 !-----------------------------------------------------------------------
-!  sediment organics exchange, N
+!  sediment organic matter exchange, N
 !-----------------------------------------------------------------------
 !  organic_N_flux_from_died_Algae
    tNMortPhytTOMS = tNMortPhytS - tNMortPhytNH4S
-!  Flux_to_sediment_organics
+!  Flux_to_sediment_organic matter
    tNPrimPOMS = tNMortPhytTOMS * (1.0_rk - self%fPrimDOMS)
    tNPrimDOMS = tNMortPhytTOMS * self%fPrimDOMS
 !-----------------------------------------------------------------------
-!  sediment organics exchange, P
+!  sediment organic matter exchange, P
 !-----------------------------------------------------------------------
 !  organic_P_flux_from_died_Algae
    tPMortPhytTOMS = tPMortPhytS - tPMortPhytPO4S
-!  Flux_to_sediment_organics
+!  Flux_to_sediment_organic matter
    tPPrimPOMS = tPMortPhytTOMS * (1.0_rk - self%fPrimDOMS)
    tPPrimDOMS = tPMortPhytTOMS * self%fPrimDOMS
 !-----------------------------------------------------------------------
-!  sediment organics exchange, Si
+!  sediment organic matter exchange, Si
 !-----------------------------------------------------------------------
 !  mortality_of_bottom_Algae
    tSiMortDiatS = self%cSiDDiat * tDMortDiatS
-!  Sediment_organics
+!  Sediment_organic matter
    tSiPrimPOMS = tSiMortDiatS* (1.0_rk - self%fPrimDOMS)
    tSiPrimDOMS = tSiMortDiatS * self%fPrimDOMS
 !-----------------------------------------------------------------------
@@ -555,5 +551,5 @@
    end module pclake_phytoplankton_sediment
 
 !------------------------------------------------------------------------------
-! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org
+! Copyright by the FABM-PCLake-team under the GNU Public License - www.gnu.org
 !------------------------------------------------------------------------------

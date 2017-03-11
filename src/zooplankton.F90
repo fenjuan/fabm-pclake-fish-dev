@@ -98,46 +98,46 @@
 !  Store parameter values in our own derived type
 !  NB: all rates must be provided in values per day,
 !  and are converted here to values per second.
-   call self%get_parameter(self%cSigTmZoo,     'cSigTmZoo',     'degree C',  'temperature constant zooplankton(sigma in Gaussian curve)',                      default=13.0_rk)
-   call self%get_parameter(self%cTmOptZoo,     'cTmOptZoo',     'degree C',  'optimum temp. zooplankton',                                                      default=25.0_rk)
-   call self%get_parameter(self%cDCarrZoo,     'cDCarrZoo',     'gm-3',      'carrying capacity of zooplankton',                                               default=25.0_rk)
-   call self%get_parameter(self%kMortZoo,      'kMortZoo',      'd-1',       'mortality constant herb.zooplankton',                                            default=0.04_rk,scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kDRespZoo,     'kDRespZoo',     'd-1',       'maintenance respiration constant herb.zooplankton',                              default=0.15_rk,scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%cPrefDiat,     'cPrefDiat',     '[-]',       'selection factor for diatoms',                                                   default=0.75_rk)
-   call self%get_parameter(self%cPrefGren,     'cPrefGren',     '[-]',       'selection factor for greens',                                                    default=0.75_rk)
-   call self%get_parameter(self%cPrefBlue,     'cPrefBlue',     '[-]',       'selection factor for blue-greens',                                           default=0.125_rk)
-   call self%get_parameter(self%cPrefPOM,      'cPrefPOM',      '[-]',       'selection factor for organics',                                                  default=0.25_rk)
-   call self%get_parameter(self%hFilt,         'hFilt',         'gDW m-3',   'half-sat. food concentration for filtering',                                             default=1.0_rk)
-   call self%get_parameter(self%fDAssZoo,      'fDAssZoo',      '[-]',       'dry weight assimilation efficiency of herb. zooplankton',                                default=0.35_rk)
-   call self%get_parameter(self%cFiltMax,      'cFiltMax',      'ltr/mgDW/d','maximum filtering rate',                                                         default=4.5_rk,scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%cPDZooRef,     'cPDZooRef',     'mgP/mgDW',  'reference P/C-ratio herb. zooplankton',                                          default=0.01_rk)
-   call self%get_parameter(self%cNDZooRef,     'cNDZooRef',     'mgN/mgDW',  'reference N/C-ratio herb. zooplankton',                                          default=0.07_rk)
-   call self%get_parameter(self%fDissEgesZoo,  'fDissEgesZoo',  '[-]',       'soluble nutrient fraction of by herb.zooplankton egested food',              default=0.25_rk)
-   call self%get_parameter(self%fDissMortZoo,  'fDissMortZoo',  '[-]',       'soluble nutrient fraction of died zooplankton',                         default=0.1_rk)
-   call self%get_parameter(self%cSiDDiat,      'cSiDDiat',      'mgSi/mgDW', 'Si/DW ratio of daitoms',                                                default=0.15_rk)
-   call self%get_parameter(self%cNDDiatMin,    'cNDDiatMin',    'mgN/mgDW',  'minimum N/day ratio diatoms',                                                    default=0.01_rk)
-   call self%get_parameter(self%cPDDiatMin,    'cPDDiatMin',    'mgP/mgDW',  'minimum P/day ratio diatoms',                                                    default=0.0005_rk)
-   call self%get_parameter(self%cNDGrenMin,    'cNDGrenMin',    'mgN/mgDW',  'minimum N/day ratio greens',                                                     default=0.02_rk)
-   call self%get_parameter(self%cPDGrenMin,    'cPDGrenMin',    'mgP/mgDW',  'minimum P/day ratio greens',                                                     default=0.0015_rk)
-   call self%get_parameter(self%cNDBlueMin,    'cNDBlueMin',    'mgN/mgDW',  'minimum N/day ratio bluegreens',                                                 default=0.03_rk)
-   call self%get_parameter(self%cPDBlueMin,    'cPDBlueMin',    'mgP/mgDW',  'minimum P/day ratio bluegreens',                                                 default=0.0025_rk)
-   call self%get_parameter(self%cNDBlueMax,    'cNDBlueMax',    'mgN/mgDW',  'maximum N/day ratio bluegreens',                                                    default=0.15_rk)
-   call self%get_parameter(self%cNDDiatMax,    'cNDDiatMax',    'mgN/mgDW',  'maximum N/day ratio diatoms',                                                       default=0.05_rk)
-   call self%get_parameter(self%cNDGrenMax,    'cNDGrenMax',    'mgN/mgDW',  'maximum N/day ratio greens',                                                        default=0.1_rk)
-   call self%get_parameter(self%cPDBlueMax,    'cPDBlueMax',    'mgP/mgDW',  'maximum P/day ratio blue-greens',                                                   default=0.025_rk)
-   call self%get_parameter(self%cPDDiatMax,    'cPDDiatMax',    'mgP/mgDW',  'maximum P/day ratio diatoms',                                                       default=0.005_rk)
-   call self%get_parameter(self%cPDGrenMax,    'cPDGrenMax',    'mgP/mgDW',  'maximum P/day ratio greens',                                                        default=0.015_rk)
+   call self%get_parameter(self%cSigTmZoo,     'cSigTmZoo',     'degree C',  'temperature constant for zooplankton (sigma)',                            default=13.0_rk)
+   call self%get_parameter(self%cTmOptZoo,     'cTmOptZoo',     'degree C',  'optimum temperature for zooplankton',                                     default=25.0_rk)
+   call self%get_parameter(self%cDCarrZoo,     'cDCarrZoo',     'gm-3',      'carrying capacity of zooplankton',                                        default=25.0_rk)
+   call self%get_parameter(self%kMortZoo,      'kMortZoo',      'd-1',       'mortality constant for zooplankton',                                      default=0.04_rk,scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kDRespZoo,     'kDRespZoo',     'd-1',       'maintenance respiration constant for zooplankton',                        default=0.15_rk,scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%cPrefDiat,     'cPrefDiat',     '[-]',       'selection factor for diatoms',                                            default=0.75_rk)
+   call self%get_parameter(self%cPrefGren,     'cPrefGren',     '[-]',       'selection factor for greens',                                             default=0.75_rk)
+   call self%get_parameter(self%cPrefBlue,     'cPrefBlue',     '[-]',       'selection factor for blue-greens',                                        default=0.125_rk)
+   call self%get_parameter(self%cPrefPOM,      'cPrefPOM',      '[-]',       'selection factor for particulate organic matter',                         default=0.25_rk)
+   call self%get_parameter(self%hFilt,         'hFilt',         'gDW m-3',   'half-saturation constant for food conc. on zooplankton',                  default=1.0_rk)
+   call self%get_parameter(self%fDAssZoo,      'fDAssZoo',      '[-]',       'dry weight assimilation efficiency of zooplankton',                       default=0.35_rk)
+   call self%get_parameter(self%cFiltMax,      'cFiltMax',      'ltr/mgDW/d','maximum filtering rate',                                                  default=4.5_rk,scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%cPDZooRef,     'cPDZooRef',     'mgP/mgDW',  'reference P/DW-ratio zooplankton',                                        default=0.01_rk)
+   call self%get_parameter(self%cNDZooRef,     'cNDZooRef',     'mgN/mgDW',  'reference N/DW-ratio zooplankton',                                        default=0.07_rk)
+   call self%get_parameter(self%fDissEgesZoo,  'fDissEgesZoo',  '[-]',       'soluble nutrient fraction of zooplankton egested food',                   default=0.25_rk)
+   call self%get_parameter(self%fDissMortZoo,  'fDissMortZoo',  '[-]',       'soluble nutrient fraction of dead zooplankton',                           default=0.1_rk)
+   call self%get_parameter(self%cSiDDiat,      'cSiDDiat',      'mgSi/mgDW', 'Si/DW ratio of diatoms',                                                  default=0.15_rk)
+   call self%get_parameter(self%cNDDiatMin,    'cNDDiatMin',    'mgN/mgDW',  'minimum N/DW ratio diatoms',                                              default=0.01_rk)
+   call self%get_parameter(self%cPDDiatMin,    'cPDDiatMin',    'mgP/mgDW',  'minimum P/DW ratio diatoms',                                              default=0.0005_rk)
+   call self%get_parameter(self%cNDGrenMin,    'cNDGrenMin',    'mgN/mgDW',  'minimum N/DW ratio greens',                                               default=0.02_rk)
+   call self%get_parameter(self%cPDGrenMin,    'cPDGrenMin',    'mgP/mgDW',  'minimum P/DW ratio greens',                                               default=0.0015_rk)
+   call self%get_parameter(self%cNDBlueMin,    'cNDBlueMin',    'mgN/mgDW',  'minimum N/DW ratio bluegreens',                                           default=0.03_rk)
+   call self%get_parameter(self%cPDBlueMin,    'cPDBlueMin',    'mgP/mgDW',  'minimum P/DW ratio bluegreens',                                           default=0.0025_rk)
+   call self%get_parameter(self%cNDBlueMax,    'cNDBlueMax',    'mgN/mgDW',  'maximum N/DW ratio bluegreens',                                           default=0.15_rk)
+   call self%get_parameter(self%cNDDiatMax,    'cNDDiatMax',    'mgN/mgDW',  'maximum N/DW ratio diatoms',                                              default=0.05_rk)
+   call self%get_parameter(self%cNDGrenMax,    'cNDGrenMax',    'mgN/mgDW',  'maximum N/DW ratio greens',                                               default=0.1_rk)
+   call self%get_parameter(self%cPDBlueMax,    'cPDBlueMax',    'mgP/mgDW',  'maximum P/DW ratio blue-greens',                                          default=0.025_rk)
+   call self%get_parameter(self%cPDDiatMax,    'cPDDiatMax',    'mgP/mgDW',  'maximum P/DW ratio diatoms',                                              default=0.005_rk)
+   call self%get_parameter(self%cPDGrenMax,    'cPDGrenMax',    'mgP/mgDW',  'maximum P/DW ratio greens',                                               default=0.015_rk)
 !  the user defined minumun value for state variables
-   call self%get_parameter(self%cDZooMin,      'cDZooMin',      'gDW/m3',    'minimun zooplankton biomass in system',                                          default=0.00001_rk)
-   call self%get_parameter(self%fZooDOMW,   'fZooDOMW',   '[-]',       'dissolved organic fraction from zooplankton',                                    default=0.5_rk)
+   call self%get_parameter(self%cDZooMin,      'cDZooMin',      'gDW/m3',    'minimum zooplankton biomass in system',                                   default=0.00001_rk)
+   call self%get_parameter(self%fZooDOMW,   'fZooDOMW',   '[-]',       'dissolved organic fraction from zooplankton',                                   default=0.5_rk)
    
 !  Register local state variable
 !  zooplankton
-   call self%register_state_variable(self%id_sDZoo,'sDZoo','g m-3','zooplankton dry weight',     &
+   call self%register_state_variable(self%id_sDZoo,'sDZoo','gDW m-3','zooplankton dry weight',     &
                                     initial_value=0.05_rk,minimum=self%cDZooMin,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sPZoo,'sPZoo','g m-3','zooplankton phosphorus content',     &
+   call self%register_state_variable(self%id_sPZoo,'sPZoo','gP m-3','zooplankton phosphorus content',     &
                                     initial_value=0.0005_rk,minimum=self%cDZooMin * self%cPDZooRef,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sNZoo,'sNZoo','g m-3','zooplankton nitrogen content',     &
+   call self%register_state_variable(self%id_sNZoo,'sNZoo','gN m-3','zooplankton nitrogen content',     &
                                     initial_value=0.0035_rk,minimum=self%cDZooMin * self%cNDZooRef,no_river_dilution=.TRUE.)
 !  Register contribution of state to global aggregate variables
    call self%add_to_aggregate_variable(standard_variables%total_nitrogen,  self%id_sNZoo)
@@ -236,19 +236,17 @@
    real(rk)      :: rPDFoodZoo,oPFoodZoo,afPAssZoo,wPConsZoo
    real(rk)      :: wPConsPhytZoo,wPConsPOMZoo,wPConsDiatZoo
    real(rk)      :: wPConsGrenZoo,wPConsBlueZoo
-!  variables for Zooplankton dw  fluxes
+!  variables for Zooplankton dw fluxes
    real(rk)      :: wDZoo,wDAssZoo,wDRespZoo,wDMortZoo
 !  variables for Zooplankton N fluxes
    real(rk)      :: wNZoo,wNAssZoo,wNExcrZoo,wNMortZoo
 !  variables for Zooplankton P fluxes
    real(rk)      ::wPZoo,wPAssZoo,wPExcrZoo,wPMortZoo
 !  variables for exchange of NH4
-!  PCLake_Osis, /m^2
    real(rk)     :: wNZooNH4W,wNEgesZooNH4,wNEgesZoo,wNMortZooNH4
 !  variables for exchange of NH3
    real(rk)     :: wNZooNO3W
 !  variables for exchange of PO4
-!  PCLake_Osis, /m^2
    real(rk)     :: wPZooPO4W,wPEgesZooPO4,wPEgesZoo,wPMortZooPO4
 !  variables for exchange of organic DW
    real(rk)     :: wDZooPOMW,wDEgesZoo
@@ -258,7 +256,7 @@
    real(rk)     :: wPZooPOMW,wPEgesZooTOM,wPMortZooTOM
 !  variables for exchange of organic Si
    real(rk)     :: wSiZooPOMW,wSiConsDiatZoo
-!  variables for exchange of dissolved organics
+!  variables for exchange of dissolved organic matter
    real(rk)     :: wDZooTOMW,wNZooTOMW,wPZooTOMW
    real(rk)     :: wSiZooTOMW,wDZooDOMW,wNZooDOMW
    real(rk)     :: wPZooDOMW,wSiZooDOMW
@@ -278,9 +276,9 @@
    _GET_(self%id_sNZoo,sNZoo)
    _GET_(self%id_sPZoo,sPZoo)
 !-----------------------------------------------------------------------
-!  Retrieve dependencies  value
+!  Retrieve dependencies  
 !-----------------------------------------------------------------------
-!  Retrieve state dependencies value
+!  Retrieve state dependencies 
    _GET_(self%id_DfoodDiat,sDDiatW)
    _GET_(self%id_DfoodGren,sDGrenW)
    _GET_(self%id_DfoodBlue,sDBlueW)
@@ -299,14 +297,14 @@
    _GET_(self%id_dz,dz)
    _GET_HORIZONTAL_(self%id_sDepthW,sDepthW)
 !-------------------------------------------------------------------------
-!  Current local nutrients ratios in zooplankton(check the current state)
+!  Current local nutrients ratios in zooplankton (check the current state)
 !-------------------------------------------------------------------------
-!  P/C_ratio of food
+!  P/DW_ratio of food
    rPDDiatW=sPDiatW/(sDDiatw+NearZero)
    rPDGrenW=sPGrenW/(sDGrenW+NearZero)
    rPDBlueW=sPBlueW/(sDBlueW+NearZero)
    rPDPOMW=sPPOMW/(sDPOMW+NearZero)
-!  N/C_ratio of food
+!  N/DW_ratio of food
    rNDDiatW=sNDiatW/(sDDiatw+NearZero)
    rNDGrenW=sNGrenW/(sDGrenW+NearZero)
    rNDBlueW=sNBlueW/(sDBlueW+NearZero)
@@ -412,7 +410,7 @@
    wNConsBlueZoo = rNDBlueW*wDConsBlueZoo
 !  total_N_phytoplankton_consumption_by_zoopl.
    wNConsPhytZoo = wNConsDiatZoo + wNConsGrenZoo + wNConsBlueZoo
-!  DW_organics_consumption_by_zooplankton
+!  DW_organic matter_consumption_by_zooplankton
    wDConsPOMZoo = self%cPrefPOM*sDPOMW / oDFoodZoo * wDConsZoo
 !  consumption_of_organic_N
    wNConsPOMZoo = rNDPOMW*wDConsPOMZoo
@@ -485,7 +483,7 @@
 !  total_flux_of_P_in_Herbivorous_zooplankton
    wPZoo = wPAssZoo - wPExcrZoo - wPMortZoo
 !=======================================================================
-!  zooplankton process relating to other modules
+!  zooplankton processes relating to other modules
 !=======================================================================
 !-----------------------------------------------------------------------
 !  Update NH4 in water
@@ -497,7 +495,7 @@
 !  total_Zoo_flux_of_N_in_ammonium_in_water_in_lake_water
   wNZooNH4W = wNExcrZoo + wNEgesZooNH4 + wNMortZooNH4
 !-----------------------------------------------------------------------
-!  Update NO3 in water   (no NO3????)
+!  Update NO3 in water (zooplankton is currently assumed to contribute NH4 only, not NO3)
 !-----------------------------------------------------------------------
 !  total_Zoo_flux_of_N_in_nitrate_in_water_in_lake_water
    wNZooNO3W = 0.0_rk
@@ -513,7 +511,7 @@
 !-----------------------------------------------------------------------
 !  Update organic DW in water
 !-----------------------------------------------------------------------
-!  total_Zoo_flux_of_DW_in_organics_in_lake_wate
+!  total_Zoo_flux_of_DW_in_organic matter_in_lake_wate
    wDZooTOMW = - wDConsPOMZoo + wDEgesZoo + wDMortZoo
    wDZooPOMW = wDZooTOMW * (1.0_rk - self%fZooDOMW)
    wDZooDOMW = wDZooTOMW * self%fZooDOMW
@@ -524,7 +522,7 @@
    wNMortZooTOM = wNMortZoo - wNMortZooNH4
 !  organic_N_egestion
    wNEgesZooTOM = wNEgesZoo - wNEgesZooNH4
-!  total_Zoo_flux_of_N_in_organics_in_lake_water
+!  total_Zoo_flux_of_N_in_organic matter_in_lake_water
    wNZooTOMW = - wNConsPOMZoo + wNEgesZooTOM + wNMortZooTOM
    wNZooPOMW = wNZooTOMW * (1.0_rk - self%fZooDOMW)
    wNZooDOMW = wNZooTOMW * self%fZooDOMW
@@ -535,7 +533,7 @@
    wPMortZooTOM = wPMortZoo - wPMortZooPO4
 !  organic_P_egestion
    wPEgesZooTOM = wPEgesZoo - wPEgesZooPO4
-!  total_Zoo_flux_of_P_in_organics_in_lake_water
+!  total_Zoo_flux_of_P_in_organic matter_in_lake_water
    wPZooTOMW = - wPConsPOMZoo + wPEgesZooTOM + wPMortZooTOM
    wPZooPOMW = wPZooTOMW * (1.0_rk - self%fZooDOMW)
    wPZooDOMW = wPZooTOMW * self%fZooDOMW
@@ -544,7 +542,7 @@
 !-----------------------------------------------------------------------
 !  consumption_of_diatoms
    wSiConsDiatZoo = self%cSiDDiat * wDConsDiatZoo
-!  total_Zoo_flux_of_silica_in_lake_water_organics
+!  total_Zoo_flux_of_silica_in_lake_water_organic matter
    wSiZooPOMW = wSiConsDiatZoo * (1.0_rk - self%fZooDOMW)
    wSiZooDOMW = wSiConsDiatZoo * self%fZooDOMW   
 !-----------------------------------------------------------------------
@@ -566,7 +564,7 @@
 !  total_Zoo_flux_of_P_in_Greens_in_lake_water
    wPZooGrenW = - wPConsGrenZoo
 !-----------------------------------------------------------------------
-!  Update blue algae state variables
+!  Update blue-green algae state variables
 !-----------------------------------------------------------------------
 !  total_Zoo_flux_of_DW_in_Blue-greens_in_lake_water
    wDZooBlueW = - wDConsBlueZoo
@@ -640,5 +638,5 @@
    end module pclake_zooplankton
 
 !------------------------------------------------------------------------------
-! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org
+! Copyright by the FABM-PCLake-team under the GNU Public License - www.gnu.org
 !------------------------------------------------------------------------------

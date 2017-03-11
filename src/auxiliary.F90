@@ -17,9 +17,9 @@
 !
 ! !PUBLIC DERIVED TYPES:
    type, extends(type_base_model),public :: type_pclake_auxiliary
-!  diagnostic variables for local output(should be discussed and added later???)
+!  diagnostic variables for local output
 !  state dependencies identifiers
-!  SW:Sediment to Water
+!  SW: Sediment to Water
 !  dependencies to pclake_abiotic_water state variables
    type (type_state_variable_id)            :: id_SWNH4,id_SWNO3,id_SWPO4,id_SWPAIM,id_SWO2,id_SWSiO2
    type (type_state_variable_id)            :: id_SWDIM,id_SWDPOM,id_SWNPOM,id_SWPPOM,id_SWSiPOM
@@ -27,7 +27,7 @@
    type (type_state_variable_id)            :: id_SWDBlue,id_SWNBlue,id_SWPBlue
    type (type_state_variable_id)            :: id_SWDDiat,id_SWNDiat,id_SWPDiat  !,id_SWSiDiat
    type (type_state_variable_id)            :: id_SWDGren,id_SWNGren,id_SWPGren
-!  WS:Water to Sediment
+!  WS: Water to Sediment
 !  dependencies to pclake_abiotic_sediment state variables
    type (type_bottom_state_variable_id)     :: id_WSPO4,id_WSPAIM,id_WSNH4,id_WSNO3
    type (type_bottom_state_variable_id)     :: id_WSDIM,id_WSDPOM,id_WSNPOM,id_WSPPOM,id_WSSiPOM
@@ -36,10 +36,10 @@
    type (type_bottom_state_variable_id)     :: id_WSDBlue,id_WSNBlue,id_WSPBlue
    type (type_bottom_state_variable_id)     :: id_WSDDiat,id_WSNDiat,id_WSPDiat  !,id_WSSiDiat
    type (type_bottom_state_variable_id)     :: id_WSDGren,id_WSNGren,id_WSPGren
-!  dependencies to foodweb_wat state variables(zooplankton only created for transportation purpose)
+!  dependencies to zooplankton
    type (type_state_variable_id)            :: id_DTranZoo,id_NTranZoo,id_PTranZoo
    type (type_bottom_state_variable_id)     :: id_TurbFish
-!  dependencies to vegetation state variables
+!  dependencies to macrophytes state variables
    type (type_bottom_state_variable_id)     :: id_DragVeg
 !  environmental dependencies
    type (type_global_dependency_id)         :: id_Day
@@ -67,9 +67,9 @@
    type ( type_horizontal_dependency_id)             :: id_tDAbioHumS
    type ( type_horizontal_dependency_id)             :: id_tDAbioPOMS,id_tDPrimPOMS,id_tDWebPOMS,id_tDBedPOMS
 !  Model parameters
-!  logic variables for whether linking dependencies
-!  diagnostic dependencies,due to resuspension
-   logical      :: fish_module,vegetation_module
+!  logical variables for choosing linking dependencies
+!  diagnostic dependencies, due to resuspension
+   logical      :: fish_module,macrophytes_module
    real(rk)                   :: cDepthS
 !  sediment properties parameters
    real(rk)                   :: fLutum,fLutumRef,bPorS
@@ -86,8 +86,6 @@
    real(rk)                   :: cPO4Ground,cNH4Ground,cNO3Ground
 !  parameter for fish temperature function
    real(rk)                   :: cSigTmFish,cTmOptFish
-!  variables need to be removed after compiled to 1d to 3d physical drivers
-!  this is removed due to lake branch is working, this will be part of external loadings
 !  nutrient ratios parameter
    real(rk)   :: cNDDiatMin,cPDDiatMin,cNDGrenMin,cPDGrenMin,cNDBlueMin,cPDBlueMin
    real(rk)   :: cNDDiatMax,cPDDiatMax,cNDGrenMax,cPDGrenMax,cNDBlueMax,cPDBlueMax
@@ -107,7 +105,7 @@
    PROCEDURE ::  do_surface
    end type type_pclake_auxiliary
 
-!  private data members(API0.92)
+!  private data members (API0.92)
    real(rk),parameter :: secs_pr_day=86400.0_rk
    real(rk),parameter :: NearZero = 0.000000000000000000000000000000001_rk
    real(rk),parameter :: Pi=3.14159265358979_rk
@@ -131,12 +129,12 @@
    class (type_pclake_auxiliary), intent(inout), target :: self
    integer,                     intent(in)            :: configunit
 
-!  Store parameter values in our own derived type
-!  NB: all rates must be provided in values per day,
+!  Store parameter values in derived type
+!  NB: all rates must be provided in values per day in .yaml input,
 !  and are converted here to values per second.
    call self%get_parameter(self%cDepthS,      'cDepthS',      'm',                 'sediment depth',                                         default=0.1_rk)
-   call self%get_parameter(self%cThetaSet,    'cThetaSet',    '1/e^oC',            'temperature parameter of sedimentation',                 default=1.01_rk)
-   call self%get_parameter(self%kVegResus,    'kVegResus',    'm2/gDW',            'relative resuspension reduction per gram vegetation',    default=0.01_rk)
+   call self%get_parameter(self%cThetaSet,    'cThetaSet',    '1/e^oC',            'temperature parameter for sedimentation',                 default=1.01_rk)
+   call self%get_parameter(self%kVegResus,    'kVegResus',    'm2/gDW',            'relative resuspension reduction per gram macrophytes',    default=0.01_rk)
    call self%get_parameter(self%kTurbFish,    'kTurbFish',    'g/gfish/d',         'relative resuspension by adult fish browsing',           default=1.0_rk)
 !  don't convert here,due to PCLake empirical function. kTurbFish
    call self%get_parameter(self%cSuspRef,     'cSuspRef',     '[-]',               'reference suspended matter function [-]',                default=0.0_rk)
@@ -145,48 +143,48 @@
    call self%get_parameter(self%cSuspSlope,   'cSuspSlope',   '[-]',               'slope of logistic function',                             default=2.1_rk)
    call self%get_parameter(self%hDepthSusp,   'hDepthSusp',   '[-]',               'half-sat. value of depth in logistic function',          default=2.0_rk)
    call self%get_parameter(self%cFetchRef,    'cFetchRef',    'm',                 'reference fetch',                                        default=1000.0_rk)
-   call self%get_parameter(self%cFetch,       'cFetch',       'm',                 'the length of the lake in the prevailing wind direction',default=1000.0_rk)
-   call self%get_parameter(self%fLutum ,      'fLutum',       '[-]',               'lutum content of inorg. matter',                         default=0.1_rk)
+   call self%get_parameter(self%cFetch,       'cFetch',       'm',                 'length of water body in prevailing wind direction',            default=1000.0_rk)
+   call self%get_parameter(self%fLutum ,      'fLutum',       '[-]',               'lutum content of inorganic matter',                         default=0.1_rk)
    call self%get_parameter(self%fLutumRef,    'fLutumRef',    '[-]',               'reference lutum fraction',                               default=0.2_rk)
-   call self%get_parameter(self%bPorS,        'bPorS',        'm3waterm-3sediment','sediment porosity',                                      default=0.847947_rk)
-   call self%get_parameter(self%cResusPhytExp,'cResusPhytExp','(gDW m-2 d-1)-1',   'expnent parameter for phytoplankton resuspension',       default=-0.379_rk)
-   call self%get_parameter(self%kResusPhytMax,'kResusPhytMax','d-1',               'max. phytopl. resuspension',                             default=0.25_rk)
-   call self%get_parameter(self%cVSetIM,      'cVSetIM',      'm d-1',             'maximum sedimentation velocity of inert org. matter',    default=-1.0_rk)
-   call self%get_parameter(self%cVSetPOM,     'cVSetPOM',     'm d-1',             'maximum sedimentation velocity of partical orgniacs',             default=-0.25_rk)
-   call self%get_parameter(self%cVSetDiat,    'cVSetDiat',    'm d-1',             'sedimentation velocity diatoms',                         default=0.5_rk)
+   call self%get_parameter(self%bPorS,        'bPorS',        'm3water/m3sediment','sediment porosity',                                      default=0.847947_rk)
+   call self%get_parameter(self%cResusPhytExp,'cResusPhytExp','(gDW m-2 d-1)-1',   'exponent parameter for phytoplankton resuspension',      default=-0.379_rk)
+   call self%get_parameter(self%kResusPhytMax,'kResusPhytMax','d-1',               'maximum phytoplankton resuspension rate',                   default=0.25_rk)
+   call self%get_parameter(self%cVSetIM,      'cVSetIM',      'm d-1',             'maximum sedimentation velocity of inert organic matter',    default=-1.0_rk)
+   call self%get_parameter(self%cVSetPOM,     'cVSetPOM',     'm d-1',             'maximum sedimentation velocity of POM',                  default=-0.25_rk)
+   call self%get_parameter(self%cVSetDiat,    'cVSetDiat',    'm d-1',             'sedimentation velocity of diatoms',                         default=0.5_rk)
    call self%get_parameter(self%cVSetGren,    'cVSetGren',    'm d-1',             'sedimentation velocity of greens',                       default=0.2_rk)
-   call self%get_parameter(self%cVSetBlue ,   'cVSetBlue',    'm d-1',             'sedimentation velocity blue-greens',                     default=0.06_rk)
+   call self%get_parameter(self%cVSetBlue ,   'cVSetBlue',    'm d-1',             'sedimentation velocity of blue-greens',                     default=0.06_rk)
    call self%get_parameter(self%cRhoIM,       'cRhoIM',       'g m-3',             'density of sediment IM',                                 default=2500000.0_rk)
-   call self%get_parameter(self%cRhoOM,       'cRhoOM',       'g m-3',             'density of sediment orgainics',                           default=1400000.0_rk)
+   call self%get_parameter(self%cRhoOM,       'cRhoOM',       'g m-3',             'density of sediment organic matter',                           default=1400000.0_rk)
    call self%get_parameter(self%fDOrgSoil,    'fDOrgSoil',    '[-]',               'fraction soil organic matter',                           default=0.1_rk)
-   call self%get_parameter(self%cPO4Ground,   'cPO4Ground',   'mgP l-1',           'PO4 cone in groundwater',                                default=0.1_rk)
-   call self%get_parameter(self%cNH4Ground,   'cNH4Ground',   'mgN l-1',           'NH4 cone in groundwater',                                default=1.0_rk)
-   call self%get_parameter(self%cNO3Ground,   'cNO3Ground',   'mgN l-1',           'NO3 cone in groundwater',                                default=0.1_rk)
-   call self%get_parameter(self%cTmOptFish,   'cTmOptFish',   'degree C',          'optimal temperature of fish',                            default=25.0_rk)
-   call self%get_parameter(self%cSigTmFish,   'cSigTmFish',   'degree C',          'temperature constant of fish(sigma_in_Gaussian_curve)',  default=10.0_rk)
-   call self%get_parameter(self%cNDDiatMin,   'cNDDiatMin',   'mgN/mgDW',          'minimum N/day ratio diatoms',                            default=0.01_rk)
-   call self%get_parameter(self%cPDDiatMin,   'cPDDiatMin',   'mgP/mgDW',          'minimum P/day ratio diatoms',                            default=0.0005_rk)
-   call self%get_parameter(self%cNDGrenMin,   'cNDGrenMin',   'mgN/mgDW',          'minimum N/day ratio greens',                             default=0.02_rk)
-   call self%get_parameter(self%cPDGrenMin,   'cPDGrenMin',   'mgP/mgDW',          'minimum P/day ratio greens',                             default=0.0015_rk)
-   call self%get_parameter(self%cNDBlueMin,   'cNDBlueMin',   'mgN/mgDW',          'minimum N/day ratio blue-greens',                         default=0.03_rk)
-   call self%get_parameter(self%cPDBlueMin,   'cPDBlueMin',   'mgP/mgDW',          'minimum P/day ratio blue-greens',                         default=0.0025_rk)
-   call self%get_parameter(self%cNDBlueMax,   'cNDBlueMax',   'mgN/mgDW',          'maximum N/day ratio blue-greens',                         default=0.15_rk)
-   call self%get_parameter(self%cNDDiatMax,   'cNDDiatMax',   'mgN/mgDW',          'maximum N/day ratio diatoms',                            default=0.05_rk)
-   call self%get_parameter(self%cNDGrenMax,   'cNDGrenMax',   'mgN/mgDW',          'maximum N/day ratio greens',                             default=0.1_rk)
-   call self%get_parameter(self%cPDBlueMax,   'cPDBlueMax',   'mgP/mgDW',          'maximum P/day ratio blue-greens',                        default=0.025_rk)
-   call self%get_parameter(self%cPDDiatMax,   'cPDDiatMax',   'mgP/mgDW',          'maximum P/day ratio diatoms',                            default=0.005_rk)
-   call self%get_parameter(self%cPDGrenMax,   'cPDGrenMax',   'mgP/mgDW',          'maximum P/day ratio greens',                             default=0.015_rk)
+   call self%get_parameter(self%cPO4Ground,   'cPO4Ground',   'mgP l-1',           'PO4 concentration in groundwater',                                default=0.1_rk)
+   call self%get_parameter(self%cNH4Ground,   'cNH4Ground',   'mgN l-1',           'NH4 concentration in groundwater',                                default=1.0_rk)
+   call self%get_parameter(self%cNO3Ground,   'cNO3Ground',   'mgN l-1',           'NO3 concentration in groundwater',                                default=0.1_rk)
+   call self%get_parameter(self%cTmOptFish,   'cTmOptFish',   'degree C',          'optimal temperature for fish',                            default=25.0_rk)
+   call self%get_parameter(self%cSigTmFish,   'cSigTmFish',   'degree C',          'temperature constant for fish (sigma)',                   default=10.0_rk)
+   call self%get_parameter(self%cNDDiatMin,   'cNDDiatMin',   'mgN/mgDW',          'minimum N/DW ratio for diatoms',                            default=0.01_rk)
+   call self%get_parameter(self%cPDDiatMin,   'cPDDiatMin',   'mgP/mgDW',          'minimum P/DW ratio for diatoms',                            default=0.0005_rk)
+   call self%get_parameter(self%cNDGrenMin,   'cNDGrenMin',   'mgN/mgDW',          'minimum N/DW ratio for greens',                             default=0.02_rk)
+   call self%get_parameter(self%cPDGrenMin,   'cPDGrenMin',   'mgP/mgDW',          'minimum P/DW ratio for greens',                             default=0.0015_rk)
+   call self%get_parameter(self%cNDBlueMin,   'cNDBlueMin',   'mgN/mgDW',          'minimum N/DW ratio for blue-greens',                         default=0.03_rk)
+   call self%get_parameter(self%cPDBlueMin,   'cPDBlueMin',   'mgP/mgDW',          'minimum P/DW ratio for blue-greens',                         default=0.0025_rk)
+   call self%get_parameter(self%cNDBlueMax,   'cNDBlueMax',   'mgN/mgDW',          'maximum N/DW ratio for blue-greens',                         default=0.15_rk)
+   call self%get_parameter(self%cNDDiatMax,   'cNDDiatMax',   'mgN/mgDW',          'maximum N/DW ratio for diatoms',                            default=0.05_rk)
+   call self%get_parameter(self%cNDGrenMax,   'cNDGrenMax',   'mgN/mgDW',          'maximum N/DW ratio for greens',                             default=0.1_rk)
+   call self%get_parameter(self%cPDBlueMax,   'cPDBlueMax',   'mgP/mgDW',          'maximum P/DW ratio for blue-greens',                        default=0.025_rk)
+   call self%get_parameter(self%cPDDiatMax,   'cPDDiatMax',   'mgP/mgDW',          'maximum P/DW ratio for diatoms',                            default=0.005_rk)
+   call self%get_parameter(self%cPDGrenMax,   'cPDGrenMax',   'mgP/mgDW',          'maximum P/DW ratio for greens',                             default=0.015_rk)
 !  resuspension rt the extral dianelated to shear stress
    call self%get_parameter(self%crt_shear,    'crt_shear',    'N m-2',             'critical shear stress',                                  default=0.005_rk)
    call self%get_parameter(self%ref_shear,    'ref_shear',    'N m-2',             'reference shear stress',                                 default=1.0_rk)
-   call self%get_parameter(self%alpha,        'alpha',        'g m-2 d-1',         'gross rate of sediment erosion((9000-9900g m-2/d)',      default=9000.0_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%alpha,        'alpha',        'g m-2 d-1',         'gross rate of sediment erosion (9000-9900g m-2/d)',      default=9000.0_rk, scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%eta,          'eta',          '[-]',               'shear stress correction factor',                         default=1.0_rk)
-   call self%get_parameter(self%cVSetMain,    'cVSetMain',    'm d-1',             'depth averaged settling velocity, between 0.5-1.5m/d)',  default=0.5_rk,    scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%cVSetMain,    'cVSetMain',    'm d-1',             'depth averaged settling velocity (between 0.5-1.5m/d)',  default=0.5_rk,    scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%resusp_meth,  'resusp_meth',  '[-]',               '1=original PCLake resuspension function',                default=2)
    call self%get_parameter(self%tDDepoIM,     'tDDepoIM',     'g m-2 d-1',         'inorganic matter deposition',                            default=0.0_rk, scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%tDDepoPOM,    'tDDepoPOM',    'g m-2 d-1',         'organic matter deposition,dry weight',                   default=0.0_rk, scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%tNDepoPOM,    'tNDepoPOM',    'g m-2 d-1',         'organic matter deposition,nitrogen',                     default=0.0_rk, scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%tPDepoPOM,    'tPDepoPOM',    'g m-2 d-1',         'organic matter deposition,phosphorus',                   default=0.0_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%tDDepoPOM,    'tDDepoPOM',    'g m-2 d-1',         'organic matter deposition, dry weight',                   default=0.0_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%tNDepoPOM,    'tNDepoPOM',    'g m-2 d-1',         'organic matter deposition, nitrogen',                     default=0.0_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%tPDepoPOM,    'tPDepoPOM',    'g m-2 d-1',         'organic matter deposition, phosphorus',                   default=0.0_rk, scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%tPDepoPO4,    'tPDepoPO4',    'g m-2 d-1',         'phosphate deposition',                                   default=0.0_rk, scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%tNDepoNH4,    'tNDepoNH4',    'g m-2 d-1',         'ammonium deposition',                                    default=0.0_rk, scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%tNDepoNO3,    'tNDepoNO3',    'g m-2 d-1',         'nitrate deposition',                                     default=0.0_rk, scale_factor=1.0_rk/secs_pr_day)
@@ -196,7 +194,7 @@
    call self%register_state_dependency(self%id_SWPO4,   'phosphate_pool_in_water',        'g m-3',  'phosphate pool in water')
    call self%register_state_dependency(self%id_SWPAIM,  'adsorbed_phosphorus_in_water'  , 'g m-3',  'adsorbed phosphorus in water')
    call self%register_state_dependency(self%id_SWO2,    'oxygen_pool_in_water',           'g m-3',  'oxygen pool in water')
-   call self%register_state_dependency(self%id_SWDIM,   'inorg_pool_in_water',            'g m-3',  'inorg pool in water')
+   call self%register_state_dependency(self%id_SWDIM,   'inorg_pool_in_water',            'g m-3',  'inorganic matter pool in water')
    call self%register_state_dependency(self%id_SWDPOM,  'POM_DW_in_water',                'g m-3',  'POM DW in water')
    call self%register_state_dependency(self%id_SWNPOM,  'POM_N_in_water',                 'g m-3',  'POM N in water')
    call self%register_state_dependency(self%id_SWPPOM,  'POM_P_in_water',                 'g m-3',  'POM P in water')
@@ -207,7 +205,7 @@
    call self%register_state_dependency(self%id_WSNO3,   'nitrate_pool_in_sediment',       'g m-2', 'nitrate pool in sediment')
    call self%register_state_dependency(self%id_WSPO4,   'phosphate_pool_in_sediment',     'g m-2', 'phosphate pool in sediment')
    call self%register_state_dependency(self%id_WSPAIM,  'adsorbed_phosphorus_in_sediment','g m-2', 'adsorbed phosphorus in sediment')
-   call self%register_state_dependency(self%id_WSDIM,   'inorg_pool_in_sediment',         'g m-2', 'inorganic pool in sediment')
+   call self%register_state_dependency(self%id_WSDIM,   'inorg_pool_in_sediment',         'g m-2', 'inorganic matter pool in sediment')
    call self%register_state_dependency(self%id_WSDPOM,  'POM_DW_in_sediment',             'g m-2', 'POM DW in sediment')
    call self%register_state_dependency(self%id_WSNPOM,  'POM_N_in_sediment',              'g m-2', 'POM N in sediment')
    call self%register_state_dependency(self%id_WSPPOM,  'POM_P_in_sediment',              'g m-2', 'POM P in sediment')
@@ -218,26 +216,26 @@
 !  Register dependencies to phytoplankton in water column
    call self%register_state_dependency(self%id_SWDDiat, 'diatom_DW_in_water',             'g m-3', 'diatom DW in water')
    call self%register_state_dependency(self%id_SWDGren, 'green_DW_in_water',              'g m-3', 'green DW in water')
-   call self%register_state_dependency(self%id_SWDBlue, 'blue_DW_in_water',               'g m-3', 'blue DW in water')
+   call self%register_state_dependency(self%id_SWDBlue, 'blue_DW_in_water',               'g m-3', 'blue-green DW in water')
    call self%register_state_dependency(self%id_SWNDiat, 'diatom_N_in_water',              'g m-3', 'diatom N in water')
    call self%register_state_dependency(self%id_SWNGren, 'green_N_in_water',               'g m-3', 'green N in water')
-   call self%register_state_dependency(self%id_SWNBlue, 'blue_N_in_water',                'g m-3', 'blue N in water')
+   call self%register_state_dependency(self%id_SWNBlue, 'blue_N_in_water',                'g m-3', 'blue-green N in water')
    call self%register_state_dependency(self%id_SWPDiat, 'diatom_P_in_water',              'g m-3', 'diatom P in water')
    call self%register_state_dependency(self%id_SWPGren, 'green_P_in_water',               'g m-3', 'green P in water')
-   call self%register_state_dependency(self%id_SWPBlue, 'blue_P_in_water',                'g m-3', 'blue P in water')
+   call self%register_state_dependency(self%id_SWPBlue, 'blue_P_in_water',                'g m-3', 'blue-green P in water')
 !  Register dependencies to phytoplankton in sediment
    call self%register_state_dependency(self%id_WSDDiat, 'diatom_DW_in_sediment',          'g m-2', 'diatom DW in sediment')
    call self%register_state_dependency(self%id_WSDGren, 'green_DW_in_sediment',           'g m-2', 'green DW in sediment')
-   call self%register_state_dependency(self%id_WSDBlue, 'blue_DW_in_sediment',            'g m-2', 'blue DW in sediment')
+   call self%register_state_dependency(self%id_WSDBlue, 'blue_DW_in_sediment',            'g m-2', 'blue-green DW in sediment')
    call self%register_state_dependency(self%id_WSNDiat, 'diatom_N_in_sediment',           'g m-2', 'diatom N in sediment')
    call self%register_state_dependency(self%id_WSNGren, 'green_N_in_sediment',            'g m-2', 'green N in sediment')
-   call self%register_state_dependency(self%id_WSNBlue, 'blue_N_in_sediment',             'g m-2', 'blue N in sediment')
+   call self%register_state_dependency(self%id_WSNBlue, 'blue_N_in_sediment',             'g m-2', 'blue-green N in sediment')
    call self%register_state_dependency(self%id_WSPDiat, 'diatom_P_in_sediment',           'g m-2', 'diatom P in sediment')
    call self%register_state_dependency(self%id_WSPGren, 'green_P_in_sediment',            'g m-2', 'green P in sediment')
-   call self%register_state_dependency(self%id_WSPBlue, 'blue_P_in_sediment',             'g m-2', 'blue P in sediment')
-!  register vegetation and fish for resuspension dependency
-   call self%register_state_dependency(self%id_DragVeg, 'vegetation_DW',                  'g m-2', 'vegetation DW')
-   call self%register_state_dependency(self%id_TurbFish,'adult_fish_DW',                  'g m-3', 'adult fish DW')
+   call self%register_state_dependency(self%id_WSPBlue, 'blue_P_in_sediment',             'g m-2', 'blue-green P in sediment')
+!  register macrophytes and fish for resuspension dependency
+   call self%register_state_dependency(self%id_DragVeg, 'macrophytes_DW',                  'g m-2', 'macrophytes DW')
+   call self%register_state_dependency(self%id_TurbFish,'adult_fish_DW',                  'g m-2', 'adult fish DW')
 !  register zooplankton for transport purpose
    call self%register_state_dependency(self%id_DTranZoo,'zooplankton_DW',                 'g m-3', 'zooplankton DW')
    call self%register_state_dependency(self%id_PTranZoo,'zooplankton_P',                  'g m-3', 'zooplankton P')
@@ -253,7 +251,7 @@
    call self%register_dependency(self%id_tDAbioHumS, 'humus_abiotic_update',    'g m-2 s-1', 'humus abiotic update')
    call self%register_dependency(self%id_tDPrimPOMS, 'POM_from_algae',     '[-]',       'POM from algae')
    call self%register_dependency(self%id_tDWebPOMS,  'POM_from_zoobenthos','[-]',       'POM from zoobenthos')
-   call self%register_dependency(self%id_tDBedPOMS,  'POM_from_vegetation','[-]',       'POM from vegetation')
+   call self%register_dependency(self%id_tDBedPOMS,  'POM_from_macrophytes','[-]',       'POM from macrophytes')
 !  register diagnostic variables
    call self%register_diagnostic_variable(self%id_tDBurIM,     'tDBurIM',     'g m-2 s-1','tDBurIM',                output=output_time_step_integrated)
    call self%register_diagnostic_variable(self%id_shearstress, 'shearstress', 'N m-2',    'shearstress',            output=output_instantaneous)
@@ -331,16 +329,16 @@
    real(rk)                   :: sDIMS,sDPOMS,sNPOMS,sPPOMS,sSiPOMS
    real(rk)                   :: sPO4S,sPAIMS,sNH4S,sNO3S
    real(rk)                   :: sDHumS,sNHumS,sPHumS
-!  in phytoplankton  sediment module
+!  in phytoplankton sediment module
    real(rk)                   :: sDDiatS,sDGrenS,sDBlueS
    real(rk)                   :: sNDiatS,sNGrenS,sNBlueS
    real(rk)                   :: sPDiatS,sPGrenS,sPBlueS
-!  in vegetation module
+!  in macrophytes module
    real(rk)                   :: sDVeg
-!  in foodweb water column module
+!  in fish module
    real(rk)                   :: sDFiAd
 !  carriers for environmental dependencies
-!  depth for empirical suspension function, should be bottom_depth
+!  depth for empirical resuspension function, should be bottom_depth
    real(rk)                   :: uTm,sDepthW ,dz
 !  carriers for diagnostic dependencies
    real(rk)                   :: tDAbioHumS
@@ -356,7 +354,7 @@
    real(rk)                   :: rPDDiatS,rPDGrenS,rPDBlueS
 !  temperature related variables
    real(rk)                   :: uFunTmSet,uFunTmFish
-!  variables related to resuspension(in the order of apperance)
+!  variables related to resuspension (in the order of appearance)
    real(rk)                   :: aFunVegResus,tDTurbFish
    real(rk)                   :: aFunDimSusp,tDResusTauDead,tDResusBareDead
    real(rk)                   :: tDResusDead,tDResusIM,tDResusPOM,tPResusPOM
@@ -367,7 +365,7 @@
    real(rk)                   :: tDResusDiat,tDResusGren,tDResusBlue
    real(rk)                   :: tNResusDiat,tNResusGren,tNResusBlue
    real(rk)                   :: tPResusDiat,tPResusGren,tPResusBlue  !,tSiResusDiat
-!  variables related to sedimentation(in the order of apperance)
+!  variables related to sedimentation (in the order of appearance)
    real(rk)                   :: aFunTauSet
    real(rk)                   :: uCorVSetIM,tDSetIM,tPSetAIM
    real(rk)                   :: uCorVSetPOM,tDSetPOM,tPSetPOM,tNSetPOM,tSiSetPOM
@@ -376,18 +374,12 @@
    real(rk)                   :: tDSetDiat,tDSetGren,tDSetBlue
    real(rk)                   :: tNSetDiat,tNSetGren,tNSetBlue
    real(rk)                   :: tPSetDiat,tPSetGren,tPSetBlue !,tSiSetDiat
-!  Variables related to burial process(ub the order of appearance)
+!  Variables related to burial process (in the order of appearance)
    real(rk)                   :: tDIMS,tDPOMS,vDeltaS
    real(rk)                   :: tDBurIM,tDBurPOM,tPBurPOM,tPBurAIM,tPBurPO4
    real(rk)                   :: tNBurPOM,tNBurNH4,tNBurNO3,tSiBurPOM
 !  Humus variables
    real(rk)                   :: tDHumS,tDBurHum,tDBurOM,tNBurHum,tPBurHum
-!  why removing erosion process from original PCLake?
-!  Erosion process is an external loadings simulating bank erosion, and as
-!  lake branch works, this is not needed anymore.
-!  Formerly, erosion is involved in burial process(calculating how much the
-!  sediment is buried) and changes of inorganic matter(IM) in water column
-!  and sediment as well as humus change(organic matter) in the sediment
 !  variables of new resuspension method
    real(rk)                   :: shear
 !
@@ -444,7 +436,7 @@
    _GET_HORIZONTAL_(self%id_WSPDiat,sPDiatS)
    _GET_HORIZONTAL_(self%id_WSPGren,sPGrenS)
    _GET_HORIZONTAL_(self%id_WSPBlue,sPBlueS)
-!  vegatation influence on vegetation
+!  vegatation influence on macrophytes
    _GET_HORIZONTAL_(self%id_DragVeg,sDVeg)
 !  fish predation influence on resuspension
    _GET_HORIZONTAL_(self%id_TurbFish,sDFiAd)
@@ -455,21 +447,21 @@
    _GET_HORIZONTAL_(self%id_sDepthW,sDepthW)
 !  fish biomass converted to g/m^2
 !   sDFiAd=sDFiAd*sDepthW
-!  retrieve diagnostic dependency
+!  retrieve diagnostic dependencies
    _GET_HORIZONTAL_(self%id_tDAbioPOMS,tDAbioPOMS)
    _GET_HORIZONTAL_(self%id_tDPrimPOMS,tDPrimPOMS)
    _GET_HORIZONTAL_(self%id_tDWebPOMS,tDWebPOMS)
    _GET_HORIZONTAL_(self%id_tDBedPOMS,tDBedPOMS)
    _GET_HORIZONTAL_(self%id_tDAbioHumS,tDAbioHumS)
 !-----------------------------------------------------------------------
-!  Current nutrients ratios(check the current state)
+!  Current nutrients ratios (check the current state)
 !-----------------------------------------------------------------------
    rPDPOMS=sPPOMS/(sDPOMS+NearZero)
    rNDPOMS=sNPOMS/(sDPOMS+NearZero)
    rSiDPOMS=sSiPOMS/(sDPOMS+NearZero)
    rPDHumS=sPHumS/(sDHumS+NearZero)
    rNDHumS=sNHumS/(sDHumS+NearZero)
-!  external source status
+!  external source states
 !  for phytoplankton in water
    rPDDiatW = sPDiatW /(sDDiatW+NearZero)
    rNDDiatW = sNDiatW /(sDDiatW+NearZero)
@@ -493,27 +485,27 @@
 !-----------------------------------------------------------------------
 !  Process related to other modules
 !-----------------------------------------------------------------------
-!  vegetation_dependence_of_resuspension
+!  macrophytes_dependence_of_resuspension
    aFunVegResus=max(0.0_rk,1.0_rk-self%kVegResus*sDVeg)
 !-----------------------------------------------------------------------
-!  resuspension and sedimentation(PCLake method)
+!  Resuspension and sedimentation 
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
-!   The resuspended matter in the water column calculation
+!  Calculate resuspension rate
 !-----------------------------------------------------------------------
 !  bioturbation_by_fish
       tDTurbFish=self%kTurbFish*uFunTmFish*sDFiAd
 !  calculate resuspension rate, two methods
    select case(self%resusp_meth)
-      case(1)
-!     Empirical_suspended_matter_function_(logistic_fit_to_data), in day
+      case(1) ! (original PCLake method)
+!     Empirical_resuspension_function_(logistic_fit_to_data), in day-1
           if (uTm >= 0.1_rk) then
               aFunDimSusp=self%cSuspRef*((self%cSuspMin+self%cSuspMax/(1.0_rk+exp(self%cSuspSlope*&
               & (sDepthW-self%hDepthSusp))))*((((self%cFetch +NearZero)/ self%cFetchRef) )** (0.5_rk)))
           else
               aFunDimSusp=0.0_rk
           endif
-      case(2)
+      case(2) ! (resuspension based on shear stress from physical driver model)
          if(shear <= self%crt_shear)then
             aFunDimSusp=0.0_rk
          else
@@ -522,13 +514,13 @@
    end select
    tDResusTauDead=min(aFunDimSusp, ((aFunDimSusp +NearZero )**(0.5_rk))) &
    &*((self%fLutum/ self%fLutumRef )** (0.5_rk))*self%bPorS
-!  resuspension_due_to_shear_stress_AND_fish, in day
+!  resuspension_due_to_shear_stress_AND_fish, in day-1
    tDResusBareDead=tDResusTauDead+tDTurbFish
-!  resuspension,_corrected_for_vegetation_effect, in secs
+!  resuspension,_corrected_for_macrophytes_effect, in secs-1
 !   tDResusDead=tDResusBareDead*aFunVegResus
    tDResusDead=tDResusBareDead*aFunVegResus/secs_pr_day
 !------------------------------------------------------------------------------------------------------------
-!  Different matter resuspension based on the suspended matter concentration in the water column
+!  Resuspension rates of individual components in the sediment
 !------------------------------------------------------------------------------------------------------------
 !  The inorganic matter resuspension
    tDResusIM=self%fLutum*sDIMS/(self%fLutum*sDIMS+sDPOMS)*tDResusDead
@@ -555,31 +547,31 @@
 !  convert to secs
    akResusPhytRef=akResusPhytRef/secs_pr_day
 !  Algae group resuspension
-!  reuspension of Diatom,DW
+!  resuspension of Diatoms,DW
    tDResusDiat=akResusPhytRef*sDDiatS
-!  reuspension of Green algae,DW
+!  resuspension of Green algae,DW
    tDResusGren=akResusPhytRef*sDGrenS
-!  reuspension of Blue algae,DW
+!  resuspension of Blue-green algae,DW
    tDResusBlue=akResusPhytRef*sDBlueS
-!  reuspension of Diatom,N
+!  resuspension of Diatoms,N
    tNResusDiat = rNDDiatS * tDResusDiat
-!  reuspension of Green algae,N
+!  resuspension of Green algae,N
    tNResusGren = rNDGrenS * tDResusGren
-!  reuspension of Blue algae,N
+!  resuspension of Blue-green algae,N
    tNResusBlue = rNDBlueS * tDResusBlue
-!  reuspension of Diatom,P
+!  resuspension of Diatom,P
    tPResusDiat = rPDDiatS * tDResusDiat
-!  reuspension of Green algae,P
+!  resuspension of Green algae,P
    tPResusGren = rPDGrenS * tDResusGren
-!  reuspension of Blue algae,P
+!  resuspension of Blue-green algae,P
    tPResusBlue = rPDBlueS * tDResusBlue
 !-----------------------------------------------------------------------
-!  The sedimentation calculation, based on resuspension
+!  The net sedimentation calculation, based on resuspension
 !-----------------------------------------------------------------------
-!  correction_factor_for_settling_rate_(<=_1),basic settling rate, in day
+!  correction_factor_for_settling_rate_(<=_1),net settling rate, in day
    aFunTauSet=min(1.0_rk,1.0_rk/((aFunDimSusp +NearZero )**(0.5_rk)))
 !-----------------------------------------------------------------------
-!  Different matter sedimentation based on the basic settling rate
+!  Sedimentation rates of individual components in the water column based on the net settling rate
 !-----------------------------------------------------------------------
 !  sedimentation_velocity_of_IM, in day
    uCorVSetIM=aFunTauSet*((self%fLutumRef/self%fLutum)**(0.5))*uFunTmSet*self%cVSetIM
@@ -634,7 +626,7 @@
 !  Diatoms_sedimentation
 !   tSiSetDiat = self%cSiDDiat * tDSetDiat
 !-----------------------------------------------------------------------
-!  Burial of sediment
+!  Burial of sediment components
 !-----------------------------------------------------------------------
 !  increase_in_inorganic_matter_in_sediment
    tDIMS=  tDSetIM - tDResusIM
@@ -833,7 +825,7 @@
    end subroutine do_bottom
 !EOC
 !
-!  IROUTINE: this subroutine deal with the atmospheric depositions
+!  IROUTINE: this subroutine deals with the atmospheric depositions
 !  including POM nitrogen, ammonium, nitrate, phosphate,
 !  POM phosphorus
  subroutine do_surface(self,_ARGUMENTS_DO_SURFACE_)
@@ -861,5 +853,5 @@
 !------------------------------------------------------------------------------
    end module pclake_auxiliary
 !------------------------------------------------------------------------------
-! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org
+! Copyright by the FABM-PCLake-team under the GNU Public License - www.gnu.org
 !------------------------------------------------------------------------------

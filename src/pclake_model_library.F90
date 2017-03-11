@@ -1,25 +1,7 @@
 !*******************************************************************************
 !*                                                                             *
-!* pclake_model_library.F90                                                 *
+!* pclake_model_library.F90                                                    *
 !*                                                                             *
-!* Developed by :                                                              *
-!*     Aquatic Ecology and Water Quality Management                            *
-!*     Wageningen University,Netherland                                        *
-!*     Bioscience-Silkeborg                                                    *
-!*     Aarhus University,Denmark                                               *
-!*     Center of Lake Restoration(CLEAR)                                       *
-!*     Southern Denmark University,Denmark                                     *
-!*     Copyright by the PCLake_FABM group @AU-silkeborg                        *
-!*     under the GNU Public License - www.gnu.org                              *
-!*                                                                             *
-!*      Created March 2014                                                     *
-!*-----------------------------------------------------------------------------*
-!*-----------------------------------------------------------------------------*
-!* If you have questions and suggestions regarding this model, please write to *
-!*      Fenjuan Hu: fenjuan@bios.au.dk                                         *
-!*      Dennis Trolle:dtr@bios.au.dk                                           *
-!*      Karsten Bolding:bold@bios.au.dk                                        *
-!*-----------------------------------------------------------------------------*
 !*******************************************************************************
 
 module pclake_model_library
@@ -79,5 +61,5 @@ contains
 end module
 
 !------------------------------------------------------------------------------
-! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org
+! Copyright by the FABM-PCLake-team under the GNU Public License - www.gnu.org
 !------------------------------------------------------------------------------

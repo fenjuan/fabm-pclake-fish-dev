@@ -17,13 +17,13 @@
 ! !PUBLIC DERIVED TYPES:
    type, extends(type_base_model),public :: type_pclake_fish
 !  local state variable identifiers
-!  id_sDFiJv,zooplanktivorous fish concentration in dry-weight, gDW/m**2
-!  id_sPFiJv,zooplanktivorous fish concentration in nitrogen element, gN/m**2
-!  id_sNFiJv,zooplanktivorous fish concentration in phosphorus element, gP/m**2
-!  id_sDFiAd,benthivoros fish concentration in dry-weight, gDW/m**2
-!  id_sPFiAd,benthivoros fish concentration in nitrogen element, gN/m**2
-!  id_sNFiAd,benthivoros fish concentration in phosphorus element, gP/m**2
-!  id_sDPisc,piscivorous fish concentration in dry-weight, gDW/m**2
+!  id_sDFiJv, zooplanktivorous fish concentration in dry-weight, gDW/m**2
+!  id_sPFiJv, zooplanktivorous fish concentration in nitrogen element, gN/m**2
+!  id_sNFiJv, zooplanktivorous fish concentration in phosphorus element, gP/m**2
+!  id_sDFiAd, benthivoros fish concentration in dry-weight, gDW/m**2
+!  id_sPFiAd, benthivoros fish concentration in nitrogen element, gN/m**2
+!  id_sNFiAd, benthivoros fish concentration in phosphorus element, gP/m**2
+!  id_sDPisc, piscivorous fish concentration in dry-weight, gDW/m**2
    type (type_bottom_state_variable_id)            :: id_sDFiJv,id_sPFiJv,id_sNFiJv
    type (type_bottom_state_variable_id)            :: id_sDFiAd,id_sPFiAd,id_sNFiAd,id_sDPisc
 !  Fish manipulation,changed biomass in fish
@@ -122,84 +122,84 @@
    call self%get_parameter(self%cDFiJvIn,        'cDFiJvIn',       'gDW m-2',   'external fish density',                                                          default=0.005_rk)
    call self%get_parameter(self%cDFiAdIn,        'cDFiAdIn',       'gDW m-2',   'external fish density',                                                          default=0.005_rk)
    call self%get_parameter(self%cDPiscIn,        'cDPiscIn',       'gDW m-2',   'external Pisc. density',                                                         default=0.001_rk)
-   call self%get_parameter(self%kMigrPisc,       'kMigrPisc',      'd-1',       'Pisc. migration rate',                                                           default=0.001_rk,   scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kMigrPisc,       'kMigrPisc',      'd-1',       'piscivorous migration rate',                                                     default=0.001_rk,   scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%fDBone,          'fDBone',         '[-]',       'fraction of fish C fixed in bones and scales',                                   default=0.35_rk)
    call self%get_parameter(self%fPBone,          'fPBone',         '[-]',       'fraction of fish P fixed in bones and scales',                                   default=0.5_rk)
    call self%get_parameter(self%cDCarrFish,      'cDCarrFish',     'gDW m-2',   'carrying capacity of fish',                                                      default=15.0_rk)
-   call self%get_parameter(self%fDissEgesFish,   'fDissEgesFish',  '[-]',       'soluble nutrient fraction of by fish egested food',                              default=0.25_rk)
-   call self%get_parameter(self%fDissMortFish,   'fDissMortFish',  '[-]',       'soluble nutrient fraction of died fish(excl. bones and scales',                  default=0.1_rk)
-   call self%get_parameter(self%cTmOptFish,      'cTmOptFish',     'degree C',  'optimal  temperature of fish',                                                   default=25.0_rk)
-   call self%get_parameter(self%cSigTmFish,      'cSigTmFish',     'degree C',  'temperature constant of fish(sigma in Gaussian curve)',                          default=10.0_rk)
-   call self%get_parameter(self%cDayReprFish,    'cDayReprFish',   '[-]',       'reproduction date of fish ',                                                     default=120.0_rk)
+   call self%get_parameter(self%fDissEgesFish,   'fDissEgesFish',  '[-]',       'soluble nutrient fraction of fish egested food',                                 default=0.25_rk)
+   call self%get_parameter(self%fDissMortFish,   'fDissMortFish',  '[-]',       'soluble nutrient fraction of dead fish (excl bones and scales)',                 default=0.1_rk)
+   call self%get_parameter(self%cTmOptFish,      'cTmOptFish',     'degree C',  'optimal  temperature of zoo- and benthivorous fish',                                                   default=25.0_rk)
+   call self%get_parameter(self%cSigTmFish,      'cSigTmFish',     'degree C',  'temperature constant of fish (sigma in Gaussian curve)',                         default=10.0_rk)
+   call self%get_parameter(self%cDayReprFish,    'cDayReprFish',   '[-]',       'reproduction day of year for fish ',                                             default=120.0_rk)
 !  new parameter, fish aging day count: the day young fish become adult fish
-   call self%get_parameter(self%cDayAgeFish,    'cDayAgeFish',     '[-]',       'aging date of fish ',                                                            default=365.0_rk)
+   call self%get_parameter(self%cDayAgeFish,    'cDayAgeFish',     '[-]',       'aging day of year for fish ',                                                    default=365.0_rk)
    call self%get_parameter(self%fReprFish,       'fReprFish',      '[-]',       'yearly reproduction fraction of benthivorous fish, daily rate',                  default=0.02_rk)
-   call self%get_parameter(self%fAgeFish,        'fAgeFish',       '[-]',       'yearly ageing fraction of zooplanktivorous fish,.daily rate',                    default=0.5_rk)
+   call self%get_parameter(self%fAgeFish,        'fAgeFish',       '[-]',       'yearly ageing fraction of zooplanktivorous fish, daily rate',                    default=0.5_rk)
    call self%get_parameter(self%kDAssFiJv,       'kDAssFiJv',      'd-1',       'maximum assimilation rate of zooplanktivorous fish',                             default=0.12_rk,    scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%hDZooFiJv,       'hDZooFiJv',      'g m-2',     'half-saturating zooplankton biomass for zooplanktivorous fish predation',        default=1.25_rk)
+   call self%get_parameter(self%hDZooFiJv,       'hDZooFiJv',      'g m-2',     'half-saturation zooplankton for zooplanktivorous fish predation',                default=1.25_rk)
    call self%get_parameter(self%fDAssFiJv,       'fDAssFiJv',      '[-]',       'C assimilation efficiency of zooplanktivorous fish',                             default=0.4_rk)
    call self%get_parameter(self%kDRespFiJv,      'kDRespFiJv',     'd-1',       'maintenance respiration constant of zooplanktivorous fish',                      default=0.01_rk,    scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%kMortFiJv,       'kMortFiJv',      'd-1',       'specific mortality of zooplanktivorous fish',                                    default=0.00137_rk, scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%kDRespFiAd,      'kDRespFiAd',     'd-1',       'maintenance respiration constant of benthivorous fish',                          default=0.004_rk,   scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%kMortFiAd,       'kMortFiAd',      'd-1',       'specific mortality of benthivorous fish',                                        default=0.00027_rk, scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%cDCarrPiscMax,   'cDCarrPiscMax',  'gDW m-2',   'maximum carrying capacity of  Pisc. fish',                                       default=1.2_rk)
-   call self%get_parameter(self%cDCarrPiscMin,   'cDCarrPiscMin',  'gDW m-2',   'minimum carrying capacity of  Pisc. fish',                                       default=0.1_rk)
-   call self%get_parameter(self%cDCarrPiscBare,  'cDCarrPiscBare', 'gDW m-2',   'carrying capacity of  Pisc. fish for lake without marsh zone',                   default=0.1_rk)
-   call self%get_parameter(self%cDPhraMinPisc,   'cDPhraMinPisc',  'gDW m-2',   'minimum reed biomass for Pisc. fish',                                            default=50.0_rk)
-   call self%get_parameter(self%cCovVegMin,      'cCovVegMin',     '%',         'minimum submerged vegetation coverage for  Pisc. fish',                          default=40.0_rk)
-   call self%get_parameter(self%cRelPhraPisc,    'cRelPhraPisc',   'gDW m-2',   'relative Pisc. fish density per reed if submerged vegetation absent',            default=0.075_rk)
-   call self%get_parameter(self%cRelVegPisc,     'cRelVegPisc',    'gDW m-2',   'extra relative Pisc. fish density per reed if  aCovVeg  >  cCovVegMin',          default=0.03_rk)
-   call self%get_parameter(self%kDAssPisc,       'kDAssPisc',      'd-1',       'maximum assimilation rate',                                                      default=0.025_rk,   scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%hDVegPisc,       'hDVegPisc',      'g m-2',     'half-sat. vegetation biomass for  Pisc. fish growth',                            default=5.0_rk)
-   call self%get_parameter(self%hDFishPisc,      'hDFishPisc',     'g m-2',     'half-saturating DFish for  Pisc. fish predation',                                default=1.0_rk)
-   call self%get_parameter(self%fDAssPisc,       'fDAssPisc',      '[-]',       'C assimilation efficiency of  Pisc. fish',                                       default=0.4_rk)
-   call self%get_parameter(self%fDissEgesPisc,   'fDissEgesPisc',  '[-]',       'soluble P fraction of by fish egested food',                                     default=0.25_rk)
-   call self%get_parameter(self%kDRespPisc,      'kDRespPisc',     'd-1',       'respiration constant of  Pisc. fish',                                            default=0.005_rk,   scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%kMortPisc,       'kMortPisc',      'd-1',       'specific mortality of  Pisc. fish',                                              default=0.00027_rk, scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%fDissMortPisc,   'fDissMortPisc',  '[-]',       'soluble nutrient fraction of died Pisc. fish(excl. bones and scales',            default=0.1_rk)
-   call self%get_parameter(self%cTmOptPisc,      'cTmOptPisc',     'degree C',  'optimal temperature of Pisc. fish',                                              default=25.0_rk)
-   call self%get_parameter(self%cSigTmPisc,      'cSigTmPisc',     'degree C',  'temperature constant of Pisc. fish(sigma in Gaussian curve)',                    default=10.0_rk)
+   call self%get_parameter(self%cDCarrPiscMax,   'cDCarrPiscMax',  'gDW m-2',   'maximum carrying capacity of piscivorous fish',                                  default=1.2_rk)
+   call self%get_parameter(self%cDCarrPiscMin,   'cDCarrPiscMin',  'gDW m-2',   'minimum carrying capacity of piscivorous fish',                                  default=0.1_rk)
+   call self%get_parameter(self%cDCarrPiscBare,  'cDCarrPiscBare', 'gDW m-2',   'carrying capacity of piscivorous fish',                                          default=0.1_rk)
+   call self%get_parameter(self%cDPhraMinPisc,   'cDPhraMinPisc',  'gDW m-2',   'minimum reed biomass for piscivorous fish',                                      default=50.0_rk)
+   call self%get_parameter(self%cCovVegMin,      'cCovVegMin',     '%',         'minimum submerged macrophytes coverage for piscivorous fish',                    default=40.0_rk)
+   call self%get_parameter(self%cRelPhraPisc,    'cRelPhraPisc',   'gDW m-2',   'relative piscivorous fish density per reed',                                     default=0.075_rk)
+   call self%get_parameter(self%cRelVegPisc,     'cRelVegPisc',    'gDW m-2',   'relative piscivorous fish density per reed if aCovVeg>cCovVegMin',               default=0.03_rk)
+   call self%get_parameter(self%kDAssPisc,       'kDAssPisc',      'd-1',       'maximum assimilation rate for piscivorous fish',                                 default=0.025_rk,   scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%hDVegPisc,       'hDVegPisc',      'g m-2',     'half-saturation constant for macrophytes on piscivorous fish',                   default=5.0_rk)
+   call self%get_parameter(self%hDFishPisc,      'hDFishPisc',     'g m-2',     'half-saturating DFish for piscivorous fish predation',                           default=1.0_rk)
+   call self%get_parameter(self%fDAssPisc,       'fDAssPisc',      '[-]',       'C assimilation efficiency of piscivorous fish',                                  default=0.4_rk)
+   call self%get_parameter(self%fDissEgesPisc,   'fDissEgesPisc',  '[-]',       'soluble P fraction of fish egested food',                                        default=0.25_rk)
+   call self%get_parameter(self%kDRespPisc,      'kDRespPisc',     'd-1',       'respiration constant of piscivorous fish',                                       default=0.005_rk,   scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%kMortPisc,       'kMortPisc',      'd-1',       'specific mortality of piscivorous fish',                                         default=0.00027_rk, scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%fDissMortPisc,   'fDissMortPisc',  '[-]',       'soluble nutrient fraction of dead piscivorous fish',                             default=0.1_rk)
+   call self%get_parameter(self%cTmOptPisc,      'cTmOptPisc',     'degree C',  'optimal temperature for piscivorous fish',                                       default=25.0_rk)
+   call self%get_parameter(self%cSigTmPisc,      'cSigTmPisc',     'degree C',  'temperature constant for piscivorous fish (sigma)',                              default=10.0_rk)
    call self%get_parameter(self%cPDFishRef,      'cPDFishRef',     'mgP/mgDW',  'reference P/C ratio of fish',                                                    default=0.022_rk)
    call self%get_parameter(self%cNDFishRef,      'cNDFishRef',     'mgN/mgDW',  'reference N/C ratio of fish',                                                    default=0.1_rk)
-   call self%get_parameter(self%cPDPisc,         'cPDPisc',        'mgP/mgDW',  'reference P/C ratio of Pisc. fish',                                              default=0.022_rk)
-   call self%get_parameter(self%cNDPisc,         'cNDPisc',        'mgN/mgDW',  'reference N/C ratio of Pisc. fish ',                                             default=0.1_rk)
+   call self%get_parameter(self%cPDPisc,         'cPDPisc',        'mgP/mgDW',  'reference P/C ratio of piscivorous fish',                                        default=0.022_rk)
+   call self%get_parameter(self%cNDPisc,         'cNDPisc',        'mgN/mgDW',  'reference N/C ratio of piscivorous fish ',                                       default=0.1_rk)
 !  Fish manipulation, register of switches
    call self%get_parameter(self%Manipulate_FiAd, 'Manipulate_FiAd', ' ',        'turn on/off benthivorous fish manipulation',                                     default=.false.)
    call self%get_parameter(self%Manipulate_FiJv, 'Manipulate_FiJv', ' ',        'turn on/off zooplanktivorous manipulation',                                      default=.false.)
    call self%get_parameter(self%Manipulate_Pisc, 'Manipulate_Pisc', ' ',        'turn on/off piscivorous fish manipulation',                                      default=.false.)
 !  the user defined minumun value for state variables
-   call self%get_parameter(self%cDFiJvMin,       'cDFiJvMin',       'gDW/m3',   'minimum zooplanktivorous  fish biomass in system',                               default=0.0001_rk)
-   call self%get_parameter(self%cDFiAdMin,       'cDFiAdMin',       'gDW/m3',   'minimum benthivorous fish biomass in system',                                    default=0.0001_rk)
-   call self%get_parameter(self%cDPiscMin,       'cDPiscMin',       'gDW/m3',   'minimum piscivorous fish biomass in system',                                     default=0.0001_rk)
-   call self%get_parameter(self%fFisDOMW,     'fFisDOMW',     '[-]',      'dissolved organics fraction from fish',                                          default=0.5_rk)
+   call self%get_parameter(self%cDFiJvMin,       'cDFiJvMin',       'gDW m-2',   'minimum zooplanktivorous fish biomass in system',                               default=0.0001_rk)
+   call self%get_parameter(self%cDFiAdMin,       'cDFiAdMin',       'gDW m-2',   'minimum benthivorous fish biomass in system',                                   default=0.0001_rk)
+   call self%get_parameter(self%cDPiscMin,       'cDPiscMin',       'gDW m-2',   'minimum piscivorous fish biomass in system',                                    default=0.0001_rk)
+   call self%get_parameter(self%fFisDOMW,     'fFisDOMW',     '[-]',      'dissolved organic matter fraction from fish',                                          default=0.5_rk)
 ! parameters regarding adult fish assimilation
-   call self%get_parameter(self%fDAssFiAd,    'fDAssFiAd',    '[-]',      'C assimilation efficiency of adult fish',                    default=0.4_rk)
-   call self%get_parameter(self%cRelVegFish,  'cRelVegFish',  '[-]',      'decrease of fish feeding per vegetation cover(max. 0.01)',   default=0.009_rk)
-   call self%get_parameter(self%kDAssFiAd,    'kDAssFiAd',    'd-1',      'maximum assimilation rate of adult fish',                    default=0.06_rk,   scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%hDBentFiAd,   'hDBentFiAd',   'g m-2',    'half saturation zoobenthos biomass for adult fish predation',default=2.5_rk)
+   call self%get_parameter(self%fDAssFiAd,    'fDAssFiAd',    '[-]',      'C assimilation efficiency of adult fish',                                              default=0.4_rk)
+   call self%get_parameter(self%cRelVegFish,  'cRelVegFish',  '[-]',      'decrease of fish feeding per macrophytes cover (max. 0.01)',                           default=0.009_rk)
+   call self%get_parameter(self%kDAssFiAd,    'kDAssFiAd',    'd-1',      'maximum assimilation rate of adult fish',                                              default=0.06_rk,   scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%hDBentFiAd,   'hDBentFiAd',   'g m-2',    'half-saturation constant for zoobenthos on adult fish',                                default=2.5_rk)
 !  Register local state variable
 !  zooplanktivorous fish, transportation is turned off
-   call self%register_state_variable(self%id_sDFiJv,'sDFiJv','g m-2','zooplanktivorous fish dry weight',     &
+   call self%register_state_variable(self%id_sDFiJv,'sDFiJv','gDW m-2','zooplanktivorous fish dry weight',     &
                                     initial_value= 0.5_rk,minimum=self%cDFiJvMin) !,no_river_dilution=.TRUE.)
 !   call self%set_variable_property(self%id_sDFiJv,'disable_transport',.true.)
-   call self%register_state_variable(self%id_sPFiJv,'sPFiJv','g m-2','zooplanktivorous fish phosphorus content',     &
+   call self%register_state_variable(self%id_sPFiJv,'sPFiJv','gP m-2','zooplanktivorous fish phosphorus content',     &
                                     initial_value=0.011_rk,minimum=self%cDFiJvMin * self%cPDFishRef) !,no_river_dilution=.TRUE.)
 !   call self%set_variable_property(self%id_sPFiJv,'disable_transport',.true.)
-   call self%register_state_variable(self%id_sNFiJv,'sNFiJv','g m-2','zooplanktivorous fish nitrogen content',     &
+   call self%register_state_variable(self%id_sNFiJv,'sNFiJv','gN m-2','zooplanktivorous fish nitrogen content',     &
                                     initial_value=0.05_rk,minimum=self%cDFiJvMin * self%cNDFishRef) !,no_river_dilution=.TRUE.)
 !   call self%set_variable_property(self%id_spFiJv,'disable_transport',.true.)
 !  benthivoros fish, transportation turned off
-   call self%register_state_variable(self%id_sDFiAd,'sDFiAd','g m-2','benthivorous fish dry weight',     &
+   call self%register_state_variable(self%id_sDFiAd,'sDFiAd','gDW m-2','benthivorous fish dry weight',     &
                                     initial_value=2.0_rk,minimum=self%cDFiAdMin) !,no_river_dilution=.TRUE.)
 !   call self%set_variable_property(self%id_sDFiAd,'disable_transport',.true.)
-   call self%register_state_variable(self%id_sPFiAd,'sPFiAd','g m-2','benthivorous fish phosphorus content',     &
+   call self%register_state_variable(self%id_sPFiAd,'sPFiAd','gP m-2','benthivorous fish phosphorus content',     &
                                     initial_value=0.044_rk,minimum=self%cDFiAdMin * self%cPDFishRef) !,no_river_dilution=.TRUE.)
 !   call self%set_variable_property(self%id_sPFiAd,'disable_transport',.true.)
-   call self%register_state_variable(self%id_sNFiAd,'sNFiAd','g m-2','benthivorous fish nitrogen content',     &
+   call self%register_state_variable(self%id_sNFiAd,'sNFiAd','gN m-2','benthivorous fish nitrogen content',     &
                                     initial_value=0.2_rk,minimum=self%cDFiAdMin * self%cNDFishRef) !,no_river_dilution=.TRUE.)
 !   call self%set_variable_property(self%id_sNFiAd,'disable_transport',.true.)
 !  piscivorous fish
-   call self%register_state_variable(self%id_sDPisc,'sDPisc','g m-2','piscivorous fish dry weight', &
+   call self%register_state_variable(self%id_sDPisc,'sDPisc','gDW m-2','piscivorous fish dry weight', &
                                     initial_value=0.01_rk,minimum=NearZero) !,no_river_dilution=.TRUE.)
 !   call self%set_variable_property(self%id_sDPisc,'disable_transport',.true.)
 !  Fish manipulation, if manipulation,register state variable of fish biomass change
@@ -268,8 +268,8 @@
 !   call self%register_dependency(self%id_aDSatFiAd, 'food_limit_function_adfish','[-]',  'food limit function for adault fish')
 
 
-   call self%register_dependency(self%id_aCovVeg,   'vegetation_coverage',       '[-]',  'vegetation coverage')
-   call self%register_dependency(self%id_aDSubVeg,  'submerged_vegetation',      'g m-2','submerged vegetation dry weight')
+   call self%register_dependency(self%id_aCovVeg,   'macrophytes_coverage',       '[-]',  'macrophytes coverage')
+   call self%register_dependency(self%id_aDSubVeg,  'submerged_macrophytes',      'g m-2','submerged macrophytes dry weight')
    
    return
 
@@ -293,7 +293,7 @@
 !  carriers for local state variables
    real(rk)      :: sDFiJv,sPFiJv,sNFiJv
    real(rk)      :: sDFiAd,sPFiAd,sNFiAd,sDPisc
-!  carriers for exteral link state variables
+!  carriers for external link state variables
    real(rk)      :: sDZoo,sNZoo,sPZoo
    real(rk)      :: sDBent,sNBent,sPBent
 !  carriers for external link diagnostic variables
@@ -305,68 +305,54 @@
    real(rk)      :: aDFish,aPFish,aNFish
 !  variables for temperature function
    real(rk)      :: uFunTmFish,uFunTmPisc
-!  variables for fish(include JV and AD)
-!  PCLake_Osis, /m^2
+!  variables for fish (including Jv, juvinile, and Ad, adult)
    real(rk)      :: tDReprFish,tDAgeFish
    real(rk)      :: tPReprFish,tPAgeFish
    real(rk)      :: tNReprFish,tNAgeFish
-!  PCLake_Osis, /m^2
-   real(rk)     :: tDFiJv,tDMigrFiJv
-   real(rk)     :: tDAssFiJv,tDRespFiJv,tDMortFiJv,tDConsFiJvPisc
-   real(rk)     :: aDSatFiJv,tDEnvFiJv,ukDIncrFiJv,tDConsFiJv
+   real(rk)      :: tDFiJv,tDMigrFiJv
+   real(rk)      :: tDAssFiJv,tDRespFiJv,tDMortFiJv,tDConsFiJvPisc
+   real(rk)      :: aDSatFiJv,tDEnvFiJv,ukDIncrFiJv,tDConsFiJv
 !  variables for zooplanktivorous fish flux_P
-   real(rk)     :: wPFiJv
-!  PCLake_Osis, /m^2
-   real(rk)     :: tPFiJv,tPMigrFiJv,tPAssFiJv
-   real(rk)     :: tPExcrFiJv,tPMortFiJv,tPConsFiJvPisc
-   real(rk)     :: afPAssFiJv,tPConsFiJv,afNAssFiJv,tNConsFiJv
-!  PCLake_Osis, /m^2
-   real(rk)     :: tNFiJv,tNMigrFiJv,tNAssFiJv
-   real(rk)     :: tNExcrFiJv,tNMortFiJv,tNConsFiJvPisc
-!  PCLake_Osis, /m^2
+   real(rk)      :: wPFiJv
+   real(rk)      :: tPFiJv,tPMigrFiJv,tPAssFiJv
+   real(rk)      :: tPExcrFiJv,tPMortFiJv,tPConsFiJvPisc
+   real(rk)      :: afPAssFiJv,tPConsFiJv,afNAssFiJv,tNConsFiJv
+   real(rk)      :: tNFiJv,tNMigrFiJv,tNAssFiJv
+   real(rk)      :: tNExcrFiJv,tNMortFiJv,tNConsFiJvPisc
+!  variables for benthivorous fish
    real(rk)     :: tDFiAd,tDMigrFiAd,tDRespFiAd,tDMortFiAd
    real(rk)     :: tDConsFiAdPisc
-!  PCLake_Osis, /m^2
    real(rk)     :: tPFiAd,tPMigrFiAd,tPExcrFiAd,tPMortFiAd
    real(rk)     :: tPConsFiAdPisc
 !  assimilation
 !  variables for benthivorous fish flux_N
-!  PCLake_Osis, /m^2
    real(rk)     :: tNFiAd,tNMigrFiAd,tNExcrFiAd,tNMortFiAd
    real(rk)     :: tNConsFiAdPisc
-!  PCLake_Osis, /m^2
    real(rk)     :: tDConsPisc,tDAssPisc,aDSatPisc,aFunVegPisc
    real(rk)     :: tDEnvPisc,akDIncrPisc,aDCarrPisc
    real(rk)     :: tDMigrPisc,tDRespPisc,tDMortPisc
    real(rk)     :: tDPisc
 !  variables for piscivorous fish P process
-!  PCLake_Osis, /m^2
    real(rk)     :: aPPisc,tPConsPisc,rPDFoodPisc,afPAssPisc,tPAssPisc
    real(rk)     :: tPEgesPisc,tPExcrPisc,tPMortPisc,tPMigrPisc
 !  variables for piscivorous fish N process
-!  PCLake_Osis, /m^2
    real(rk)     :: aNPisc,tNConsPisc,rNDFoodPisc,afNAssPisc,tNAssPisc
    real(rk)     :: tNEgesPisc,tNExcrPisc,tNMortPisc,tNMigrPisc
 !  variables for exchange of NH4
-!  PCLake_Osis, /m^2
    real(rk)     :: tNEgesFiJv,tNMortFishNH4,tNMortFishBot,tNEgesFiJvNH4
    real(rk)     :: tNMortFish,tNEgesPiscNH4,tNMortPiscNH4,tNMortPiscBot
    real(rk)     :: tNFishNH4W
 !  variables for exchange of PO4
-!  PCLake_Osis, /m^2
    real(rk)     :: tPEgesFiJvPO4,tPFishPO4W
    real(rk)     :: tPEgesFiJv,tPMortFish,tPMortFishBot
    real(rk)     :: tPMortFishPO4,tPEgesPiscPO4,tPMortPiscPO4,tPMortPiscBot
 !  variables for exchange of organic matter DW
-!  PCLake_Osis, /m^2
    real(rk)     :: tDEgesFiJv, tDMortFishTOM
    real(rk)     :: tDMortFish,tDMortFishBot,tDEgesPisc,tDMortPiscTOM,tDMortPiscBot
 !  variables for exchange of organic matter N
-!  PCLake_Osis, /m^2
    real(rk)     :: tNEgesFiJvTOM,tNMortFishPOM
    real(rk)     :: tNEgesPiscTOM,tNMortPiscTOM
 !  variables for exchange of organic matter P
-!  PCLake_Osis, /m^2
    real(rk)     :: tPEgesFiJvTOM,tPMortFishTOM
    real(rk)     :: tPEgesPiscTOM,tPMortPiscTOM
 !  benthivorous fish assimilation
@@ -461,17 +447,15 @@
 
 
 !-------------------------------------------------------------------------
-!  The orders for the processes. We try to orgnize the order
-!  from zooplanktivorous fish, to benthivorous fish, and at last piscivorous
-!  fish. And each group finish all their process before going to the next
-!  groups. But there a special sections on zooplankton comsumption by
-!  zooplanktivorous fish, due to the variables dependent on each other.It
-!  starts with assimilation of DW to provide wDAssFiJv for its predation of zoo-
-!  -plankton(DW,N,P).The later process(predation) provide variable wDConsFiJv
-!  for fish assimilation of N,P
+!  The following section is orgnize in the order of zooplanktivorous fish, 
+!  benthivorous fish, and piscivorous processes. There a special section 
+!  on zooplankton comsumption by zooplanktivorous fish, due to the variables 
+!  being dependent on each other. It starts with assimilation of DW to provide 
+!  wDAssFiJv for its predation of zooplankton(DW,N,P).The later process (predation) 
+!  provide the variable wDConsFiJv for fish assimilation of N,P
 !-------------------------------------------------------------------------
 !-------------------------------------------------------------------------
-!  Current local nutrients ratios in zooplankton(check the current state)
+!  Current local nutrients ratios in zooplankton (check the current state)
 !-------------------------------------------------------------------------
 !  P/D_ratio_herb.zooplankton
    rPDZoo = sPZoo /(sDZoo+NearZero)
@@ -520,19 +504,15 @@
 !  environmental_correction_of_fish
    tDEnvFiJv = max(0.0_rk,ukDIncrFiJv /(self%cDCarrFish - sDFiAd) * sDFiJv*sDFiJv)
 !  assimilation_of_fish
-!  PCLake_Osis:
    tDAssFiJv = aDSatFiJv *(self%kDAssFiJv * uFunTmFish * sDFiJv - tDEnvFiJv)
 !-----------------------------------------------------------------------
 !  zooplankton predated by fish
 !-----------------------------------------------------------------------
 !  zooplankton_consumption_of_fish
-!  PCLake_osis:sDFiJv,in g/m^2
     tDConsFiJv = tDAssFiJv / self%fDAssFiJv
 !  (zooplankton)_P_consumption_by_FiJv
-!  PCLake_osis:sPFiJv,in g/m^2
    tPConsFiJv = rPDZoo * tDConsFiJv
 !  (zooplankton)_N_consumption_by_FiJv
-!  PCLake_osis:sNFiJv,in g/m^2
    tNConsFiJv = rNDZoo * tDConsFiJv
 !-----------------------------------------------------------------------
 !  zooplanktivorous fish assimilation_P
@@ -540,7 +520,6 @@
 !  P_assim._efficiency_of_FiJv
    afPAssFiJv = min(1.0_rk,self%cPDFishRef / rPDZoo * self%fDAssFiJv)
 !  P_assimilation_of_FiJv
-!  PCLake_osis:sPFiJv,in g/m^2
    tPAssFiJv = afPAssFiJv * tPConsFiJv
 !-----------------------------------------------------------------------
 !  zooplanktivorous fish assimilation_N
@@ -548,60 +527,47 @@
 !  N_assim._efficiency_of_FiJv
    afNAssFiJv = min(1.0_rk,self%cNDFishRef / rNDZoo * self%fDAssFiJv)
 !  N_assimilation_of_FiJv
-!  PCLake_osis:sNFiJv,in g/m^2
    tNAssFiJv = afNAssFiJv * tNConsFiJv
 !-----------------------------------------------------------------------
 !  zooplanktivorous fish respiration and excretion
 !-----------------------------------------------------------------------
 !  respiration_of_fish_DW
-!  PCLake_osis:sDFiAd,in g/m^2
    tDRespFiJv = (self%cPDFishRef / rPDFiJv) * self%kDRespFiJv * uFunTmFish * sDFiJv
 !  P_excretion_of_FiJv
-!  PCLake_osis:sPFiAd,in g/m^2
    tPExcrFiJv = (rPDFiJv / self%cPDFishRef) * self%kDRespFiJv * uFunTmFish * sPFiJv
 !  N_excretion_of_FiJv
-!  PCLake_osis:sNFiAd,in g/m^2
    tNExcrFiJv = (rNDFiJv / self%cNDFishRef) * self%kDRespFiJv * uFunTmFish * sNFiJv
 !-----------------------------------------------------------------------
 !  zooplanktivorous fish migration
 !-----------------------------------------------------------------------
 !  migration_flux of zooplanktivorous fish, DW
-!  PCLake_osis:sDFiJv,in g/m^2
    tDMigrFiJv = self%kMigrFish *(self%cDFiJvIn - sDFiJv)
 !  net_migration_flux of zooplanktivorous fish,P
-!  PCLake_osis:sPFiJv,in g/m^2
    tPMigrFiJv = self%kMigrFish *(self%cPDFishRef * self%cDFiJvIn - sPFiJv)
 !  net_migration_flux of zooplanktivorous fish,N
-!  PCLake_osis:sNFiJv,in g/m^2
    tNMigrFiJv = self%kMigrFish *(self%cNDFishRef * self%cDFiJvIn - sNFiJv)
 !-----------------------------------------------------------------------
 !  zooplanktivorous fish mortality
 !-----------------------------------------------------------------------
 !  fish_mortality_incl._environmental_correction
-!  PCLake_osis:sDFiAd,in g/m^2
    tDMortFiJv = self%kMortFiJv * sDFiJv +(1.0_rk - aDSatFiJv) * tDEnvFiJv
 !  mortality_of_FiJv_P
-!  PCLake_osis:sPFiAd,in g/m^2
    tPMortFiJv = rPDFiJv * tDMortFiJv
 !  mortality_of_FiJv_N
-!  PCLake_osis:sNFiAd,in g/m^2
    tNMortFiJv = rNDFiJv * tDMortFiJv
 !-----------------------------------------------------------------------
 !  zooplankivirous fish egestion
 !-----------------------------------------------------------------------
 !  egestion_of_fish,zooplanktivorous fish
-!  PCLake_osis:sDFiAd,in g/m^2
    tDEgesFiJv = tDConsFiJv - tDAssFiJv
 !  egestion_of_FiJv
-!  PCLake_osis:sPFiAd,in g/m^2
    tNEgesFiJv = tNConsFiJv - tNAssFiJv
 !  egestion_of_FiJv
-!  PCLake_osis:sNFiAd,in g/m^2
    tPEgesFiJv = tPConsFiJv - tPAssFiJv
 !-----------------------------------------------------------------------
 !  benthivorous fish assimilation_DW
 !-----------------------------------------------------------------------
-!  vegetation_dependence_of_fish_feeding
+!  macrophytes_dependence_of_fish_feeding
    aFunVegFish = max(0.0_rk,1.0_rk - self%cRelVegFish * aCovVeg)
 !   for first time step check out
 !   aFunVegFish = max(0.0_rk,1.0_rk - self%cRelVegFish * 0.2_rk)
@@ -628,9 +594,9 @@
 !-----------------------------------------------------------------------
 !  benthivorous fish assimilation_N
 !-----------------------------------------------------------------------
-!  (zoobenthos)_N_consumption_by_FiAd
+!  Zoobenthos_N_consumption_by_FiAd
    tNConsFiAd = rNDBent * tDConsFiAd
-!  N_assim._efficiency_of_FiAd
+!  N_assimilation_efficiency_of_FiAd
    afNAssFiAd = min(1.0_rk,self%cNDFishRef / rNDBent * self%fDAssFiAd)
 !  N_assimilation_of_FiAd
    tNAssFiAd = afNAssFiAd * tNConsFiAd
@@ -638,37 +604,28 @@
 !  benthivorous fish respiration and excretion
 !-----------------------------------------------------------------------
 !  respiration_of_fish
-!  PCLake_osis:sDFiAd,in g/m^2
    tDRespFiAd = (self%cPDFishRef / rPDFiAd) * self%kDRespFiAd * uFunTmFish * sDFiAd
 !  P_excretion_of_FiAd
-!  PCLake_osis:sPFiAd,in g/m^2
    tPExcrFiAd = (rPDFiAd / self%cPDFishRef) * self%kDRespFiAd * uFunTmFish * sPFiAd
 !  N_excretion_of_FiAd
-!  PCLake_osis:sNFiAd,in g/m^2
    tNExcrFiAd = (rNDFiAd / self%cNDFishRef) * self%kDRespFiAd * uFunTmFish * sNFiAd
 !-----------------------------------------------------------------------
 !  benthivorous fish migration
 !-----------------------------------------------------------------------
 !  migration_flux of benthivorous fish,DW
-!  PCLake_osis:sDFiAd,in g/m^2
    tDMigrFiAd = self%kMigrFish *(self%cDFiAdIn - sDFiAd)
 !  net_migration_flux of benthivorous fish, P
-!  PCLake_osis:sPFiAd,in g/m^2
    tPMigrFiAd = self%kMigrFish *(self%cPDFishRef * self%cDFiAdIn - sPFiAd)
 !  net_migration_flux of benthivorous fish, N
-!  PCLake_osis:sPFiAd,in g/m^2
    tNMigrFiAd = self%kMigrFish *(self%cNDFishRef * self%cDFiAdIn - sNFiAd)
 !-----------------------------------------------------------------------
 !  benthivorous fish mortality
 !-----------------------------------------------------------------------
 !  fish_mortality_incl._environmental_correction
-!  PCLake_osis:sDFiAd,in g/m^2
    tDMortFiAd = self%kMortFiAd * sDFiAd +(1.0_rk - aDSatFiAd) * tDEnvFiAd
 !  mortality_of_FiAd
-!  PCLake_osis:sPFiAd,in g/m^2
    tPMortFiAd = rPDFiAd * tDMortFiAd
 !  mortality_of_FiAd
-!  PCLake_osis:sNFiAd,in g/m^2
    tNMortFiAd = rNDFiAd * tDMortFiAd
 !-----------------------------------------------------------------------
 !  benthivirous fish egestion
@@ -684,7 +641,6 @@
 !-----------------------------------------------------------------------
 !  Reproduction_flux_DW
    if (Day == self%cDayReprFish) then
-!  PCLake_osis:sDFiAd,in g/m^2
       tDReprFish = self%fReprFish * sDFiAd/secs_pr_day
    else
       tDReprFish =0.0_rk
@@ -698,19 +654,18 @@
 !-----------------------------------------------------------------------
 !  Ageing_DW
    if (Day == self%cDayAgeFish) then
-!  PCLake_osis:sDFiAd,in g/m^2
       tDAgeFish = self%fAgeFish * sDFiJv/secs_pr_day
    else
-       tDAgeFish = 0.0_rk
+      tDAgeFish = 0.0_rk
    endif
 !  Ageing_P
    tPAgeFish = rPDFiJv * tDAgeFish
 !  Ageing_N
    tNAgeFish = rNDFiJv * tDAgeFish
 !---------------------------------------------------------------------------
-!  Piscivorous fish assimilation( this whole area is calibrated in /m^2)
+!  Piscivorous fish assimilation 
 !---------------------------------------------------------------------------
-!  vegetation_dependence_of_Pisc_growth_rate
+!  macrophytes_dependence_of_Pisc_growth_rate
    aFunVegPisc = aDSubVeg /(self%hDVegPisc + aDSubVeg + NearZero)
 !  food_limitation_function_of_Pisc
    aDSatPisc = aDFish*aDFish /(self%hDFishPisc*self%hDFishPisc + aDFish*aDFish)
@@ -719,57 +674,49 @@
 !  Carrying_capacity_of_Pisc_for_lake_without_marsh_zone
    aDCarrPisc = max(self%cDCarrPiscMin,min(self%cDCarrPiscMax,self%cDCarrPiscBare))
 !  environmental_correction_of_Pisc
-!  PCLake_osis:sDPisc,in g/m^2
    tDEnvPisc = max(0.0_rk,akDIncrPisc / aDCarrPisc * sDPisc*sDPisc)
 !  assimilation_of_Pisc
-!  PCLake_osis:sDPisc,in g/m^2
    tDAssPisc = aDSatPisc *(self%kDAssPisc * aFunVegPisc * uFunTmPisc * sDPisc - tDEnvPisc)
 !-----------------------------------------------------------------------
 !  Piscivorous fish consumption
 !-----------------------------------------------------------------------
 !  consumption_of_Pisc
-!  PCLake_osis:sDPisc,in g/m^2
    tDConsPisc = tDAssPisc / self%fDAssPisc
 !-----------------------------------------------------------------------
-!  zooplanktivorous fish predated by piscivirious fish
+!  zooplanktivorous fish predated by piscivorous fish
 !-----------------------------------------------------------------------
 !  young_fish_consumption_by_Pisc_DW
-!  PCLake_osis:sDPisc,aDFish,in g/m^2
    tDConsFiJvPisc = sDFiJv / aDFish * tDConsPisc
 !  young_fish_consumption_by_Pisc
    tPConsFiJvPisc = rPDFiJv * tDConsFiJvPisc
 !  young_fish_consumption_by_Pisc
    tNConsFiJvPisc = rNDFiJv * tDConsFiJvPisc
 !-----------------------------------------------------------------------
-!  benthivorous fish predated by piscivirious fish
+!  benthivorous fish predated by piscivorious fish
 !-----------------------------------------------------------------------
 !  adult_fish_consumption_by_Pisc
-!  PCLake_osis:sDPisc,aDFish,in g/m^2
    tDConsFiAdPisc = tDConsPisc - tDConsFiJvPisc
 !  adult_fish_consumption_by_Pisc
    tPConsFiAdPisc = rPDFiAd * tDConsFiAdPisc
 !  adult_fish_consumption_by_Pisc
    tNConsFiAdPisc = rNDFiAd * tDConsFiAdPisc
 !-----------------------------------------------------------------------
-!  piscivirious fish migration
+!  piscivorous fish migration
 !-----------------------------------------------------------------------
 !  migration_flux
-!  PCLake_osis:sDPisc,in g/m^2
    tDMigrPisc = self%kMigrPisc *(self%cDPiscIn - sDPisc)
 !-----------------------------------------------------------------------
-!  piscivirious fish respiration
+!  piscivorous fish respiration
 !-----------------------------------------------------------------------
 !  respiration_of_Pisc
-!  PCLake_osis:sDPisc,in g/m^2
    tDRespPisc = self%kDRespPisc * uFunTmPisc * sDPisc
 !-----------------------------------------------------------------------
-!  piscivirious fish mortality
+!  piscivorous fish mortality
 !-----------------------------------------------------------------------
 !  mortality_of_Pisc(incl._environmental_correction)
-!  PCLake_osis:sDPisc,in g/m^2
    tDMortPisc = self%kMortPisc * sDPisc +(1.0_rk - aDSatPisc) * tDEnvPisc
 !---------------------------------------------------------------------------
-!  piscivirious fish N process
+!  piscivorous fish N process
 !---------------------------------------------------------------------------
 !  _Piscivorous_fish
     aPPisc = self%cPDPisc * sDPisc
@@ -788,7 +735,7 @@
 !  net_migration_flux
    tPMigrPisc = self%kMigrPisc *(self%cPDPisc * self%cDPiscIn - aPPisc)
 !-----------------------------------------------------------------------
-!  piscivirious fish N process
+!  piscivorous fish N process
 !-----------------------------------------------------------------------
 !  Piscivorous_fish
    aNPisc = self%cNDPisc * sDPisc
@@ -809,7 +756,7 @@
 !  net_migration_flux
    tNMigrPisc = self%kMigrPisc *(self%cNDPisc * self%cDPiscIn - aNPisc)
 !-----------------------------------------------------------------------
-!  piscivirious fish egestion
+!  piscivorous fish egestion
 !-----------------------------------------------------------------------
 !  egestion_of_Pisc
    tDEgesPisc = tDConsPisc - tDAssPisc
@@ -873,8 +820,6 @@
 !   wDPisc=tDPisc/sDepthW
 
 
-
-
 !=======================================================================
 !  fish processes relating to other modules
 !=======================================================================
@@ -882,10 +827,10 @@
 !  Update NH4 in water
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
-!  external state variables change due to adult fish(egestion, from sediment top)
+!  external state variables change due to adult fish (egestion, from sediment top)
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
-!  for fish it has t-, unit in /m^2
+!  for fish it has t-, units in /m^2
 !-----------------------------------------------------------------------
 !  NH4_egestion_of_young_fish
    tNEgesFiJvNH4 = self%fDissEgesFish * tNEgesFiJv
@@ -912,11 +857,9 @@
 !   & tNExcrPisc + tNEgesPiscNH4 + tNMortPiscNH4)/sDepthW
 
 
-
-
 !-----------------------------------------------------------------------
 !  Update PO4 in water
-!  for fish it has t-, unit in /m^2
+!  for fish it has t-, units in /m^2
 !-----------------------------------------------------------------------
 !  SRP_egestion_of_adult_fish
    tPEgesFiAdPO4 = self%fDissEgesFish * tPEgesFiAd
@@ -945,7 +888,7 @@
 
 !-----------------------------------------------------------------------
 !  Update organic matter DW in water
-!  for fish it has t-, unit in /m^2
+!  for fish it has t-, units in /m^2
 !-----------------------------------------------------------------------
 !  bent._fish_mortality
    tDMortFish = tDMortFiJv + tDMortFiAd
@@ -957,14 +900,11 @@
    tDMortPiscBot = self%fDBone * tDMortPisc
 !  part_of_died_Pisc_DW_becoming_organic matters
    tDMortPiscTOM = tDMortPisc - tDMortPiscBot
-!  total_fish_flux_of_DW_in_organics_in_lake_water
+!  total_fish_flux_of_DW_in_organic matter_in_lake_water
 !  parameters before changed fish to nonlocal
 !   wDFishDetW = (tDEgesFiJv + tDMortFishDet + tDEgesPisc + tDMortPiscDet)/sDepthW
 !   wDFishPOMW = wDFishDetW * (1.0_rk - self%fFisDOMW)
 !   wDFishDOMW = wDFishDetW * self%fFisDOMW
-
-
-
 
    tDFishTOMW = tDEgesFiJv + tDEgesFiAd + tDMortFishTOM + tDEgesPisc + tDMortPiscTOM
    tDFishPOMW = tDFishTOMW * (1.0_rk - self%fFisDOMW)
@@ -972,11 +912,11 @@
 !-----------------------------------------------------------------------
 !  Update organic N in water
 !-----------------------------------------------------------------------
-!  part_of_died_Pisc_N_becoming_orgainc_N
+!  part_of_dead_Pisc_N_becoming_orgainc_N
    tNMortPiscTOM = tNMortPisc - tNMortPiscBot - tNMortPiscNH4
 !  organic_N_egestion_of_Pisc
    tNEgesPiscTOM = tNEgesPisc - tNEgesPiscNH4
-!  part_of_died_fish_NW_becoming_organics
+!  part_of_dead_fish_NW_becoming_organic matter
    tNMortFishPOM = tNMortFish - tNMortFishBot - tNMortFishNH4
 !  organic_N_egestion_of_adult_fish
    tNEgesFiAdTOM = tNEgesFiAd - tNEgesFiAdNH4
@@ -1000,13 +940,13 @@
    tPMortPiscTOM = tPMortPisc - tPMortPiscBot - tPMortPiscPO4
 !  organic_P_egestion_of_Pisc
    tPEgesPiscTOM = tPEgesPisc - tPEgesPiscPO4
-!  part_of_died_fish_PW_becoming_organics
+!  part_of_died_fish_PW_becoming_organic matter
    tPMortFishTOM = tPMortFish - tPMortFishBot - tPMortFishPO4
 !  organic_P_egestion_of_young_fish
    tPEgesFiJvTOM = tPEgesFiJv - tPEgesFiJvPO4
 !  organic_P_egestion_of_adult_fish
    tPEgesFiAdTOM = tPEgesFiAd - tPEgesFiAdPO4
-!  total_fish_flux_of_P_in_organics_in_lake_water
+!  total_fish_flux_of_P_in_organic matter_in_lake_water
 
 
 !  parameters before changed fish to nonlocal
@@ -1086,9 +1026,9 @@
    n=n+1
 #endif
 !-----------------------------------------------------------------------
-!  Updated changed fish biomass for biomanipulation
+!  Updated fish biomass due to biomanipulation
 !-----------------------------------------------------------------------
-!  If benthivorous fish manipulation tured on
+!  If benthivorous fish manipulation is turned on
    _SET_ODE_BEN_(self%id_ChangedFiAd,tDManFiAd)
 !  If zooplanktivorous manipulation tured on
    _SET_ODE_BEN_(self%id_ChangedFiJv,tDManFiJv)
@@ -1108,5 +1048,5 @@
    end module pclake_fish
 
 !------------------------------------------------------------------------------
-! Copyright by the FABM_PCLake-team under the GNU Public License - www.gnu.org
+! Copyright by the FABM-PCLake-team under the GNU Public License - www.gnu.org
 !------------------------------------------------------------------------------
