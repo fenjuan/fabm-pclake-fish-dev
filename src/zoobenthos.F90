@@ -128,14 +128,14 @@
    call self%get_parameter(self%cPDDiatMax,   'cPDDiatMax',   'mgP/mgDW', 'maximum P/DW ratio diatoms',                                   default=0.05_rk)
    call self%get_parameter(self%cPDGrenMax,   'cPDGrenMax',   'mgP/mgDW', 'maximum P/DW ratio greens',                                    default=0.015_rk)
 !  the user defined minumun value for state variables
-   call self%get_parameter(self%cDBentMin,    'cDBentMin',    'gDW/m2',   'minimum zoobenthos concentration in system',                       default=0.00001_rk)
-   call self%get_parameter(self%fBenDOMS,  'fBenDOMS',   '[-]',     'dissolved organic fraction from zoobenthos',                 default=0.5_rk)
+   call self%get_parameter(self%cDBentMin,    'cDBentMin',    'gDW/m2',   'minimum zoobenthos concentration in system',                   default=0.00001_rk)
+   call self%get_parameter(self%fBenDOMS,  'fBenDOMS',   '[-]',           'dissolved organic fraction from zoobenthos',                   default=0.5_rk)
 !  Register local state variable
-   call self%register_state_variable(self%id_sDBent,'sDBent','gDW m-2','zoobenthos dry weight',     &
+   call self%register_state_variable(self%id_sDBent,'sDBent','gDW m-2','zoobenthos DW',     &
                                     initial_value=1.0_rk,minimum=self%cDBentMin)
-   call self%register_state_variable(self%id_sPBent,'sPBent','gP m-2','zoobenthos phosphorus content',     &
+   call self%register_state_variable(self%id_sPBent,'sPBent','gP m-2','zoobenthos P',     &
                                     initial_value=0.1_rk,minimum=self%cDBentMin * self%cPDBentRef)
-   call self%register_state_variable(self%id_sNBent,'sNBent','gn m-2','zoobenthos nitrogen content',     &
+   call self%register_state_variable(self%id_sNBent,'sNBent','gN m-2','zoobenthos N',     &
                                     initial_value=0.01_rk,minimum=self%cDBentMin * self%cNDBentRef)
 !  Register diagnostic variables for dependencies in other modules
    call self%register_diagnostic_variable(self%id_tDBenPOMS,     'tDBenPOMS',    'g m-2 s-1', 'tDBenPOMS',                output=output_none)

@@ -171,7 +171,7 @@
    call self%get_parameter(self%cDFiJvMin,       'cDFiJvMin',       'gDW m-2',   'minimum zooplanktivorous fish biomass in system',                               default=0.0001_rk)
    call self%get_parameter(self%cDFiAdMin,       'cDFiAdMin',       'gDW m-2',   'minimum benthivorous fish biomass in system',                                   default=0.0001_rk)
    call self%get_parameter(self%cDPiscMin,       'cDPiscMin',       'gDW m-2',   'minimum piscivorous fish biomass in system',                                    default=0.0001_rk)
-   call self%get_parameter(self%fFisDOMW,     'fFisDOMW',     '[-]',      'dissolved organic matter fraction from fish',                                          default=0.5_rk)
+   call self%get_parameter(self%fFisDOMW,        'fFisDOMW',        '[-]',       'dissolved organic matter fraction from fish',                                          default=0.5_rk)
 ! parameters regarding adult fish assimilation
    call self%get_parameter(self%fDAssFiAd,    'fDAssFiAd',    '[-]',      'C assimilation efficiency of adult fish',                                              default=0.4_rk)
    call self%get_parameter(self%cRelVegFish,  'cRelVegFish',  '[-]',      'decrease of fish feeding per macrophytes cover (max. 0.01)',                           default=0.009_rk)
@@ -179,27 +179,27 @@
    call self%get_parameter(self%hDBentFiAd,   'hDBentFiAd',   'g m-2',    'half-saturation constant for zoobenthos on adult fish',                                default=2.5_rk)
 !  Register local state variable
 !  zooplanktivorous fish, transportation is turned off
-   call self%register_state_variable(self%id_sDFiJv,'sDFiJv','gDW m-2','zooplanktivorous fish dry weight',     &
+   call self%register_state_variable(self%id_sDFiJv,'sDFiJv','gDW m-2','zooplanktivorous fish DW',     &
                                     initial_value= 0.5_rk,minimum=self%cDFiJvMin) !,no_river_dilution=.TRUE.)
 !   call self%set_variable_property(self%id_sDFiJv,'disable_transport',.true.)
-   call self%register_state_variable(self%id_sPFiJv,'sPFiJv','gP m-2','zooplanktivorous fish phosphorus content',     &
+   call self%register_state_variable(self%id_sPFiJv,'sPFiJv','gP m-2','zooplanktivorous fish P',     &
                                     initial_value=0.011_rk,minimum=self%cDFiJvMin * self%cPDFishRef) !,no_river_dilution=.TRUE.)
 !   call self%set_variable_property(self%id_sPFiJv,'disable_transport',.true.)
-   call self%register_state_variable(self%id_sNFiJv,'sNFiJv','gN m-2','zooplanktivorous fish nitrogen content',     &
+   call self%register_state_variable(self%id_sNFiJv,'sNFiJv','gN m-2','zooplanktivorous fish N',     &
                                     initial_value=0.05_rk,minimum=self%cDFiJvMin * self%cNDFishRef) !,no_river_dilution=.TRUE.)
 !   call self%set_variable_property(self%id_spFiJv,'disable_transport',.true.)
 !  benthivoros fish, transportation turned off
-   call self%register_state_variable(self%id_sDFiAd,'sDFiAd','gDW m-2','benthivorous fish dry weight',     &
+   call self%register_state_variable(self%id_sDFiAd,'sDFiAd','gDW m-2','benthivorous fish DW',     &
                                     initial_value=2.0_rk,minimum=self%cDFiAdMin) !,no_river_dilution=.TRUE.)
 !   call self%set_variable_property(self%id_sDFiAd,'disable_transport',.true.)
-   call self%register_state_variable(self%id_sPFiAd,'sPFiAd','gP m-2','benthivorous fish phosphorus content',     &
+   call self%register_state_variable(self%id_sPFiAd,'sPFiAd','gP m-2','benthivorous fish P',     &
                                     initial_value=0.044_rk,minimum=self%cDFiAdMin * self%cPDFishRef) !,no_river_dilution=.TRUE.)
 !   call self%set_variable_property(self%id_sPFiAd,'disable_transport',.true.)
-   call self%register_state_variable(self%id_sNFiAd,'sNFiAd','gN m-2','benthivorous fish nitrogen content',     &
+   call self%register_state_variable(self%id_sNFiAd,'sNFiAd','gN m-2','benthivorous fish N',     &
                                     initial_value=0.2_rk,minimum=self%cDFiAdMin * self%cNDFishRef) !,no_river_dilution=.TRUE.)
 !   call self%set_variable_property(self%id_sNFiAd,'disable_transport',.true.)
 !  piscivorous fish
-   call self%register_state_variable(self%id_sDPisc,'sDPisc','gDW m-2','piscivorous fish dry weight', &
+   call self%register_state_variable(self%id_sDPisc,'sDPisc','gDW m-2','piscivorous fish DW', &
                                     initial_value=0.01_rk,minimum=NearZero) !,no_river_dilution=.TRUE.)
 !   call self%set_variable_property(self%id_sDPisc,'disable_transport',.true.)
 !  Fish manipulation, if manipulation,register state variable of fish biomass change
@@ -214,8 +214,8 @@
    call self%register_state_variable(self%id_ChangedPisc,  'ChangedPisc',          '',    'changed piscivorous fish biomass', 0.0_rk)
    call self%register_dependency(self%id_ManPisc,          'manipulate_rate_Pisc', 's-1', 'piscivorous fish manipulate rate')
 !  Register diagnostic variables for dependencies in other modules
-   call self%register_diagnostic_variable(self%id_aNPisc,    'aNPisc',      'g m-3',     'Piscivorous fish nitrogen content',   output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_aPPisc,    'aPPisc',      'g m-3',     'Piscivorous fish phosphorus content', output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aNPisc,    'aNPisc',      'g m-3',     'piscivorous fish nitrogen content',   output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aPPisc,    'aPPisc',      'g m-3',     'piscivorous fish phosphorus content', output=output_instantaneous)
 #ifdef _DEVELOPMENT_
 !  register diagnostic variables for modular fluxes
    call self%register_diagnostic_variable(self%id_tDFiJv,     'tDFiJv',     'g m-3 s-1', 'fish_DFiJv_change',                   output=output_instantaneous)

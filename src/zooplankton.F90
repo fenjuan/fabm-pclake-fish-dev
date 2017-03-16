@@ -133,11 +133,11 @@
    
 !  Register local state variable
 !  zooplankton
-   call self%register_state_variable(self%id_sDZoo,'sDZoo','gDW m-3','zooplankton dry weight',     &
+   call self%register_state_variable(self%id_sDZoo,'sDZoo','gDW m-3','zooplankton DW',     &
                                     initial_value=0.05_rk,minimum=self%cDZooMin,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sPZoo,'sPZoo','gP m-3','zooplankton phosphorus content',     &
+   call self%register_state_variable(self%id_sPZoo,'sPZoo','gP m-3','zooplankton P',     &
                                     initial_value=0.0005_rk,minimum=self%cDZooMin * self%cPDZooRef,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sNZoo,'sNZoo','gN m-3','zooplankton nitrogen content',     &
+   call self%register_state_variable(self%id_sNZoo,'sNZoo','gN m-3','zooplankton N',     &
                                     initial_value=0.0035_rk,minimum=self%cDZooMin * self%cNDZooRef,no_river_dilution=.TRUE.)
 !  Register contribution of state to global aggregate variables
    call self%add_to_aggregate_variable(standard_variables%total_nitrogen,  self%id_sNZoo)

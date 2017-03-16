@@ -132,23 +132,23 @@
    call self%get_parameter(self%cDDiatMinS,   'cDDiatMinS',   'gDW/m2',   'minimum diatom biomass in system',                          default=0.00001_rk)
    call self%get_parameter(self%fPrimDOMS, 'fPrimDOMS', '[-]',      'fraction of DOM from settled phytoplankton',                      default=0.5_rk)
 !  Register local state variable
-   call self%register_state_variable(self%id_sDDiatS,'sDDiatS','gDW m-2','diatom dry weight',     &
+   call self%register_state_variable(self%id_sDDiatS,'sDDiatS','gDW m-2','diatoms DW',     &
                                     initial_value=0.001_rk,minimum= self%cDDiatMinS)
-   call self%register_state_variable(self%id_sPDiatS,'sPDiatS','gP m-2','diatom phosphorus content',     &
+   call self%register_state_variable(self%id_sPDiatS,'sPDiatS','gP m-2','diatoms P',     &
                                     initial_value=0.00001_rk,minimum= self%cDDiatMinS * self%cPDDiatMin)
-   call self%register_state_variable(self%id_sNDiatS,'sNDiatS','gN m-2','diatom nitrogen content',     &
+   call self%register_state_variable(self%id_sNDiatS,'sNDiatS','gN m-2','diatoms N',     &
                                     initial_value=0.0001_rk,minimum= self%cDDiatMinS * self%cNDDiatMin)
-   call self%register_state_variable(self%id_sDGrenS,'sDGrenS','gDW m-2','green dry weight',     &
+   call self%register_state_variable(self%id_sDGrenS,'sDGrenS','gDW m-2','greens DW',     &
                                     initial_value=0.001_rk,minimum= self%cDGrenMinS)
-   call self%register_state_variable(self%id_sPGrenS,'sPGrenS','gP m-2','green phosphorus content',     &
+   call self%register_state_variable(self%id_sPGrenS,'sPGrenS','gP m-2','greens P',     &
                                     initial_value=0.00001_rk,minimum= self%cDGrenMinS * self%cPDGrenMin)
-   call self%register_state_variable(self%id_sNGrenS,'sNGrenS','gN m-2','green nitrogen content',     &
+   call self%register_state_variable(self%id_sNGrenS,'sNGrenS','gN m-2','greens N',     &
                                     initial_value=0.0001_rk,minimum=self%cDGrenMinS * self%cNDGrenMin)
-   call self%register_state_variable(self%id_sDBlueS,'sDBlueS','gDW m-2','blue-green dry weight',     &
+   call self%register_state_variable(self%id_sDBlueS,'sDBlueS','gDW m-2','blue-greens DW',     &
                                     initial_value=0.001_rk,minimum=self%cDBlueMinS)
-   call self%register_state_variable(self%id_sPBlueS,'sPBlueS','gP m-2','blue-green phosphorus content',     &
+   call self%register_state_variable(self%id_sPBlueS,'sPBlueS','gP m-2','blue-greens P',     &
                                     initial_value=0.00001_rk,minimum=self%cDBlueMinS * self%cPDBlueMin)
-   call self%register_state_variable(self%id_sNBlueS,'sNBlueS','gN m-2','blue-green nitrogen content',     &
+   call self%register_state_variable(self%id_sNBlueS,'sNBlueS','gN m-2','blue-greens N',     &
                                     initial_value=0.0001_rk,minimum=self%cDBlueMinS * self%cNDBlueMin)
 !  register diagnostic variables
    call self%register_diagnostic_variable(self%id_oSiDiatS,  'oSiDiatS',  'g m-2 s-1','oSiDiatS',  output=output_instantaneous)

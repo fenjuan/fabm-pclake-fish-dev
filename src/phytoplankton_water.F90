@@ -213,30 +213,30 @@
    call self%get_parameter(self%fPrimDOMW,      'fPrimDOMW',      '[-]',       'fraction of dissolved organic matter from water column phytoplankton',                                                           default=0.5_rk)
 !  Register local state variable
 !  all phytoplankton has vertical movement activated,normally netgative, meaning settling.
-   call self%register_state_variable(self%id_sDDiatW,'sDDiatW','gDW m-3','diatom dry weight',    &
+   call self%register_state_variable(self%id_sDDiatW,'sDDiatW','gDW m-3','diatoms DW',    &
                                     initial_value=0.5_rk,minimum=self%cDDiatMinW,vertical_movement= self%cVSetDiat,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sPDiatW,'sPDiatW','gP m-3','diatom phosphorus content',     &
+   call self%register_state_variable(self%id_sPDiatW,'sPDiatW','gP m-3','diatoms P',     &
                                     initial_value=0.005_rk,minimum=self%cDDiatMinW* self%cPDDiatMin,vertical_movement= self%cVSetDiat,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sNDiatW,'sNDiatW','gN m-3','diatom nitrogen content',     &
+   call self%register_state_variable(self%id_sNDiatW,'sNDiatW','gN m-3','diatoms N',     &
                                     initial_value=0.05_rk,minimum=self%cDDiatMinW * self%cNDDiatMin,vertical_movement= self%cVSetDiat,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sDGrenW,'sDGrenW','gDW m-3','green dry weight',    &
+   call self%register_state_variable(self%id_sDGrenW,'sDGrenW','gDW m-3','greens DW',    &
                                     initial_value=0.5_rk,minimum=NearZero,vertical_movement= self%cVSetGren,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sPGrenW,'sPGrenW','gP m-3','green phosphorus content',     &
+   call self%register_state_variable(self%id_sPGrenW,'sPGrenW','gP m-3','greens P',     &
                                     initial_value=0.005_rk,minimum=self%cDGrenMinW * self%cPDGrenMin,vertical_movement= self%cVSetGren,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sNGrenW,'sNGrenW','gN m-3','green nitrogen content',     &
+   call self%register_state_variable(self%id_sNGrenW,'sNGrenW','gN m-3','greens N',     &
                                     initial_value=0.05_rk,minimum=self%cDGrenMinW * self%cNDGrenMin,vertical_movement= self%cVSetGren,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sDBlueW,'sDBlueW','gDW m-3','blue-green dry weight',     &
+   call self%register_state_variable(self%id_sDBlueW,'sDBlueW','gDW m-3','blue-greens DW',     &
                                     initial_value=3.0_rk,minimum=self%cDBlueMinW,vertical_movement= self%cVSetBlue,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sPBlueW,'sPBlueW','gP m-3','blue-green phosphorus content',     &
+   call self%register_state_variable(self%id_sPBlueW,'sPBlueW','gP m-3','blue-greens P',     &
                                     initial_value=0.03_rk,minimum=self%cDBlueMinW * self%cPDBlueMin,vertical_movement= self%cVSetBlue,no_river_dilution=.TRUE.)
-   call self%register_state_variable(self%id_sNBlueW,'sNBlueW','gN m-3','blue-green nitrogen content',     &
+   call self%register_state_variable(self%id_sNBlueW,'sNBlueW','gN m-3','blue-greens N',     &
                                     initial_value=0.3_rk,minimum=self%cDBlueMinW * self%cNDBlueMin,vertical_movement= self%cVSetBlue,no_river_dilution=.TRUE.)
 !     register diagnostic variables
-   call self%register_diagnostic_variable(self%id_oSiDiatW,       'oSiDiatW',       'g m-3 ',   'diatom Si content',                           output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_oChlaDiat,      'oChlaDiat',      'mg m-3',   'diatom chlorophyll a',                                  output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_oChlaGren,      'oChlaGren',      'mg m-3',   'green algae chlorophyll a',                             output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_oChlaBlue,      'oChlaBlue',      'mg m-3',   'blue-green algae chlorophyll a',                              output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_rPDDiatW,       'rPDDiatW',       '[-]',      'diatom P/D ratio',                        output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_oSiDiatW,       'oSiDiatW',       'g m-3 ',   'diatoms Si',                           output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_oChlaDiat,      'oChlaDiat',      'mg m-3',   'diatoms chlorophyll a',                                  output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_oChlaGren,      'oChlaGren',      'mg m-3',   'greens chlorophyll a',                             output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_oChlaBlue,      'oChlaBlue',      'mg m-3',   'blue-greens algae chlorophyll a',                              output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_rPDDiatW,       'rPDDiatW',       '[-]',      'diatoms P/D ratio',                        output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_rPDGrenW,       'rPDGrenW',       '[-]',      'greens P/D ratio',                         output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_rPDBlueW,       'rPDBlueW',       '[-]',      'blue-greens P/D ratio',                          output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_rNDDiatW,       'rNDDiatW',       '[-]',      'diatoms N/D ratio',                        output=output_instantaneous)
@@ -245,16 +245,16 @@
    call self%register_diagnostic_variable(self%id_rPDPhytW,       'rPDPhytW',       '[-]',      'phytoplankton P/D ratio',                          output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_rNDPhytW,       'rNDPhytW',       '[-]',      'phytoplankton N/D ratio',                          output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_extDiat,        'extDiat',        '[-]',      'extinction factor caused by diatoms',          output=output_instantaneous)!, source=source_get_light_extinction)
-   call self%register_diagnostic_variable(self%id_extGren,        'extGren',        '[-]',      'extinction factor caused by green algae',      output=output_instantaneous)!, source=source_get_light_extinction)
-   call self%register_diagnostic_variable(self%id_extBlue,        'extBlue',        '[-]',      'extinction factor caused by blue-green algae', output=output_instantaneous)!, source=source_get_light_extinction)
+   call self%register_diagnostic_variable(self%id_extGren,        'extGren',        '[-]',      'extinction factor caused by greens',      output=output_instantaneous)!, source=source_get_light_extinction)
+   call self%register_diagnostic_variable(self%id_extBlue,        'extBlue',        '[-]',      'extinction factor caused by blue-greens', output=output_instantaneous)!, source=source_get_light_extinction)
    call self%register_diagnostic_variable(self%id_phytoextinction,'phytoextinction','[-]',      'phytoextinction',                              output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_phypar,         'phypar',         '[-]',      'local PAR',                                    output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_aLLimDiat,      'aLLimDiat',      '[-]',      'diatoms light limitation factor',              output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_aLLimGren,      'aLLimGren',      '[-]',      'green algae light limitation factor',          output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_aLLimBlue,      'aLLimBlue',      '[-]',      'blue-green algae light limitation factor',     output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aLLimGren,      'aLLimGren',      '[-]',      'greens light limitation factor',          output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aLLimBlue,      'aLLimBlue',      '[-]',      'blue-greens algae light limitation factor',     output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_aNutLimDiat,    'aNutLimDiat',    '[-]',      'diatoms nutrient limitation factor',          output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_aNutLimGren,    'aNutLimGren',    '[-]',      'green algae nutrient limitation factor',     output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_aNutLimBlue,    'aNutLimBlue',    '[-]',      'blue-green algae nutrient limitation factor', output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aNutLimGren,    'aNutLimGren',    '[-]',      'greens nutrient limitation factor',     output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aNutLimBlue,    'aNutLimBlue',    '[-]',      'blue-greens nutrient limitation factor', output=output_instantaneous)
 #ifdef _DEVELOPMENT_
 !  diagnostic variables for modular fluexes
 !  modular fluxes regarding other modules, mainly abiotic water module

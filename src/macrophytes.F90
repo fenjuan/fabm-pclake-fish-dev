@@ -51,7 +51,7 @@
    type (type_horizontal_dependency_id)     :: id_sDepthW
 !  output light variables
    type (type_horizontal_diagnostic_variable_id)       :: id_aLPAR1Veg,id_aLPAR2Veg
-   type (type_horizontal_diagnostic_variable_id)       :: id_allimveg,id_aNutLimVeg
+   type (type_horizontal_diagnostic_variable_id)       :: id_aLLimVeg,id_aNutLimVeg
    type (type_horizontal_diagnostic_variable_id)       :: id_macroextinction
 !  diagnostic dependencies
    type (type_horizontal_dependency_id)     :: id_afOxySed
@@ -161,7 +161,7 @@
    call self%get_parameter(self%cAffNUptVeg,   'cAffNUptVeg',    'l/mgDW/d',            'initial N uptake affinity macrophytes',                                                                   default=0.2_rk,  scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%cVNUptMaxVeg,  'cVNUptMaxVeg',   'mgN/mgDW/d',          'maximum N uptake capacity of macrophytes',                                                                default=0.1_rk,  scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%cDepthS,       'cDepthS',        '[m]',                 'sediment depth',                                                                                          default=0.1_rk)
-   call self%get_parameter(self%bPorS,         'bPorS',          '[m3waterm-3sediment]','sediment porosity',                                                                                       default=0.847947_rk)
+   call self%get_parameter(self%bPorS,         'bPorS',          '[m3water/m3sediment]','sediment porosity',                                                                                       default=0.847947_rk)
    call self%get_parameter(self%UseEmpUpt,     'UseEmpUpt',      '[-]',                 'false=do not use this empirical relation',                                                                default=0)
    call self%get_parameter(self%cAffPUptVeg,   'cAffPUptVeg',    'l/mgDW/d',            'initial P uptake affinity macrophytes',                                                                   default=0.2_rk,   scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%cVPUptMaxVeg,  'cVPUptMaxVeg',   'mgP/mgDW/d',          'maximum P uptake capacity of macrophytes',                                                                default=0.01_rk,  scale_factor=1.0_rk/secs_pr_day)
@@ -176,20 +176,20 @@
    call self%get_parameter(self%fVegDOMS,  'fVegDOMS',      '[-]',                'dissolved organic fraction from benthic macrophytes',                                                           default=0.5_rk)
    call self%get_parameter(self%fVegDOMW,  'fVegDOMW',      '[-]',                'dissolved organic fraction from pelagic macrophytes',                                                           default=0.5_rk)
 !  Register local state variable
-   call self%register_state_variable(self%id_sDVeg,'sDVeg','gDW m-2','macrophytes dry weight',    &
+   call self%register_state_variable(self%id_sDVeg,'sDVeg','gDW m-2','macrophytes DW',    &
                                     initial_value=1.0_rk,minimum=self%cDVegMin)
-   call self%register_state_variable(self%id_sNVeg,'sNVeg','gN m-2','macrophytes nitrogen content',     &
+   call self%register_state_variable(self%id_sNVeg,'sNVeg','gN m-2','macrophytes N',     &
                                     initial_value=0.02_rk,minimum=self%cDVegMin * self%cNDVegMin)
-   call self%register_state_variable(self%id_sPVeg,'sPVeg','gP m-2','macrophytes phosphorus content',     &
+   call self%register_state_variable(self%id_sPVeg,'sPVeg','gP m-2','macrophytes P',     &
                                     initial_value=0.002_rk,minimum=self%cDVegMin * self%cPDVegMin)
 !  register diagnostic variables
    call self%register_diagnostic_variable(self%id_aDSubVeg,       'aDSubVeg',       'gDW m-2',    'aDSubVeg',                         output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_aCovVeg,        'aCovVeg',        '%',          'aCovVeg',                          output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_afCovSurfVeg,   'afCovSurfVeg',   '[-]',        'afCovSurfVeg',                     output=output_none)
    call self%register_diagnostic_variable(self%id_aDayInitVeg,    'aDayInitVeg',    'd',          'aDayInitVeg',                      output=output_none)
-   call self%register_diagnostic_variable(self%id_aNutLimVeg,     'aNutLimVeg',     '[-]',        'aNutLimVeg',                       output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aNutLimVeg,     'aNutLimVeg',     '[-]',        'nutrient limitation factor',       output=output_instantaneous,domain=domain_bottom)
    call self%register_diagnostic_variable(self%id_macroextinction,'macroextinction','[-]',        'macroextinction',                  output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_allimveg,       'allimveg',       '[-]',        'light limitation factor',          output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aLLimVeg,       'aLLimVeg',       '[-]',        'light limitation factor',          output=output_instantaneous,domain=domain_bottom)
    call self%register_diagnostic_variable(self%id_aLPAR1Veg,      'aLPAR1Veg',      'W m-2',      'light at top of the macrophytes',   output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_aLPAR2Veg,      'aLPAR2Veg',      'W m-2',      'light at bottom of the macrophytes',output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_tDBedPOMS,      'tDBedPOMS',      'g m-2 s-1',  'tDBedPOMS',                        output=output_none)
@@ -839,7 +839,7 @@
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_macroextinction,extc)
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_aLPAR1Veg,aLPAR1Veg)
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_aLPAR2Veg,aLPAR2Veg)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_allimveg,aLLimShootVeg)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_aLLimVeg,aLLimShootVeg)
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_aNutLimVeg,aNutLimVeg)
 !  Output diagnostic variables for modular fluxes
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tDBedVeg,tDBedVeg*secs_pr_day)
