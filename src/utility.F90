@@ -113,7 +113,8 @@
 !BOC
 !  http://www.gandraxa.com/length_of_day.xml
    m = 1._rk-tan(deg2rad*latitude)*tan(ecliptic*cos(0.0172_rk*Day))
-   DayLength = acos(1._rk-m)/Pi*24._rk
+!   DayLength = acos(1._rk-m)/Pi*24._rk
+   DayLength = acos(1._rk-m)/Pi ! fraction of day with sun shine
    end function DayLength
 !EOC
 
