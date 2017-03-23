@@ -21,6 +21,7 @@
    public uFunTmAbio
    public uFunTmBio
    public uFunTmVeg
+   public DayLength
 !
 ! !PRIVATE DATA MEMBERS:
    real(rk), parameter                 :: cTmRef=20.0_rk
@@ -86,6 +87,34 @@
 !BOC
    uFunTmVeg = ((cQ10Veg )** (0.1_rk * (uTm - cTmRef)))
    end function uFunTmVeg
+!EOC
+
+!-----------------------------------------------------------------------
+!BOP
+!
+!
+! !INTERFACE:
+   pure real(rk) function DayLength(latitude,day)
+!
+! !INPUT PARAMETERS:
+   real(rk), intent(in)                :: latitude
+   integer, intent(in)                 :: day
+!
+! !REVISION HISTORY:
+!  Original author(s): Karsten Bolding
+!
+! !Local variables:
+   real(rk),parameter :: Pi=3.14159265358979_rk
+   real(rk),parameter :: deg2rad=Pi/180._rk
+   real(rk),parameter :: ecliptic=23.439_rk*deg2rad
+   real(rk)           :: m 
+!EOP
+!-----------------------------------------------------------------------
+!BOC
+!  http://www.gandraxa.com/length_of_day.xml
+   m = 1._rk-tan(deg2rad*latitude)*tan(ecliptic*cos(0.0172_rk*Day))
+   DayLength = acos(1._rk-m)/Pi*24._rk
+   end function DayLength
 !EOC
 
 !-----------------------------------------------------------------------

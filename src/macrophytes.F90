@@ -8,7 +8,7 @@
    use fabm_types
    use fabm_expressions
    use fabm_standard_variables
-   use pclake_utility, ONLY:uFunTmVeg
+   use pclake_utility, ONLY:uFunTmVeg, DayLength
 
    implicit none
 
@@ -48,7 +48,7 @@
    type (type_global_dependency_id)         :: id_Day
    type (type_dependency_id)                :: id_uTm,id_extc,id_dz
    type (type_dependency_id)                :: id_par,id_meanpar
-   type (type_horizontal_dependency_id)     :: id_sDepthW
+   type (type_horizontal_dependency_id)     :: id_sDepthW,id_lat
 !  output light variables
    type (type_horizontal_diagnostic_variable_id)       :: id_aLPAR1Veg,id_aLPAR2Veg
    type (type_horizontal_diagnostic_variable_id)       :: id_aLLimVeg,id_aNutLimVeg
@@ -247,6 +247,7 @@
    call self%register_dependency(self%id_extc,   standard_variables%attenuation_coefficient_of_photosynthetic_radiative_flux)
    call self%register_dependency(self%id_Day,    standard_variables%number_of_days_since_start_of_the_year)
    call self%register_dependency(self%id_sDepthW,standard_variables%bottom_depth)
+   call self%register_dependency(self%id_lat,    standard_variables%latitude)
    call self%register_dependency(self%id_dz,     standard_variables%cell_thickness)
    call self%register_dependency(self%id_par,    standard_variables%downwelling_photosynthetic_radiative_flux)
    call self%register_dependency(self%id_meanpar,temporal_mean(self%id_par,period=86400._rk,resolution=3600._rk,missing_value=0.0_rk))
@@ -271,7 +272,7 @@
 ! !LOCAL VARIABLES:
 !  Carriers for environment dependencies
    real(rk)     :: uTm,extc,meanpar,dz
-   real(rk)     :: day,sDepthW
+   real(rk)     :: day,sDepthW,lat
 !  state variable value carriers
    real(rk)     :: sDVeg,sNVeg,sPVeg
 !  external state variable carriers
@@ -371,6 +372,7 @@
    _GET_GLOBAL_(self%id_Day,Day)
    _GET_(self%id_extc,extc)
    _GET_HORIZONTAL_(self%id_sDepthW,sDepthW)
+   _GET_HORIZONTAL_(self%id_lat,lat)
 !  retrieve diagnostic dependency
    _GET_HORIZONTAL_(self%id_afOxySed,afOxySed)
 !  auxiliaries for nutrient variables
@@ -488,7 +490,12 @@
                  + bfSubVeg* (1.0 - afCovSurfVeg) * 1.0 / (extc * self%cHeightVeg) &
                  * log( (1.0 + aLPAR1Veg / uhLVeg) / (1.0 + aLPAR2Veg / uhLVeg))
 !=======================================================================
+#if 0
    ufDay = 0.5_rk - 0.2_rk * cos(2.0_rk*Pi*Day / 365.0_rk)
+#else
+   ufDay = DayLength(lat,int(Day))
+!   write(*,*) 'lat, Day, ufDay: ',lat,int(Day),ufDay
+#endif
 !  max._growth_rate_at_current_temp._AND_light
    aMuTmLVeg =ufDay * bfShootVeg * aLLimShootVeg * uFunTmProdVeg * self%cMuMaxVeg
 !-----------------------------------------------------------------------

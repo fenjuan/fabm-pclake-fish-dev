@@ -7,7 +7,7 @@
    use fabm_types
    use fabm_expressions
    use fabm_standard_variables
-   use pclake_utility, ONLY:uFunTmBio
+   use pclake_utility, ONLY:uFunTmBio, DayLength
 
    implicit none
 
@@ -59,7 +59,7 @@
    type (type_dependency_id)                :: id_uTm,id_dz
    type (type_dependency_id)                :: id_par,id_meanpar,id_extc
 !  diagnostic dependency
-   type (type_horizontal_dependency_id)     :: id_afCovSurfVeg
+   type (type_horizontal_dependency_id)     :: id_afCovSurfVeg,id_lat
 !  Model parameters
 !  temperature parameters
    real(rk)   :: cSigTmDiat,cTmOptDiat
@@ -316,6 +316,7 @@
    call self%register_dependency(self%id_dz,  standard_variables%cell_thickness)
    call self%register_dependency(self%id_extc,standard_variables%attenuation_coefficient_of_photosynthetic_radiative_flux)
    call self%register_dependency(self%id_Day, standard_variables%number_of_days_since_start_of_the_year)
+   call self%register_dependency(self%id_lat, standard_variables%latitude)
 !  environmental light dependencies
    call self%register_dependency(self%id_par, standard_variables%downwelling_photosynthetic_radiative_flux)
    call self%register_dependency(self%id_meanpar,temporal_mean(self%id_par,period=86400._rk,resolution=3600._rk,missing_value=0.0_rk))
@@ -337,7 +338,7 @@
    _DECLARE_ARGUMENTS_DO_
 ! !LOCAL VARIABLES:
 !  environmental dependency variables
-   real(rk)   :: uTm,dz,extc,Day,meanpar
+   real(rk)   :: uTm,dz,extc,Day,meanpar,lat
 !  diagnostic dependency
    real(rk)   :: aCorO2BOD,afCovSurfVeg
 !  state variable value carrier
@@ -445,6 +446,7 @@
    _GET_(self%id_dz,dz)
    _GET_GLOBAL_(self%id_Day,Day)
 !  retrieve diagnostic dependency
+   _GET_HORIZONTAL_(self%id_lat,lat)
    _GET_HORIZONTAL_(self%id_afCovSurfVeg,afCovSurfVeg)
 !-----------------------------------------------------------------------
 !   SiDiat
@@ -536,7 +538,13 @@
        aLLimDiat = exp(1.0_rk) /(extc * dz) *(exp(- aLPARBot /uOptDiat) - exp(- uLPARSurf /uOptDiat))
    end select
 !  day_length
+#if 0
    ufDay = 0.5_rk - 0.2_rk * cos(2.0_rk*Pi*Day / 365.0_rk)
+#else
+   ufDay = DayLength(lat,int(Day))
+!   write(*,*) 'lat, Day, ufDay: ',lat,int(Day),ufDay
+#endif
+
 !  growth_rate_at_current_light_AND_temp.
    aMuTmLDiat = ufDay *(1.0_rk - afCovSurfVeg)*aLLimDiat * uFunTmDiat*self%cMuMaxDiat
 !  growth_rate_at_current_light_AND_temp.
