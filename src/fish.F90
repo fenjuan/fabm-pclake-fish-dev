@@ -48,12 +48,13 @@
    type (type_state_variable_id)                       :: id_DDOMpoolW,id_PDOMpoolW,id_NDOMpoolW
 !  environmental dependencies
    type (type_dependency_id)                :: id_uTm
+   type (type_dependency_id)                :: id_dz
    type (type_horizontal_dependency_id)     :: id_sDepthW
    type (type_global_dependency_id)         :: id_Day
 !  diagnostic dependencies
    type (type_horizontal_dependency_id)     :: id_aDSubVeg !,id_tDEnvFiAd,id_aDSatFiAd
 !  for adult fish assimilation
-   type ( type_horizontal_dependency_id)           :: id_aCovVeg
+   type ( type_horizontal_dependency_id)    :: id_aCovVeg
 !  Fish manipulation, external fish manipulation rate
    type (type_horizontal_dependency_id)     :: id_ManFiAd,id_ManFiJv,id_ManPisc
 !  Model parameters
@@ -261,6 +262,7 @@
    call self%register_dependency(self%id_uTm,    standard_variables%temperature)
    call self%register_dependency(self%id_Day,    standard_variables%number_of_days_since_start_of_the_year)
    call self%register_dependency(self%id_sDepthW,standard_variables%bottom_depth)
+   call self%register_dependency(self%id_dz,     standard_variables%cell_thickness)
 
 !  register diagnostic dependencies
 !  parameters before changed fish to nonlocal
@@ -289,7 +291,7 @@
    _DECLARE_ARGUMENTS_DO_BOTTOM_
 !  LOCAL VARIABLES:
 !  Carriers for environment dependencies
-   real(rk)     :: uTm,Day,sDepthW
+   real(rk)     :: uTm,Day,sDepthW,dz
 !  carriers for local state variables
    real(rk)      :: sDFiJv,sPFiJv,sNFiJv
    real(rk)      :: sDFiAd,sPFiAd,sNFiAd,sDPisc
@@ -419,6 +421,7 @@
    _GET_(self%id_uTm,uTm)
    _GET_GLOBAL_(self%id_Day,Day)
    _GET_HORIZONTAL_(self%id_sDepthW,sDepthW)
+   _GET_(self%id_dz,dz)
 ! !retrieve diagnostic dependency
    _GET_HORIZONTAL_(self%id_aDSubVeg,aDSubVeg)
    _GET_HORIZONTAL_(self%id_aCovVeg,aCovVeg)
@@ -497,8 +500,8 @@
 !  zooplanktivorous fish assimilation_DW
 !-----------------------------------------------------------------------
 !  food_limitation_function_of_young_fish
-   aDSatFiJv = (sDZoo * sDepthW) *(sDZoo * sDepthW) /(self%hDZooFiJv * &
-   &self%hDZooFiJv + (sDZoo * sDepthW) *(sDZoo * sDepthW))
+   aDSatFiJv = (sDZoo * dz) *(sDZoo * dz) /(self%hDZooFiJv * &
+   &self%hDZooFiJv + (sDZoo * dz) *(sDZoo * dz))
 !  intrinsic_net_increase_rate_of_fish
    ukDIncrFiJv = (self%kDAssFiJv - self%kDRespFiJv) * uFunTmFish - self%kMortFiJv
 !  environmental_correction_of_fish
