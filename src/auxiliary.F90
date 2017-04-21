@@ -174,7 +174,7 @@
    call self%get_parameter(self%cPDBlueMax,   'cPDBlueMax',   'mgP/mgDW',          'maximum P/DW ratio for blue-greens',                        default=0.025_rk)
    call self%get_parameter(self%cPDDiatMax,   'cPDDiatMax',   'mgP/mgDW',          'maximum P/DW ratio for diatoms',                            default=0.005_rk)
    call self%get_parameter(self%cPDGrenMax,   'cPDGrenMax',   'mgP/mgDW',          'maximum P/DW ratio for greens',                             default=0.015_rk)
-!  resuspension rt the extral dianelated to shear stress
+!  resuspension related to shear stress
    call self%get_parameter(self%crt_shear,    'crt_shear',    'N m-2',             'critical shear stress',                                  default=0.005_rk)
    call self%get_parameter(self%ref_shear,    'ref_shear',    'N m-2',             'reference shear stress',                                 default=1.0_rk)
    call self%get_parameter(self%alpha,        'alpha',        'g m-2 d-1',         'gross rate of sediment erosion (9000-9900g m-2/d)',      default=9000.0_rk, scale_factor=1.0_rk/secs_pr_day)

@@ -129,7 +129,7 @@
    call self%get_parameter(self%cDCarrFish,      'cDCarrFish',     'gDW m-2',   'carrying capacity of fish',                                                      default=15.0_rk)
    call self%get_parameter(self%fDissEgesFish,   'fDissEgesFish',  '[-]',       'soluble nutrient fraction of fish egested food',                                 default=0.25_rk)
    call self%get_parameter(self%fDissMortFish,   'fDissMortFish',  '[-]',       'soluble nutrient fraction of dead fish (excl bones and scales)',                 default=0.1_rk)
-   call self%get_parameter(self%cTmOptFish,      'cTmOptFish',     'degree C',  'optimal  temperature of zoo- and benthivorous fish',                                                   default=25.0_rk)
+   call self%get_parameter(self%cTmOptFish,      'cTmOptFish',     'degree C',  'optimal temperature of zoo- and benthivorous fish',                                                   default=25.0_rk)
    call self%get_parameter(self%cSigTmFish,      'cSigTmFish',     'degree C',  'temperature constant of fish (sigma in Gaussian curve)',                         default=10.0_rk)
    call self%get_parameter(self%cDayReprFish,    'cDayReprFish',   '[-]',       'reproduction day of year for fish ',                                             default=120.0_rk)
 !  new parameter, fish aging day count: the day young fish become adult fish
@@ -263,13 +263,6 @@
    call self%register_dependency(self%id_Day,    standard_variables%number_of_days_since_start_of_the_year)
    call self%register_dependency(self%id_sDepthW,standard_variables%bottom_depth)
    call self%register_dependency(self%id_dz,     standard_variables%cell_thickness)
-
-!  register diagnostic dependencies
-!  parameters before changed fish to nonlocal
-!   call self%register_dependency(self%id_tDEnvFiAd, 'env_correction_adfish',     '[-]',  'environmental correction for adult fish')
-!   call self%register_dependency(self%id_aDSatFiAd, 'food_limit_function_adfish','[-]',  'food limit function for adault fish')
-
-
    call self%register_dependency(self%id_aCovVeg,   'macrophytes_coverage',       '[-]',  'macrophytes coverage')
    call self%register_dependency(self%id_aDSubVeg,  'submerged_macrophytes',      'g m-2','submerged macrophytes dry weight')
    
@@ -376,21 +369,6 @@
    real(rk)     :: tDEgesFiAd,tNEgesFiAd,tPEgesFiAd
    real(rk)     :: tNEgesFiAdNH4,tPEgesFiAdPO4,tNEgesFiAdTOM,tPEgesFiAdTOM
 
-
-!  parameters before changed fish to nonlocal
-!   real(rk)     :: wNFiJv,wDFiAd,wPFiAd,wNFiAd,wDPisc
-!   real(rk)     :: wNFishNH4W,wNEgesZooNH4,wNEgesZoo,wNMortZooNH4
-!   real(rk)     :: wDFiJv,wPFishPO4W,wDFishPOMW,wNFishPOMW,wPFishPOMW
-!   real(rk)     :: wSiConsDiatZoo
-!   real(rk)     :: wDFishDetW,wNFishDetW,wPFishDetW 
-!   real(rk)     :: wDFishDOMW,wNFishDOMW,wPFishDOMW
-!!  variables for exchange of diatoms
-!   real(rk)     :: wDFishDiatW,wNFishDiatW,wPFishDiatW
-!!  variables for exchange of green algae
-!   real(rk)     :: wDFishGrenW,wNFishGrenW,wPFishGrenW
-!!  variables for exchange of green algae
-!   real(rk)     :: wDFishBlueW,wNFishBlueW,wPFishBlueW
-
 #ifdef _DEVELOPMENT_
    integer, save :: n=0
 #endif
@@ -436,25 +414,12 @@
    _GET_HORIZONTAL_(self%id_ManPisc,rManPisc)
    _GET_HORIZONTAL_(self%id_ChangedPisc,ChangedPisc)
 
-!  parameters before changed fish to nonlocal
-!   _GET_HORIZONTAL_(self%id_tDEnvFiAd,tDEnvFiAd)
-!   _GET_HORIZONTAL_(self%id_aDSatFiAd,aDSatFiAd)
-!!  convert fish concentration to areal units
-!   sDFiJv=sDFiJv*sDepthW
-!   sPFiJv=sPFiJv*sDepthW
-!   sNFiJv=sNFiJv*sDepthW
-!   sDFiAd=sDFiAd*sDepthW
-!   sPFiAd=sPFiAd*sDepthW
-!   sNFiAd=sNFiAd*sDepthW
-!   sDPisc=sDPisc*sDepthW
-
-
 !-------------------------------------------------------------------------
-!  The following section is orgnize in the order of zooplanktivorous fish, 
-!  benthivorous fish, and piscivorous processes. There a special section 
-!  on zooplankton comsumption by zooplanktivorous fish, due to the variables 
+!  The following section is organized in the order of zooplanktivorous fish, 
+!  benthivorous fish, and piscivorous processes. There is a special section 
+!  on zooplankton consumption by zooplanktivorous fish, due to the variables 
 !  being dependent on each other. It starts with assimilation of DW to provide 
-!  wDAssFiJv for its predation of zooplankton(DW,N,P).The later process (predation) 
+!  wDAssFiJv for its predation of zooplankton(DW,N,P).The latter process (predation) 
 !  provide the variable wDConsFiJv for fish assimilation of N,P
 !-------------------------------------------------------------------------
 !-------------------------------------------------------------------------
@@ -559,7 +524,7 @@
 !  mortality_of_FiJv_N
    tNMortFiJv = rNDFiJv * tDMortFiJv
 !-----------------------------------------------------------------------
-!  zooplankivirous fish egestion
+!  zooplanktivorous fish egestion
 !-----------------------------------------------------------------------
 !  egestion_of_fish,zooplanktivorous fish
    tDEgesFiJv = tDConsFiJv - tDAssFiJv
@@ -811,18 +776,6 @@
 !  total_fish_flux_of_DW_in_predatory_fish
    tDPisc = tDMigrPisc + tDAssPisc - tDRespPisc - tDMortPisc + tDManPisc
 
-
-!  parameters before changed fish to nonlocal
-!!  temperal solution, vertial averaged
-!   wDFiJv=tDFiJv/sDepthW
-!   wPFiJv = tPFiJv/sDepthW
-!   wNFiJv= tNFiJv/ sDepthW
-!   wDFiAd= tDFiAd/ sDepthW
-!   wPFiAd= tPFiAd/ sDepthW
-!   wNFiAd= tNFiAd/ sDepthW
-!   wDPisc=tDPisc/sDepthW
-
-
 !=======================================================================
 !  fish processes relating to other modules
 !=======================================================================
@@ -855,11 +808,6 @@
    tNFishNH4W = tNExcrFiJv + tNExcrFiAd + tNEgesFiJvNH4 + tNEgesFiAdNH4 &
    & + tNMortFishNH4 + tNExcrPisc + tNEgesPiscNH4 + tNMortPiscNH4
 
-!  parameters before changed fish to nonlocal
-!   wNFishNH4W = (tNExcrFiJv + tNExcrFiAd + tNEgesFiJvNH4 + tNMortFishNH4 + &
-!   & tNExcrPisc + tNEgesPiscNH4 + tNMortPiscNH4)/sDepthW
-
-
 !-----------------------------------------------------------------------
 !  Update PO4 in water
 !  for fish it has t-, units in /m^2
@@ -884,11 +832,6 @@
    tPFishPO4W= tPExcrFiJv + tPExcrFiAd + tPEgesFiJvPO4 + tPEgesFiAdPO4 + &
    & tPMortFishPO4 + tPExcrPisc + tPEgesPiscPO4 + tPMortPiscPO4
 
-
-!  parameters before changed fish to nonlocal
-!   wPFishPO4W = tPFishPO4W/sDepthW
-
-
 !-----------------------------------------------------------------------
 !  Update organic matter DW in water
 !  for fish it has t-, units in /m^2
@@ -904,11 +847,6 @@
 !  part_of_died_Pisc_DW_becoming_organic matters
    tDMortPiscTOM = tDMortPisc - tDMortPiscBot
 !  total_fish_flux_of_DW_in_organic matter_in_lake_water
-!  parameters before changed fish to nonlocal
-!   wDFishDetW = (tDEgesFiJv + tDMortFishDet + tDEgesPisc + tDMortPiscDet)/sDepthW
-!   wDFishPOMW = wDFishDetW * (1.0_rk - self%fFisDOMW)
-!   wDFishDOMW = wDFishDetW * self%fFisDOMW
-
    tDFishTOMW = tDEgesFiJv + tDEgesFiAd + tDMortFishTOM + tDEgesPisc + tDMortPiscTOM
    tDFishPOMW = tDFishTOMW * (1.0_rk - self%fFisDOMW)
    tDFishDOMW = tDFishTOMW * self%fFisDOMW
@@ -927,12 +865,6 @@
    tNEgesFiJvTOM = tNEgesFiJv - tNEgesFiJvNH4
 !  total_fish_flux_of_N_in_orgainics_in_lake_water
 
-!  parameters before changed fish to nonlocal
-!   wNFishDetW = (tNEgesFiJvDet + tNMortFishDet + tNEgesPiscDet + tNMortPiscDet)/sDepthW
-!   wNFishPOMW  = wNFishDetW * (1.0_rk - self%fFisDOMW)
-!   wNFishDOMW = wNFishDetW * self%fFisDOMW
-
-
    tNFishTOMW = tNEgesFiJvTOM + tNEgesFiAdTOM + tNMortFishPOM + tNEgesPiscTOM + tNMortPiscTOM
    tNFishPOMW = tNFishTOMW * (1.0_rk - self%fFisDOMW)
    tNFishDOMW = tNFishTOMW * self%fFisDOMW
@@ -950,14 +882,6 @@
 !  organic_P_egestion_of_adult_fish
    tPEgesFiAdTOM = tPEgesFiAd - tPEgesFiAdPO4
 !  total_fish_flux_of_P_in_organic matter_in_lake_water
-
-
-!  parameters before changed fish to nonlocal
-!   wPFishDetW = (tPEgesFiJvDet + tPMortFishDet + tPEgesPiscDet + tPMortPiscDet)/sDepthW
-!   wPFishPOMW  = wPFishDetW * (1.0_rk - self%fFisDOMW)
-!   wPFishDOMW = wPFishDetW * self%fFisDOMW
-
-
    tPFishTOMW = tPEgesFiJvTOM + tPEgesFiAdTOM + tPMortFishTOM + tPEgesPiscTOM + tPMortPiscTOM
    tPFishPOMW = tPFishTOMW * (1.0_rk - self%fFisDOMW)
    tPFishDOMW = tPFishTOMW * self%fFisDOMW

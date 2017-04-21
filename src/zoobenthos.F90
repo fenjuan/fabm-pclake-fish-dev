@@ -51,14 +51,6 @@
    real(rk)   :: cDBentMin
 !  fraction of dissolved organic matter from zoobenthos
    real(rk)   :: fBenDOMS
-!  parameters before changed fish to nonlocal
-!   type (type_bottom_state_variable_id)            :: id_DAdFish,id_NAdFish,id_PAdFish,id_DJvFish
-!   type (type_state_variable_id)                   :: id_NH4poolW,id_PO4poolW,id_DPOMpoolW,id_NPOMpoolW,id_PPOMpoolW
-!   type ( type_horizontal_dependency_id)           :: id_aCovVeg
-!   type (type_horizontal_dependency_id)            :: id_sDepthW
-!   type (type_horizontal_diagnostic_variable_id)       :: id_tDEnvFiAd ,id_aDSatFiAd
-!   real(rk)           :: cSigTmFish,cTmOptFish,fDAssFiAd,cPDFishRef,cNDFishRef,fDissEgesFish
-!   real(rk)           :: cRelVegFish,hDBentFiAd,kMortFiAd,kDRespFiAd,kDAssFiAd,cDCarrFish
    contains
 !  Module procedures
    procedure :: initialize
@@ -102,19 +94,6 @@
    call self%get_parameter(self%cPDBentRef,   'cPDBentRef',   'mgP/mgDW', 'reference P/C ratio of zoobenthos',                          default=0.01_rk)
    call self%get_parameter(self%cNDBentRef,   'cNDBentRef',   'mgN/mgDW', 'reference N/C ratio of zoobenthos',                          default=0.07_rk)
    call self%get_parameter(self%cSiDDiat,     'cSiDDiat',     'mgSi/mgDW','Si/DW ratio of diatoms',                                     default=0.15_rk)
-!  parameters before changed fish to nonlocal
-!   call self%get_parameter(self%fDAssFiAd,    'fDAssFiAd',    '[-]',      'C assimilation efficiency of adult fish',                    default=0.4_rk)
-!   call self%get_parameter(self%cPDFishRef,   'cPDFishRef',   'mgP/mgDW', 'reference P/C ratio of fish',                                default=0.022_rk)
-!   call self%get_parameter(self%cNDFishRef,   'cNDFishRef',   'mgN/mgDW', 'reference N/C ratio of fish',                                default=0.1_rk)
-!   call self%get_parameter(self%fDissEgesFish,'fDissEgesFish','[-]',      'soluble nutrient fraction of by fish egested food',          default=0.25_rk)
-!   call self%get_parameter(self%cTmOptFish,   'cTmOptFish',   'degree C', 'optimum temp. of fish',                                      default=25.0_rk)
-!   call self%get_parameter(self%cSigTmFish,   'cSigTmFish',   'degree C', 'temperature constant of fish(sigma in Gaussian curve)',      default=10.0_rk)
-!   call self%get_parameter(self%cRelVegFish,  'cRelVegFish',  '[-]',      'decrease of fish feeding per macrophytes cover(max. 0.01)',   default=0.009_rk)
-!   call self%get_parameter(self%kDAssFiAd,    'kDAssFiAd',    'd-1',      'maximum assimilation rate of adult fish',                    default=0.06_rk,   scale_factor=1.0_rk/secs_pr_day)
-!   call self%get_parameter(self%hDBentFiAd,   'hDBentFiAd',   'g m-2',    'half saturation zoobenthos biomass for adult fish predation',default=2.5_rk)
-!   call self%get_parameter(self%kDRespFiAd,   'kDRespFiAd',   'd-1',      'maintenance respiration constant of adult fish',             default=0.004_rk,  scale_factor=1.0_rk/secs_pr_day)
-!   call self%get_parameter(self%kMortFiAd,    'kMortFiAd',    'd-1',      'specific mortality of adult fish',                           default=0.00027_rk,scale_factor=1.0_rk/secs_pr_day)
-!   call self%get_parameter(self%cDCarrFish,   'cDCarrFish',   'gDW m-2',  'carrying capacity of fish',                                  default=15.0_rk)
    call self%get_parameter(self%cNDDiatMin,   'cNDDiatMin',   'mgN/mgDW', 'minimum N/DW ratio diatoms',                                default=0.01_rk)
    call self%get_parameter(self%cPDDiatMin,   'cPDDiatMin',   'mgP/mgDW', 'minimum P/DW ratio diatoms',                                default=0.0005_rk)
    call self%get_parameter(self%cNDGrenMin,   'cNDGrenMin',   'mgN/mgDW', 'minimum N/DW ratio greens',                                 default=0.02_rk)
@@ -139,9 +118,6 @@
                                     initial_value=0.01_rk,minimum=self%cDBentMin * self%cNDBentRef)
 !  Register diagnostic variables for dependencies in other modules
    call self%register_diagnostic_variable(self%id_tDBenPOMS,     'tDBenPOMS',    'g m-2 s-1', 'tDBenPOMS',                output=output_none)
-!  parameters before changed fish to nonlocal
-!   call self%register_diagnostic_variable(self%id_tDEnvFiAd,     'tDEnvFiAd',    'g m-2',     'tDEnvFiAd',                output=output_none)
-!   call self%register_diagnostic_variable(self%id_aDSatFiAd,     'aDSatFiAd',    'g m-2',     'aDSatFiAd',                output=output_none)
 #ifdef _DEVELOPMENT_
 !  Register diagnostic variables for modular fluxes
    call self%register_diagnostic_variable(self%id_tDBenBent,     'tDBenBent',     'g m-2',    'zoobenthos_DBent_change',  output=output_instantaneous)
@@ -196,20 +172,6 @@
    call self%register_state_dependency(self%id_NDOMpoolS,    'DOM_N_pool_sediment',    'g m-2', 'dissolved organic matter N in sediment')
    call self%register_state_dependency(self%id_PDOMpoolS,    'DOM_P_pool_sediment',    'g m-2', 'dissolved organic matter P in sediment')
    call self%register_state_dependency(self%id_SiDOMpoolS,   'DOM_Si_pool_sediment',   'g m-2', 'dissolved organic matter Si in sediment')
-!  parameters before changed fish to nonlocal
-!   call self%register_state_dependency(self%id_DAdFish,      'adult_fish_biomass',               'g m-3', 'adult fish biomass')
-!   call self%register_state_dependency(self%id_NAdFish,      'adult_fish_nitrogen',              'g m-3', 'adult fish nitrogen')
-!   call self%register_state_dependency(self%id_PAdFish,      'adult_fish_phosphorus',            'g m-3', 'adult fish phosphorus')
-!   call self%register_state_dependency(self%id_NH4poolW,     'NH4_pool_water',                   'g m-3', 'NH4 pool in water')
-!   call self%register_state_dependency(self%id_PO4poolW,     'PO4_pool_water',                   'g m-3', 'PO4 pool in water')
-!   call self%register_state_dependency(self%id_DPOMpoolW,    'POM_DW_pool_water',                  'g m-3', 'DDet pool in water')
-!   call self%register_state_dependency(self%id_NPOMpoolW,    'POM_N_pool_water',                  'g m-3', 'NDet pool in water')
-!   call self%register_state_dependency(self%id_PPOMpoolW,    'POM_P_pool_water',                  'g m-3', 'PDet pool in water')
-!   call self%register_state_dependency(self%id_DJvFish,      'young_fish_biomass',               'g m-3', 'young fish biomass')
-!!  register diagnostic dependencies
-!   call self%register_dependency(self%id_aCovVeg,          'macrophytes_coverage',       '[-]',  'macrophytes coverage')
-!   call self%register_dependency(self%id_sDepthW,standard_variables%bottom_depth)
-
 !  register environmental dependencies
    call self%register_dependency(self%id_uTm, standard_variables%temperature)
    call self%register_dependency(self%id_dz,  standard_variables%cell_thickness)
@@ -280,18 +242,6 @@
 !  variables for exchange for green algae
    real(rk)          :: tDBenBlueS,tNBenBlueS,tPBenBlueS
 
-!  parameters before changed fish to nonlocal
-!   real(rk)         :: sDFiAd,sDFiJv,sDepthW
-!!  variables related to adult fish assimilation and consumption
-!!  adult fish assimilation
-!   real(rk)          :: tDEnvFiAd,tDAssFiAd,ukDIncrFiAd,aFunVegFish,aDSatFiAd
-!   real(rk)          :: aCovVeg,uFunTmFish
-!   real(rk)          :: tDConsFiAd,tNConsFiAd,tPConsFiAd
-!   real(rk)          :: afNAssFiAd,tNAssFiAd,afPAssFiAd,tPAssFiAd
-!   real(rk)          :: tDEgesFiAd,tNEgesFiAd,tPEgesFiAd
-!   real(rk)          :: tNEgesFiAdNH4,tPEgesFiAdPO4,tNEgesFiAdDet,tPEgesFiAdDetS
-
-
 !  Enter spatial loops (if any)
    _FABM_HORIZONTAL_LOOP_BEGIN_
 !-----------------------------------------------------------------------
@@ -316,16 +266,6 @@
    _GET_HORIZONTAL_(self%id_PfoodDiatS,sPDiatS)
    _GET_HORIZONTAL_(self%id_PfoodGrenS,sPGrenS)
    _GET_HORIZONTAL_(self%id_PfoodBlueS,sPBlueS)
-
-!  parameters before changed fish to nonlocal
-!   _GET_HORIZONTAL_(self%id_DAdFish,sDFiAd)
-!   _GET_HORIZONTAL_(self%id_DJvFish,sDFiJv)
-!   _GET_HORIZONTAL_(self%id_aCovVeg,aCovVeg)
-!!  retrieve diagnostic denpendency
-!   _GET_HORIZONTAL_(self%id_sDepthW,sDepthW)
-!   sDFiAd=sDFiAd*sDepthW
-!   sDFiJv=sDFiJv*sDepthW
-
 
 !  retrieve environmental dependencies
    _GET_(self%id_uTm,uTm)
@@ -505,64 +445,6 @@
    tDEgesBent = tDConsBent - tDAssBent
 !  egestion_of_zoobenthos_N
    tNEgesBent = tNConsBent - tNAssBent
-! this section will be moved to fish module due to fish module is changed back
-! to a benthic module
-
-!  parameters before changed fish to nonlocal
-!!-----------------------------------------------------------------------
-!!  adult fish assimilation_DW
-!!-----------------------------------------------------------------------
-!!  macrophytes_dependence_of_fish_feeding
-!   aFunVegFish = max(0.0_rk,1.0_rk - self%cRelVegFish * aCovVeg)
-!!   for first time step check out
-!!   aFunVegFish = max(0.0_rk,1.0_rk - self%cRelVegFish * 0.2_rk)
-!!  food_limitation_function_of_adult_fish
-!   aDSatFiAd = (aFunVegFish * sDBent) *(aFunVegFish * sDBent) /(self%hDBentFiAd * &
-!   &self%hDBentFiAd + (aFunVegFish * sDBent) *(aFunVegFish * sDBent))
-!!  intrinsic_net_increase_rate_of_fish
-!   ukDIncrFiAd = (self%kDAssFiAd - self%kDRespFiAd) * uFunTmFish - self%kMortFiAd
-!!  environmental_correction_of_fish,in concentration
-!   tDEnvFiAd = max(0.0_rk,ukDIncrFiAd /(self%cDCarrFish - sDFiJv) * sDFiAd*sDFiAd)
-!!  assimilation_of_fish
-!   tDAssFiAd = aDSatFiAd *(self%kDAssFiAd * uFunTmFish * sDFiAd - tDEnvFiAd)
-!!-----------------------------------------------------------------------
-!!  adult fish assimilation_P
-!!-----------------------------------------------------------------------
-!!  zoobenthos_consumption_of_fish
-!   tDConsFiAd = tDAssFiAd / self%fDAssFiAd
-!!  (zoobenthos)_P_consumption_by_FiAd
-!   tPConsFiAd = rPDBent * tDConsFiAd
-!!  P_assim._efficiency_of_FiAd
-!   afPAssFiAd = min(1.0_rk,self%cPDFishRef / rPDBent * self%fDAssFiAd)
-!!  P_assimilation_of_FiAd
-!   tPAssFiAd = afPAssFiAd * tPConsFiAd
-!!-----------------------------------------------------------------------
-!!  adult fish assimilation_N
-!!-----------------------------------------------------------------------
-!!  (zoobenthos)_N_consumption_by_FiAd
-!   tNConsFiAd = rNDBent * tDConsFiAd
-!!  N_assim._efficiency_of_FiAd
-!   afNAssFiAd = min(1.0_rk,self%cNDFishRef / rNDBent * self%fDAssFiAd)
-!!  N_assimilation_of_FiAd
-!   tNAssFiAd = afNAssFiAd * tNConsFiAd
-!!-----------------------------------------------------------------------
-!!  external state variables change due to adult fish(egestion, from sediment top)
-!!-----------------------------------------------------------------------
-!!  egestion_of_fish,adult fish
-!   tDEgesFiAd = tDConsFiAd - tDAssFiAd
-!!  egestion_of_FiAd
-!   tPEgesFiAd = tPConsFiAd - tPAssFiAd
-!!  egestion_of_FiAd
-!   tNEgesFiAd = tNConsFiAd - tNAssFiAd
-!!  NH4_egestion_of_adult_fish
-!   tNEgesFiAdNH4 = self%fDissEgesFish * tNEgesFiAd
-!!  SRP_egestion_of_adult_fish
-!   tPEgesFiAdPO4 = self%fDissEgesFish * tPEgesFiAd
-!!  detrital_N_egestion_of_adult_fish
-!   tNEgesFiAdDet = tNEgesFiAd - tNEgesFiAdNH4
-!!  detrital_P_egestion_of_adult_fish
-!   tPEgesFiAdDet = tPEgesFiAd - tPEgesFiAdPO4
-
 
 !-----------------------------------------------------------------------
 !  total flux of Zoobenthos change to state variables
@@ -688,22 +570,6 @@
    _SET_ODE_BEN_(self%id_DfoodBlueS, tDBenBlueS)
    _SET_ODE_BEN_(self%id_NfoodBlueS, tNBenBlueS)
    _SET_ODE_BEN_(self%id_PfoodBlueS, tPBenBlueS)
-
-
-!  parameters before changed fish to nonlocal
-!!  update abiotic water section variable
-!   _SET_ODE_BEN_(self%id_DAdFish,   tDAssFiAd)
-!   _SET_ODE_BEN_(self%id_NAdFish,   tNAssFiAd)
-!   _SET_ODE_BEN_(self%id_PAdFish,   tPAssFiAd)
-!   _SET_BOTTOM_EXCHANGE_(self%id_NH4poolW,  tNEgesFiAdNH4)
-!   _SET_BOTTOM_EXCHANGE_(self%id_PO4poolW,  tPEgesFiAdPO4)
-!   _SET_BOTTOM_EXCHANGE_(self%id_DPOMpoolW, tDEgesFiAd)
-!   _SET_BOTTOM_EXCHANGE_(self%id_NPOMpoolW, tNEgesFiAdDet)
-!   _SET_BOTTOM_EXCHANGE_(self%id_PPOMpoolW, tPEgesFiAdDet)
-!   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tDEnvFiAd,tDEnvFiAd)
-!   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_aDSatFiAd,aDSatFiAd)
-
-
 
 !-----------------------------------------------------------------------
 !  output diagnostic variables for external links

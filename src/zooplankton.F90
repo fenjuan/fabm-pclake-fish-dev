@@ -493,7 +493,7 @@
 !  soluble_N_mortality
    wNMortZooNH4 = self%fDissMortZoo*wNMortZoo
 !  total_Zoo_flux_of_N_in_ammonium_in_water_in_lake_water
-  wNZooNH4W = wNExcrZoo + wNEgesZooNH4 + wNMortZooNH4
+   wNZooNH4W = wNExcrZoo + wNEgesZooNH4 + wNMortZooNH4
 !-----------------------------------------------------------------------
 !  Update NO3 in water (zooplankton is currently assumed to contribute NH4 only, not NO3)
 !-----------------------------------------------------------------------
@@ -507,7 +507,7 @@
 !  soluble_P_mortality
    wPMortZooPO4 = self%fDissMortZoo * wPMortZoo
 !  total_Zoo_flux_of_P_in_SRP_in_water_in_lake_water
-  wPZooPO4W = wPExcrZoo + wPEgesZooPO4 + wPMortZooPO4
+   wPZooPO4W = wPExcrZoo + wPEgesZooPO4 + wPMortZooPO4
 !-----------------------------------------------------------------------
 !  Update organic DW in water
 !-----------------------------------------------------------------------
