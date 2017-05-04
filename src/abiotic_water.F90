@@ -385,7 +385,7 @@
 !-----------------------------------------------------------------------
 !  mineralization_flux_by_denitrification
    wDDenitW = sNO3W*sNO3W/(self%hNO3Denit*self%hNO3Denit+sNO3W*sNO3W)* &
-   & (1.0_rk-aCorO2BOD)*wDMinDOMW
+   & (1.0_rk-aCorO2BOD)*(wDMinDOMW+wDMinPOMW)
 !  Denitrification_flux
    wNDenitW=self%NO3PerC*molNmolC*self%cCPerDW*wDDenitW
 !-----------------------------------------------------------------------
@@ -401,7 +401,7 @@
 !-----------------------------------------------------------------------
 !  total_abiotic/microbial_DW_inorganic_matter_flux_in_water
    wDAbioIMW=0.0_rk
-!  change of particulate orgainics
+!  change of particulate organics
 !  total_abiotic/microbial_DW particulate OM flux in water
    wDAbioPOMW=-wDMinPOMW
 !  total_abiotic/microbial_N particulate OM flux in water
@@ -410,7 +410,7 @@
    wPAbioPOMW=-wPMinPOMW
 !  total_abiotic/microbial_Si particulate OM flux in water
    wSiAbioPOMW=-wSiMinPOMW
-!  change of dissolved ditritus
+!  change of dissolved detritus
 !  total_abiotic/microbial_DW dissoved orignic flux in water
    wDAbioDOMW=wDMinPOMW - wDMinDOMW
 !  total_abiotic/microbial_N dissolved organic flux in water

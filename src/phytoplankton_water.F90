@@ -810,7 +810,7 @@
 !-----------------------------------------------------------------------
 !  O2_production_by_phytoplankton
    wO2ProdPhyt = molO2molC * self%cCPerDW * wDAssPhyt
-!  correction_of_O2_demand_in_water_at_low_oxygen_conc.
+!  correction_of_O2_demand_in_water_at_low_oxygen_conc
    aCorO2BOD = sO2W / (self%hO2BOD + sO2W)
 !  O2_production_by_phytoplankton
    wO2RespPhytW = molO2molC * self%cCPerDW * wDRespPhytW * aCorO2BOD

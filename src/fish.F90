@@ -684,7 +684,7 @@
 !  mortality_of_Pisc(incl._environmental_correction)
    tDMortPisc = self%kMortPisc * sDPisc +(1.0_rk - aDSatPisc) * tDEnvPisc
 !---------------------------------------------------------------------------
-!  piscivorous fish N process
+!  piscivorous fish P process
 !---------------------------------------------------------------------------
 !  _Piscivorous_fish
     aPPisc = self%cPDPisc * sDPisc
@@ -863,13 +863,13 @@
    tNEgesFiAdTOM = tNEgesFiAd - tNEgesFiAdNH4
 !  organic_N_egestion_of_young_fish
    tNEgesFiJvTOM = tNEgesFiJv - tNEgesFiJvNH4
-!  total_fish_flux_of_N_in_orgainics_in_lake_water
+!  total_fish_flux_of_N_in_organics_in_lake_water
 
    tNFishTOMW = tNEgesFiJvTOM + tNEgesFiAdTOM + tNMortFishPOM + tNEgesPiscTOM + tNMortPiscTOM
    tNFishPOMW = tNFishTOMW * (1.0_rk - self%fFisDOMW)
    tNFishDOMW = tNFishTOMW * self%fFisDOMW
 !-----------------------------------------------------------------------
-!  Update orgainic P in water
+!  Update organic P in water
 !-----------------------------------------------------------------------
 !  part_of_died_Pisc_P_becoming_organic_P
    tPMortPiscTOM = tPMortPisc - tPMortPiscBot - tPMortPiscPO4
