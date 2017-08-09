@@ -52,8 +52,6 @@
 !  nutrient ratios parameter
    real(rk)   :: cNDDiatMin,cPDDiatMin,cNDGrenMin,cPDGrenMin,cNDBlueMin,cPDBlueMin
    real(rk)   :: cNDDiatMax,cPDDiatMax,cNDGrenMax,cPDGrenMax,cNDBlueMax,cPDBlueMax
-!  Fish manipulation parameters, switch for turned on/off fish manipulation
-   logical    :: Manipulate_FiAd, Manipulate_FiJv, Manipulate_Pisc
 !  minimum state variable values
    real(rk)   :: cDZooMin
 !  dissolved fraction of organic matter

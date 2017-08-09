@@ -26,9 +26,7 @@
 !  id_sDPisc, piscivorous fish concentration in dry-weight, gDW/m**2
    type (type_bottom_state_variable_id)            :: id_sDFiJv,id_sPFiJv,id_sNFiJv
    type (type_bottom_state_variable_id)            :: id_sDFiAd,id_sPFiAd,id_sNFiAd,id_sDPisc
-!  Fish manipulation,changed biomass in fish
-   type (type_bottom_state_variable_id)            :: id_ChangedFiAd,id_ChangedFiJv,id_ChangedPisc
-!  diagnostic variables for local output
+!  Diagnostic variables for local output
 !  id_aNPisc, piscivorous fish concentration in nitrogen element, gN/m**2
 !  id_aPPisc, piscivorous fish concentration in phosphorus element, gP/m**2
    type (type_horizontal_diagnostic_variable_id)       :: id_aNPisc,id_aPPisc
@@ -55,8 +53,6 @@
    type (type_horizontal_dependency_id)     :: id_aDSubVeg !,id_tDEnvFiAd,id_aDSatFiAd
 !  for adult fish assimilation
    type ( type_horizontal_dependency_id)    :: id_aCovVeg
-!  Fish manipulation, external fish manipulation rate
-   type (type_horizontal_dependency_id)     :: id_ManFiAd,id_ManFiJv,id_ManPisc
 !  Model parameters
 !  parameters for fish
    real(rk)      :: kMigrFish,cDFiJvIn,cDFiAdIn
@@ -72,10 +68,8 @@
    real(rk)      :: kMortPisc,fDissMortPisc,cTmOptPisc,cSigTmPisc
    real(rk)      :: cPDFishRef,cNDFishRef,cPDPisc,cNDPisc
    real(rk)      :: cDayAgeFish
-!  added pars. regarding adult fish assimilation
+!  Parameter relating to adult fish assimilation
    real(rk)      :: fDAssFiAd, cRelVegFish, kDAssFiAd, hDBentFiAd
-!  Fish manipulation parameters, switch for turned on/off fish manipulation
-   logical    :: Manipulate_FiAd, Manipulate_FiJv, Manipulate_Pisc
 !  minimum state variable values
    real(rk)   :: cDFiJvMin,cDFiAdMin,cDPiscMin
 !  dissolved organic fraction from fish
@@ -164,16 +158,12 @@
    call self%get_parameter(self%cNDFishRef,      'cNDFishRef',     'mgN/mgDW',  'reference N/C ratio of fish',                                                    default=0.1_rk)
    call self%get_parameter(self%cPDPisc,         'cPDPisc',        'mgP/mgDW',  'reference P/C ratio of piscivorous fish',                                        default=0.022_rk)
    call self%get_parameter(self%cNDPisc,         'cNDPisc',        'mgN/mgDW',  'reference N/C ratio of piscivorous fish ',                                       default=0.1_rk)
-!  Fish manipulation, register of switches
-   call self%get_parameter(self%Manipulate_FiAd, 'Manipulate_FiAd', ' ',        'turn on/off benthivorous fish manipulation',                                     default=.false.)
-   call self%get_parameter(self%Manipulate_FiJv, 'Manipulate_FiJv', ' ',        'turn on/off zooplanktivorous manipulation',                                      default=.false.)
-   call self%get_parameter(self%Manipulate_Pisc, 'Manipulate_Pisc', ' ',        'turn on/off piscivorous fish manipulation',                                      default=.false.)
-!  the user defined minumun value for state variables
+!  The user defined minimum value for state variables
    call self%get_parameter(self%cDFiJvMin,       'cDFiJvMin',       'gDW m-2',   'minimum zooplanktivorous fish biomass in system',                               default=0.0001_rk)
    call self%get_parameter(self%cDFiAdMin,       'cDFiAdMin',       'gDW m-2',   'minimum benthivorous fish biomass in system',                                   default=0.0001_rk)
    call self%get_parameter(self%cDPiscMin,       'cDPiscMin',       'gDW m-2',   'minimum piscivorous fish biomass in system',                                    default=0.0001_rk)
    call self%get_parameter(self%fFisDOMW,        'fFisDOMW',        '[-]',       'dissolved organic matter fraction from fish',                                          default=0.5_rk)
-! parameters regarding adult fish assimilation
+! Parameters regarding adult fish assimilation
    call self%get_parameter(self%fDAssFiAd,    'fDAssFiAd',    '[-]',      'C assimilation efficiency of adult fish',                                              default=0.4_rk)
    call self%get_parameter(self%cRelVegFish,  'cRelVegFish',  '[-]',      'decrease of fish feeding per macrophytes cover (max. 0.01)',                           default=0.009_rk)
    call self%get_parameter(self%kDAssFiAd,    'kDAssFiAd',    'd-1',      'maximum assimilation rate of adult fish',                                              default=0.06_rk,   scale_factor=1.0_rk/secs_pr_day)
@@ -203,17 +193,7 @@
    call self%register_state_variable(self%id_sDPisc,'sDPisc','gDW m-2','piscivorous fish DW', &
                                     initial_value=0.01_rk,minimum=NearZero) !,no_river_dilution=.TRUE.)
 !   call self%set_variable_property(self%id_sDPisc,'disable_transport',.true.)
-!  Fish manipulation, if manipulation,register state variable of fish biomass change
-!  as well as register external fish manipulation rate
-!  Benthivorous fish manipulation 
-   call self%register_state_variable(self%id_ChangedFiAd, 'ChangedFiAd',          '',    'changed benthivorous fish biomass', 0.0_rk)
-   call self%register_dependency(self%id_ManFiAd,         'manipulate_rate_FiAd', 's-1', 'benthivorous fish manipulate rate')
-!  Zooplanktivorous fish manipulation
-   call self%register_state_variable(self%id_ChangedFiJv,  'ChangedFiJv',          '',    'changed zooplanktivorous biomass', 0.0_rk)
-   call self%register_dependency(self%id_ManFiJv,          'manipulate_rate_FiJv', 's-1', 'zooplanktivorous manipulate rate')
-!  Piscivorous fish manipulation
-   call self%register_state_variable(self%id_ChangedPisc,  'ChangedPisc',          '',    'changed piscivorous fish biomass', 0.0_rk)
-   call self%register_dependency(self%id_ManPisc,          'manipulate_rate_Pisc', 's-1', 'piscivorous fish manipulate rate')
+
 !  Register diagnostic variables for dependencies in other modules
    call self%register_diagnostic_variable(self%id_aNPisc,    'aNPisc',      'g m-3',     'piscivorous fish nitrogen content',   output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_aPPisc,    'aPPisc',      'g m-3',     'piscivorous fish phosphorus content', output=output_instantaneous)
@@ -352,12 +332,7 @@
    real(rk)     :: tPEgesPiscTOM,tPMortPiscTOM
 !  benthivorous fish assimilation
    real(rk)     :: ukDIncrFiAd
-!  Fish manipulation, manipulate rate variable
-   real(rk)     :: rManFiAd,rManFiJv,rManPisc
-   real(rk)     :: tDManFiAd,tDManFiJv,tDManPisc
-   real(rk)     :: tNManFiAd,tNManFiJv
-   real(rk)     :: tPManFiAd,tPManFiJv
-   real(rk)     :: ChangedFiAd,ChangedFiJv,ChangedPisc
+!  Fish organic compoments
    real(rk)     :: tDFishTOMW, tNFishTOMW, tPFishTOMW
    real(rk)     :: tDFishPOMW, tNFishPOMW, tPFishPOMW
    real(rk)     :: tDFishDOMW, tNFishDOMW, tPFishDOMW
@@ -403,20 +378,10 @@
 ! !retrieve diagnostic dependency
    _GET_HORIZONTAL_(self%id_aDSubVeg,aDSubVeg)
    _GET_HORIZONTAL_(self%id_aCovVeg,aCovVeg)
-!  Fish manipulation
-!  If benthivorous fish manipulation tured on
-   _GET_HORIZONTAL_(self%id_ManFiAd,rManFiAd)
-   _GET_HORIZONTAL_(self%id_ChangedFiAd,ChangedFiAd)
-!  If zooplanktivorous manipulation tured on
-   _GET_HORIZONTAL_(self%id_ManFiJv,rManFiJv)
-   _GET_HORIZONTAL_(self%id_ChangedFiJv,ChangedFiJv)
-!  If piscivorous fish manipulation tured on
-   _GET_HORIZONTAL_(self%id_ManPisc,rManPisc)
-   _GET_HORIZONTAL_(self%id_ChangedPisc,ChangedPisc)
 
 !-------------------------------------------------------------------------
 !  The following section is organized in the order of zooplanktivorous fish, 
-!  benthivorous fish, and piscivorous processes. There is a special section 
+!  benthivorous fish, and piscivorous processes. There is a separate section 
 !  on zooplankton consumption by zooplanktivorous fish, due to the variables 
 !  being dependent on each other. It starts with assimilation of DW to provide 
 !  wDAssFiJv for its predation of zooplankton(DW,N,P).The latter process (predation) 
@@ -733,48 +698,22 @@
 !  egestion_of_Pisc
    tPEgesPisc = tPConsPisc - tPAssPisc
 !-----------------------------------------------------------------------
-!  Fish manipulation, if turned on, operated on g/m2/s base
-!-----------------------------------------------------------------------
-!  If benthivorous fish manipulation tured on
-   If(self%Manipulate_FiAd) then
-     tDManFiAd= sDFiAd * log(1+rManFiAd)/secs_pr_day
-   else
-     tDManFiAd = 0.0_rk
-   endif
-!  If zooplanktivorous manipulation tured on
-   If(self%Manipulate_FiJv) then
-      tDManFiJv= sDFiJv * log(1+rManFiJv)/secs_pr_day
-   else
-      tDManFiJv = 0.0_rk
-   endif
-!  If piscivorous fish manipulation tured on
-   If(self%Manipulate_Pisc) then
-      tDManPisc= sDPisc * log(1+rManPisc)/secs_pr_day
-   else
-      tDManPisc = 0.0_rk
-   endif
-!  Change in N, P rate due to manipulation
-   tNManFiAd = rNDFiAd*tDManFiAd
-   tNManFiJv = rNDFiJv*tDManFiJv
-   tPManFiAd = rPDFiAd*tDManFiAd
-   tPManFiJv = rPDFiJv*tDManFiJv
-!-----------------------------------------------------------------------
 !  total flux of Fish change to state variables
 !-----------------------------------------------------------------------
 !  total_fish_flux_of_DW_in_Young_fish
-   tDFiJv = tDMigrFiJv + tDReprFish + tDAssFiJv - tDRespFiJv - tDMortFiJv - tDConsFiJvPisc - tDAgeFish + tDManFiJv
+   tDFiJv = tDMigrFiJv + tDReprFish + tDAssFiJv - tDRespFiJv - tDMortFiJv - tDConsFiJvPisc - tDAgeFish 
 !  total_fish_flux_of_P_in_Young_fish
-   tPFiJv = tPMigrFiJv + tPReprFish  + tPAssFiJv - tPExcrFiJv - tPMortFiJv - tPConsFiJvPisc - tPAgeFish + tNManFiJv
+   tPFiJv = tPMigrFiJv + tPReprFish  + tPAssFiJv - tPExcrFiJv - tPMortFiJv - tPConsFiJvPisc - tPAgeFish 
 !  total_fish_flux_of_N_in_Young_fish
-   tNFiJv = tNMigrFiJv + tNReprFish + tNAssFiJv - tNExcrFiJv - tNMortFiJv - tNConsFiJvPisc - tNAgeFish + tPManFiJv
+   tNFiJv = tNMigrFiJv + tNReprFish + tNAssFiJv - tNExcrFiJv - tNMortFiJv - tNConsFiJvPisc - tNAgeFish 
 !  total_fish_flux_of_DW_in_Adult_fish
-   tDFiAd = tDMigrFiAd - tDRespFiAd - tDMortFiAd - tDReprFish - tDConsFiAdPisc + tDAgeFish+ tDManFiAd 
+   tDFiAd = tDMigrFiAd - tDRespFiAd - tDMortFiAd - tDReprFish - tDConsFiAdPisc + tDAgeFish
 !  total_fish_flux_of_P_in_Adult_fish
-   tPFiAd = tPMigrFiAd  - tPExcrFiAd - tPMortFiAd - tPReprFish - tPConsFiAdPisc + tPAgeFish + tPManFiAd
+   tPFiAd = tPMigrFiAd  - tPExcrFiAd - tPMortFiAd - tPReprFish - tPConsFiAdPisc + tPAgeFish 
 !  total_fish_flux_of_N_in_Adult_fish
-   tNFiAd = tNMigrFiAd - tNExcrFiAd - tNMortFiAd - tNReprFish - tNConsFiAdPisc + tNAgeFish + tNManFiAd
+   tNFiAd = tNMigrFiAd - tNExcrFiAd - tNMortFiAd - tNReprFish - tNConsFiAdPisc + tNAgeFish 
 !  total_fish_flux_of_DW_in_predatory_fish
-   tDPisc = tDMigrPisc + tDAssPisc - tDRespPisc - tDMortPisc + tDManPisc
+   tDPisc = tDMigrPisc + tDAssPisc - tDRespPisc - tDMortPisc
 
 !=======================================================================
 !  fish processes relating to other modules
@@ -864,7 +803,6 @@
 !  organic_N_egestion_of_young_fish
    tNEgesFiJvTOM = tNEgesFiJv - tNEgesFiJvNH4
 !  total_fish_flux_of_N_in_organics_in_lake_water
-
    tNFishTOMW = tNEgesFiJvTOM + tNEgesFiAdTOM + tNMortFishPOM + tNEgesPiscTOM + tNMortPiscTOM
    tNFishPOMW = tNFishTOMW * (1.0_rk - self%fFisDOMW)
    tNFishDOMW = tNFishTOMW * self%fFisDOMW
@@ -952,15 +890,6 @@
    endif
    n=n+1
 #endif
-!-----------------------------------------------------------------------
-!  Updated fish biomass due to biomanipulation
-!-----------------------------------------------------------------------
-!  If benthivorous fish manipulation is turned on
-   _SET_ODE_BEN_(self%id_ChangedFiAd,tDManFiAd)
-!  If zooplanktivorous manipulation tured on
-   _SET_ODE_BEN_(self%id_ChangedFiJv,tDManFiJv)
-!  If Piscivorous fish manipulation tured on
-   _SET_ODE_BEN_(self%id_ChangedPisc,tDManPisc)
 ! Horizontal loop end
 !   _LOOP_END_
    _FABM_HORIZONTAL_LOOP_END_
