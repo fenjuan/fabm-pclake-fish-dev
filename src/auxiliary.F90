@@ -40,7 +40,8 @@
    type (type_state_variable_id)            :: id_DTranZoo,id_NTranZoo,id_PTranZoo
    type (type_bottom_state_variable_id)     :: id_TurbFish
 !  dependencies to macrophytes state variables
-   type (type_bottom_state_variable_id)     :: id_DragVeg
+   type (type_horizontal_dependency_id)     :: id_DragVeg
+!   type (type_bottom_state_variable_id)     :: id_DragVeg
 !  environmental dependencies
    type (type_global_dependency_id)         :: id_Day
    type (type_dependency_id)                :: id_uTm ,id_dz
@@ -79,8 +80,8 @@
    real(rk)                   :: hDepthSusp,cFetchRef,cFetch
    real(rk)                   :: cResusPhytExp,kResusPhytMax  !,cSiDDiat
 !  sedimentation parameters
-   real(rk)                   :: cThetaSet,cVSetIM,cVSetPOM
-   real(rk)                   :: cVSetDiat,cVSetGren,cVSetBlue
+   real(rk)                   :: cThetaSed,cVSedIM,cVSedPOM
+   real(rk)                   :: cVSedDiat,cVSedGren,cVSedBlue
 !  Burial process parameters
    real(rk)                   :: cRhoIM,cRhoOM,fDOrgSoil
    real(rk)                   :: cPO4Ground,cNH4Ground,cNO3Ground
@@ -90,7 +91,7 @@
    real(rk)   :: cNDDiatMin,cPDDiatMin,cNDGrenMin,cPDGrenMin,cNDBlueMin,cPDBlueMin
    real(rk)   :: cNDDiatMax,cPDDiatMax,cNDGrenMax,cPDGrenMax,cNDBlueMax,cPDBlueMax
 !  parameters relating to new resuspension method
-   real(rk)   :: crt_shear,ref_shear,alpha,eta,cVSetMain
+   real(rk)   :: crt_shear,ref_shear,alpha,eta,cVSedMain
 !  variable for selecting different resuspension methods
    integer    :: resusp_meth
 !  variables for atmospheric depostions
@@ -133,7 +134,7 @@
 !  NB: all rates must be provided in values per day in .yaml input,
 !  and are converted here to values per second.
    call self%get_parameter(self%cDepthS,      'cDepthS',      'm',                 'sediment depth',                                         default=0.1_rk)
-   call self%get_parameter(self%cThetaSet,    'cThetaSet',    '1/e^oC',            'temperature parameter for sedimentation',                 default=1.01_rk)
+   call self%get_parameter(self%cThetaSed,    'cThetaSed',    '1/e^oC',            'temperature parameter for sedimentation',                 default=1.01_rk)
    call self%get_parameter(self%kVegResus,    'kVegResus',    'm2/gDW',            'relative resuspension reduction per gram macrophytes',    default=0.01_rk)
    call self%get_parameter(self%kTurbFish,    'kTurbFish',    'g/gfish/d',         'relative resuspension by adult fish browsing',           default=1.0_rk)
 !  don't convert here,due to PCLake empirical function. kTurbFish
@@ -149,11 +150,11 @@
    call self%get_parameter(self%bPorS,        'bPorS',        'm3water/m3sediment','sediment porosity',                                      default=0.847947_rk)
    call self%get_parameter(self%cResusPhytExp,'cResusPhytExp','(gDW m-2 d-1)-1',   'exponent parameter for phytoplankton resuspension',      default=-0.379_rk)
    call self%get_parameter(self%kResusPhytMax,'kResusPhytMax','d-1',               'maximum phytoplankton resuspension rate',                   default=0.25_rk)
-   call self%get_parameter(self%cVSetIM,      'cVSetIM',      'm d-1',             'maximum sedimentation velocity of inert organic matter',    default=-1.0_rk)
-   call self%get_parameter(self%cVSetPOM,     'cVSetPOM',     'm d-1',             'maximum sedimentation velocity of POM',                  default=-0.25_rk)
-   call self%get_parameter(self%cVSetDiat,    'cVSetDiat',    'm d-1',             'sedimentation velocity of diatoms',                         default=0.5_rk)
-   call self%get_parameter(self%cVSetGren,    'cVSetGren',    'm d-1',             'sedimentation velocity of greens',                       default=0.2_rk)
-   call self%get_parameter(self%cVSetBlue ,   'cVSetBlue',    'm d-1',             'sedimentation velocity of blue-greens',                     default=0.06_rk)
+   call self%get_parameter(self%cVSedIM,      'cVSedIM',      'm d-1',             'maximum sedimentation velocity of inert organic matter',    default=-1.0_rk)
+   call self%get_parameter(self%cVSedPOM,     'cVSedPOM',     'm d-1',             'maximum sedimentation velocity of POM',                  default=0.25_rk)
+   call self%get_parameter(self%cVSedDiat,    'cVSedDiat',    'm d-1',             'sedimentation velocity of diatoms',                         default=0.5_rk)
+   call self%get_parameter(self%cVSedGren,    'cVSedGren',    'm d-1',             'sedimentation velocity of greens',                       default=0.2_rk)
+   call self%get_parameter(self%cVSedBlue ,   'cVSedBlue',    'm d-1',             'sedimentation velocity of blue-greens',                     default=0.06_rk)
    call self%get_parameter(self%cRhoIM,       'cRhoIM',       'g m-3',             'density of sediment IM',                                 default=2500000.0_rk)
    call self%get_parameter(self%cRhoOM,       'cRhoOM',       'g m-3',             'density of sediment organic matter',                           default=1400000.0_rk)
    call self%get_parameter(self%fDOrgSoil,    'fDOrgSoil',    '[-]',               'fraction soil organic matter',                           default=0.1_rk)
@@ -179,7 +180,7 @@
    call self%get_parameter(self%ref_shear,    'ref_shear',    'N m-2',             'reference shear stress',                                 default=1.0_rk)
    call self%get_parameter(self%alpha,        'alpha',        'g m-2 d-1',         'gross rate of sediment erosion (9000-9900g m-2/d)',      default=9000.0_rk, scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%eta,          'eta',          '[-]',               'shear stress correction factor',                         default=1.0_rk)
-   call self%get_parameter(self%cVSetMain,    'cVSetMain',    'm d-1',             'depth averaged settling velocity (between 0.5-1.5m/d)',  default=0.5_rk,    scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%cVSedMain,    'cVSedMain',    'm d-1',             'depth averaged settling velocity (between 0.5-1.5m/d)',  default=0.5_rk,    scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%resusp_meth,  'resusp_meth',  '[-]',               '1=original PCLake resuspension function',                default=2)
    call self%get_parameter(self%tDDepoIM,     'tDDepoIM',     'g m-2 d-1',         'inorganic matter deposition',                            default=0.0_rk, scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%tDDepoPOM,    'tDDepoPOM',    'g m-2 d-1',         'organic matter deposition, dry weight',                   default=0.0_rk, scale_factor=1.0_rk/secs_pr_day)
@@ -234,7 +235,8 @@
    call self%register_state_dependency(self%id_WSPGren, 'green_P_in_sediment',            'g m-2', 'green P in sediment')
    call self%register_state_dependency(self%id_WSPBlue, 'blue_P_in_sediment',             'g m-2', 'blue-green P in sediment')
 !  register macrophytes and fish for resuspension dependency
-   call self%register_state_dependency(self%id_DragVeg, 'macrophytes_DW',                  'g m-2', 'macrophytes DW')
+   call self%register_dependency(self%id_DragVeg, 'macrophytes_DW',                  'g m-2', 'macrophytes DW')
+!   call self%register_state_dependency(self%id_DragVeg, 'macrophytes_DW',                  'g m-2', 'macrophytes DW')
    call self%register_state_dependency(self%id_TurbFish,'adult_fish_DW',                  'g m-2', 'adult fish DW')
 !  register zooplankton for transport purpose
    call self%register_state_dependency(self%id_DTranZoo,'zooplankton_DW',                 'g m-3', 'zooplankton DW')
@@ -353,7 +355,7 @@
    real(rk)                   :: rNDDiatS,rNDGrenS,rNDBlueS
    real(rk)                   :: rPDDiatS,rPDGrenS,rPDBlueS
 !  temperature related variables
-   real(rk)                   :: uFunTmSet,uFunTmFish
+   real(rk)                   :: uFunTmSed,uFunTmFish
 !  variables related to resuspension (in the order of appearance)
    real(rk)                   :: aFunVegResus,tDTurbFish
    real(rk)                   :: aFunDimSusp,tDResusTauDead,tDResusBareDead
@@ -367,10 +369,10 @@
    real(rk)                   :: tPResusDiat,tPResusGren,tPResusBlue  !,tSiResusDiat
 !  variables related to sedimentation (in the order of appearance)
    real(rk)                   :: aFunTauSet
-   real(rk)                   :: uCorVSetIM,tDSetIM,tPSetAIM
-   real(rk)                   :: uCorVSetPOM,tDSetPOM,tPSetPOM,tNSetPOM,tSiSetPOM
+   real(rk)                   :: uCorVSedIM,tDSetIM,tPSetAIM
+   real(rk)                   :: uCorVSedPOM,tDSetPOM,tPSetPOM,tNSetPOM,tSiSetPOM
 !  variables for phytoplankton sedimentation
-   real(rk)                   :: uCorVSetDiat,uCorVSetGren,uCorVSetBlue
+   real(rk)                   :: uCorVSedDiat,uCorVSedGren,uCorVSedBlue
    real(rk)                   :: tDSetDiat,tDSetGren,tDSetBlue
    real(rk)                   :: tNSetDiat,tNSetGren,tNSetBlue
    real(rk)                   :: tPSetDiat,tPSetGren,tPSetBlue !,tSiSetDiat
@@ -480,7 +482,7 @@
 !  Temperature functions for sediment abiotic process
 !-----------------------------------------------------------------------
 !  temperature_correction_of_sedimentation
-   uFunTmSet= uFunTmAbio(uTm,self%cThetaSet)
+   uFunTmSed= uFunTmAbio(uTm,self%cThetaSed)
    uFunTmFish= uFunTmBio(uTm,self%cSigTmFish,self%cTmOptFish)
 !-----------------------------------------------------------------------
 !  Process related to other modules
@@ -509,7 +511,7 @@
          if(shear <= self%crt_shear)then
             aFunDimSusp=0.0_rk
          else
-            aFunDimSusp=(self%alpha/self%cVSetMain)*((shear-self%crt_shear)/self%ref_shear)**self%eta
+            aFunDimSusp=(self%alpha/self%cVSedMain)*((shear-self%crt_shear)/self%ref_shear)**self%eta
          endif
    end select
    tDResusTauDead=min(aFunDimSusp, ((aFunDimSusp +NearZero )**(0.5_rk))) &
@@ -574,43 +576,43 @@
 !  Sedimentation rates of individual components in the water column based on the net settling rate
 !-----------------------------------------------------------------------
 !  sedimentation_velocity_of_IM, in day
-   uCorVSetIM=aFunTauSet*((self%fLutumRef/self%fLutum)**(0.5))*uFunTmSet*self%cVSetIM
+   uCorVSedIM=aFunTauSet*((self%fLutumRef/self%fLutum)**(0.5))*uFunTmSed*self%cVSedIM
 !  convert to seconds
-   uCorVSetIM=uCorVSetIM/secs_pr_day
+   uCorVSedIM=uCorVSedIM/secs_pr_day
 !  sedimentation_IM
-   tDSetIM=uCorVSetIM*sDIMW
+   tDSetIM=uCorVSedIM*sDIMW
 !  sedimentation_PAIM
    tPSetAIM=sPAIMW/(sDIMW +NearZero)*tDSetIM
 !  sedimentation_velocity_of_POM, in day
-   uCorVSetPOM=self%cVSetPOM*aFunTauSet*uFunTmSet
+   uCorVSedPOM=self%cVSedPOM*aFunTauSet*uFunTmSed
 !  convert to seconds
-   uCorVSetPOM=uCorVSetPOM/secs_pr_day
+   uCorVSedPOM=uCorVSedPOM/secs_pr_day
 !  sedimentation_flux_of_POM
-   tDSetPOM=uCorVSetPOM*sDPOMW
+   tDSetPOM=uCorVSedPOM*sDPOMW
 !  sedimentation_POM_P
-   tPSetPOM=uCorVSetPOM*sPPOMW
+   tPSetPOM=uCorVSedPOM*sPPOMW
 !  sedimentation_POM_N
-   tNSetPOM=uCorVSetPOM*sNPOMW
+   tNSetPOM=uCorVSedPOM*sNPOMW
 !  sedimentation_POM_Si
-   tSiSetPOM=uCorVSetPOM*sSiPOMW
+   tSiSetPOM=uCorVSedPOM*sSiPOMW
 !  corrected_sedimentation_velocity_of_Algae, in day
-   uCorVSetDiat = self%cVSetDiat * aFunTauSet * uFunTmSet
+   uCorVSedDiat = self%cVSedDiat * aFunTauSet * uFunTmSed
 !  convert to seconds
-   uCorVSetDiat=uCorVSetDiat/secs_pr_day
+   uCorVSedDiat=uCorVSedDiat/secs_pr_day
 !  sedimentation_flux_of_Diatom
-   tDSetDiat = uCorVSetDiat * sDDiatW
+   tDSetDiat = uCorVSedDiat * sDDiatW
 !  corrected_sedimentation_velocity_of_Algae,in day
-   uCorVSetGren = self%cVSetGren * aFunTauSet * uFunTmSet
+   uCorVSedGren = self%cVSedGren * aFunTauSet * uFunTmSed
 !  convert to seconds
-   uCorVSetGren=uCorVSetGren/secs_pr_day
+   uCorVSedGren=uCorVSedGren/secs_pr_day
 !  sedimentation_flux_of_Algae
-   tDSetGren = uCorVSetGren * sDGrenW
+   tDSetGren = uCorVSedGren * sDGrenW
 !  corrected_sedimentation_velocity_of_Algae, in day
-   uCorVSetBlue = self%cVSetBlue * aFunTauSet * uFunTmSet
+   uCorVSedBlue = self%cVSedBlue * aFunTauSet * uFunTmSed
 !  convert to seconds
-   uCorVSetBlue=uCorVSetBlue/secs_pr_day
+   uCorVSedBlue=uCorVSedBlue/secs_pr_day
 !  sedimentation_flux_of_Algae
-   tDSetBlue = uCorVSetBlue * sDBlueW
+   tDSetBlue = uCorVSedBlue * sDBlueW
 !  sedimentation
    tNSetDiat = rNDDiatW * tDSetDiat
 !  sedimentation

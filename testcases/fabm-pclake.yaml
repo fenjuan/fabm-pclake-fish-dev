@@ -3,7 +3,7 @@ instances:
     long_name: abiotic_process_in_water
     model: pclake/abiotic_water
     parameters:
-      cCPerDW: 0.45                                              # C content of organic matter (gC/gDW), default = 0.4
+      cCPerDW: 0.4                                               # C content of organic matter (gC/gDW), default = 0.4
       cExtSpPOM: 0.15                                            # specific extinction factor for POM (m2/gDW), default = 0.15
       cExtSpIM: 0.05                                             # specific extinction inorganic matter (m2/gDW), default = 0.05
       cKPAdsOx: 0.6                                              # P adsorption affinity at oxidized conditions (m3/gP), default = 0.6
@@ -12,8 +12,8 @@ instances:
       cRelPAdsFe: 0.065                                          # maximum P adsorption per g Fe (gP/gFe), default = 0.065
       cThetaAer: 1.024                                           # temperature coefficient for reaeration (1/e^oC), default = 1.024
       cThetaNitr: 1.08                                           # temperature coefficient for nitrification ([-]), default = 1.08
-      cVSetPOM: -0.5                                            # maximum sedimentation velocity of POM (m/day), default = -0.25
-      cVSetIM: -1.0                                              # maximum sedimentation velocity of iorganic matter (m/day), default = -1.0
+      cVSetPOM: -0.25                                            # maximum settling rate of POM (m/day), default = -0.25
+      cVSetIM: -1.0                                              # maximum settling rate of iorganic matter (m/day), default = -1.0
       fAlDIM: 0.01                                               # Al content of inorganic matter (gAl/gD), default = 0.01
       fFeDIM: 0.01                                               # Fe content of inorganic matter (gFe/gD), default = 0.01
       fRedMax: 0.9                                               # maximum reduction factor of P adsorption affinity ([-]), default = 0.9
@@ -36,27 +36,27 @@ instances:
       kSiMinDOMW: 0.01                                           # mineralization constant of dissolved organic Si (day-1), default = 0.01
     initialization:
       sNH4W: 0.05                                                # ammonium (g m-3)
-      sNO3W: 2.5                                                 # nitrate (g m-3)
-      sPO4W: 0.01                                                # phosphate (g m-3)
-      sPAIMW: 0.0                                                # IM-adsorbed P (g m-3)
-      sSiO2W: 1.2                                                # silica dioxide (g m-3)
-      sO2W: 10.6                                                 # oxygen (g m-3)
-      sDIMW: 5.0                                                 # inorganic matter (g m-3)
-      sDPOMW: 2.5                                                # particulate organic matter DW (g m-3)
+      sNO3W: 0.5                                                 # nitrate (g m-3)
+      sPO4W: 0.1                                                 # phosphate (g m-3)
+      sPAIMW: 0.00024                                            # IM-adsorbed P (g m-3)
+      sSiO2W: 3.5                                                # silica dioxide (g m-3)
+      sO2W: 13.0                                                 # oxygen (g m-3)
+      sDIMW: 4.0                                                 # inorganic matter (g m-3)
+      sDPOMW: 0.1                                                # particulate organic matter DW (g m-3)
       sPPOMW: 0.001                                              # particulate organic P (g m-3)
       sNPOMW: 0.01                                               # particulate organic N (g m-3)
       sSiPOMW: 0.025                                             # particulate organic Si (g m-3)
       sDDOMW: 2.5                                                # dissolved organic matter DW (g m-3)
       sPDOMW: 0.001                                              # dissolved organic P (g m-3)
       sNDOMW: 0.01                                               # dissolved organic N (g m-3)
-      sSiDOMW: 0.025                                             # dissolved organic Si (g m-3)
+      sSiDOMW: 0.25                                              # dissolved organic Si (g m-3)
   abiotic_sediment:
     long_name: abiotic_process_in_sediment
     model: pclake/abiotic_sediment
     parameters:
-      cDepthS: 0.2                                               # sediment depth (m), default = 0.1
+      cDepthS: 0.1                                               # sediment depth (m), default = 0.1
       fRefrPOMS: 0.15                                            # refractory fraction of sediment POM ([-]), default = 0.15
-      cCPerDW: 0.45                                              # C content of organic matter (gC/gDW), default = 0.4
+      cCPerDW: 0.4                                               # C content of organic matter (gC/gDW), default = 0.4
       O2PerNH4: 2.0                                              # O2 used per mol NH4+ nitrified (mol), default = 2.0
       kNitrS: 1.0                                                # nitrification rate constant (d-1), default = 1.0
       cThetaNitr: 1.08                                           # temperature coefficient for nitrification ([-]), default = 1.08
@@ -70,16 +70,16 @@ instances:
       fAlDIM: 0.01                                               # Al content of inorganic matter (gAl/gD), default = 0.01
       fRedMax: 0.9                                               # max. reduction factor of P adsorption affinity ([-]), default = 0.9
       cKPAdsOx: 0.6                                              # P adsorption affinity at oxidized conditions (m3/gP), default = 0.6
-      kPChemPO4: 0.1                                            # chem. PO4 loss rate (d-1), default = 0.03
-      coPO4Max: 0.25                                              # max. SRP conc. in pore water (mgP/l), default = 1.0
-      bPorS: 0.918222                                            # sediment porosity (m3 water m-3 sediment), default = 0.847947
-      cThetaDif: 1.04                                            # temperature coefficient for diffusion ([-]), default = 1.02
+      kPChemPO4: 0.03                                            # chem. PO4 loss rate (d-1), default = 0.03
+      coPO4Max: 1.0                                              # max. SRP conc. in pore water (mgP/l), default = 1.0
+      bPorS: 0.85                                                # sediment porosity (m3 water m-3 sediment), default = 0.847947
+      cThetaDif: 1.02                                            # temperature coefficient for diffusion ([-]), default = 1.02
       fDepthDifS: 0.5                                            # nutrient diffusion distance as fraction of sediment depth ([-]), default = 0.5
-      kNDifNH4: 0.00112                                          # molecular NH4 diffusion constant (m2/day), default = 0.000112
+      kNDifNH4: 0.000112                                         # molecular NH4 diffusion constant (m2/day), default = 0.000112
       cTurbDifNut: 5.0                                           # bioturbation factor for diffusion ([-]), default = 5.0
       bPorCorS: 0.737275                                         # sediment porosity, corrected for tortuosity (m3 water m-3 sediment), default = 0.737275
-      kNDifNO3: 0.0025                                            # molecular NO3 diffusion constant (m2/day), default = 8.6e-05
-      kPDifPO4: 0.000025                                           # molecular PO4 diffusion constant (m2/day), default = 7.2e-05
+      kNDifNO3: 8.6e-05                                          # molecular NO3 diffusion constant (m2/day), default = 8.6e-05
+      kPDifPO4: 7.2e-05                                          # molecular PO4 diffusion constant (m2/day), default = 7.2e-05
       kO2Dif: 2.6e-05                                            # molecular O2 diffusion constant (m2/day), default = 2.6e-05
       cTurbDifO2: 5.0                                            # bioturbation factor for diffusion ([-]), default = 5.0
       kDMinHum: 0.00001                                          # maximum decomposition constant of humic material (1D-5) (d-1), default = 1e-05
@@ -98,22 +98,22 @@ instances:
       kPDifDOM: 0.0                                              # molecular diffusion constant for dissolved organic P (m2/day), default = 0.000112
       kSiDifDOM: 0.0                                             # molecular diffusion constant for dissolved organic Si (m2/day), default = 0.000112
     initialization:
-      sNH4S: 0.06                                                # sediment ammonium (g m-2)
-      sNO3S: 0.006                                               # sediment nitrate (g m-2)
-      sPO4S: 0.3008735                                           # sediment phosphate (g m-2)
-      sPAIMS: 15.0                                               # sediment absorbed phosphate (g m-2)
-      sDIMS: 52047.5                                             # sediment inorganic matter (g m-2)
-      sDDOMS: 106.36                                             # sediment dissolved organic matter (g m-2)
-      sNDOMS: 10.159                                             # sediment dissolved organic N (g m-2)
-      sPDOMS: 1.0159                                             # sediment dissolved organic P (g m-2)
-      sSiDOMS: 4.0636                                            # sediment dissolved organic Si (g m-2)
-      sDPOMS: 206.36                                             # sediment particulate organic DW (g m-2)
-      sNPOMS: 10.159                                             # sediment particulate organic N (g m-2)
-      sPPOMS: 1.0159                                             # sediment particulate organic P (g m-2)
-      sSiPOMS: 4.0636                                            # sediment particulate organic Si (g m-2)
-      sDHumS: 7720.846                                           # sediment humus DW (g m-2)
-      sNHumS: 386.0423                                           # sediment humus N (g m-2)
-      sPHumS: 38.60423                                           # sediment humus P (g m-2)
+      sNH4S: 0.04                                                # sediment ammonium (g m-2)
+      sNO3S: 0.025                                               # sediment nitrate (g m-2)
+      sPO4S: 0.02                                                # sediment phosphate (g m-2)
+      sPAIMS: 2.0                                                # sediment absorbed phosphate (g m-2)
+      sDIMS: 31700.0                                             # sediment inorganic matter (g m-2)
+      sDDOMS: 10.0                                               # sediment dissolved organic matter (g m-2)
+      sNDOMS: 0.06                                               # sediment dissolved organic N (g m-2)
+      sPDOMS: 0.01                                               # sediment dissolved organic P (g m-2)
+      sSiDOMS: 0.1                                               # sediment dissolved organic Si (g m-2)
+      sDPOMS: 474.0                                              # sediment particulate organic DW (g m-2)
+      sNPOMS: 6.0                                                # sediment particulate organic N (g m-2)
+      sPPOMS: 1.0                                                # sediment particulate organic P (g m-2)
+      sSiPOMS: 14.0                                              # sediment particulate organic Si (g m-2)
+      sDHumS: 3719.0                                             # sediment humus DW (g m-2)
+      sNHumS: 166.0                                              # sediment humus N (g m-2)
+      sPHumS: 16.0                                               # sediment humus P (g m-2)
     coupling:
       oxygen_pool_water: abiotic_water/sO2W                      # Oxygen pool water (g m-3)
       SiO2_generated_by_mineralization: abiotic_water/sSiO2W     # SiO2 generated by mineralization (g m-3)
@@ -129,16 +129,16 @@ instances:
     model: pclake/phytoplankton_water
     parameters:
       cSigTmDiat: 20.0                                           # temperature constant diatoms (sigma in Gaussian curve) (degree C), default = 20.0
-      cTmOptDiat: 15.0                                           # optimum temperature of diatoms (degree C), default = 18.0
+      cTmOptDiat: 18.0                                           # optimum temperature of diatoms (degree C), default = 18.0
       cSigTmBlue: 12.0                                           # temperature constant blue-greens (sigma in Gaussian curve) (degree C), default = 12.0
-      cTmOptBlue: 28.0                                           # optimum temperature of blue-greens (degree C), default = 25.0
+      cTmOptBlue: 25.0                                           # optimum temperature of blue-greens (degree C), default = 25.0
       cSigTmGren: 15.0                                           # temperature constant greens (sigma in Gaussian curve) (degree C), default = 15.0
       cTmOptGren: 25.0                                           # optimum temperature of greens (degree C), default = 25.0
       cPDDiatMin: 0.0005                                         # minimum P/DW ratio for diatoms (mgP/mgDW), default = 0.0005
-      cPDDiatMax: 0.005                                           # maximum P/DW ratio for diatoms (mgP/mgDW), default = 0.005
+      cPDDiatMax: 0.005                                          # maximum P/DW ratio for diatoms (mgP/mgDW), default = 0.005
       cNDDiatMin: 0.01                                           # minimum N/DW ratio for diatoms (mgN/mgDW), default = 0.01
-      cNDDiatMax: 0.05                                            # maximum N/DW ratio for diatoms (mgN/mgDW), default = 0.05
-      hSiAssDiat: 0.0                                           # half-saturation constant for Si influence on diatoms (mgSi/l), default = 0.09
+      cNDDiatMax: 0.05                                           # maximum N/DW ratio for diatoms (mgN/mgDW), default = 0.05
+      hSiAssDiat: 0.09                                           # half-saturation constant for Si influence on diatoms (mgSi/l), default = 0.09
       cPDGrenMin: 0.0015                                         # minimum P/DW ratio greens (mgP/mgDW), default = 0.0015
       cPDGrenMax: 0.015                                          # maximum P/DW ratio greens (mgP/mgDW), default = 0.015
       cNDGrenMin: 0.02                                           # minimum N/DW ratio greens (mgN/mgDW), default = 0.02
@@ -156,8 +156,8 @@ instances:
       cLOptRefGren: 30.0                                         # optimum PAR for greens at 20 degree C (Steele function) (W m-2), default = 30.0
       cLOptRefBlue: 13.6                                         # optimum PAR for blue-greens at 20 degree C (Steele function) (W m-2), default = 13.6
       cMuMaxBlue: 0.6                                            # maximum growth rate blue-greens (d-1), default = 0.6
-      cMuMaxGren: 0.8                                            # maximum growth rate greens (d-1), default = 1.5
-      cMuMaxDiat: 1.4                                            # maximum growth rate diatoms (d-1), default = 2.0
+      cMuMaxGren: 1.5                                            # maximum growth rate greens (d-1), default = 1.5
+      cMuMaxDiat: 2.0                                            # maximum growth rate diatoms (d-1), default = 2.0
       kDRespDiat: 0.1                                            # maintenance respiration constant diatoms (d-1), default = 0.1
       kDRespGren: 0.075                                          # maintenance respiration constant greens (d-1), default = 0.075
       kDRespBlue: 0.03                                           # maintenance respiration constant blue-greens (d-1), default = 0.03
@@ -178,19 +178,19 @@ instances:
       cAffNUptBlue: 0.2                                          # initial N uptake affinity bluegreens (l/mgDW/d), default = 0.2
       fDissMortPhyt: 0.0                                         # soluble nutrient fraction of died algae ([-]), default = 0.2
       cSiDDiat: 0.15                                             # Si/DW ratio of diatoms (mgSi/mgDW), default = 0.15
-      cCPerDW: 0.45                                               # C content of organic matter (gC/gDW), default = 0.4
+      cCPerDW: 0.4                                               # C content of organic matter (gC/gDW), default = 0.4
       hO2BOD: 1.0                                                # half-sat. constant of oxygen conc. for BOD (mgO2/l), default = 1.0
       cChDDiatMin: 0.004                                         # minimum chlorophyll/C ratio for diatoms (mgChl/mgDW), default = 0.004
       cChDDiatMax: 0.012                                         # maximum chlorophyll/C ratio for diatoms (mgChl/mgDW), default = 0.012
-      cChDGrenMin: 0.01                                         # minimum chlorophyll/C ratio for greens (mgChl/mgDW), default = 0.01
-      cChDGrenMax: 0.02                                         # maximum chlorophyll/C ratio for greens (mgChl/mgDW), default = 0.02
+      cChDGrenMin: 0.01                                          # minimum chlorophyll/C ratio for greens (mgChl/mgDW), default = 0.01
+      cChDGrenMax: 0.02                                          # maximum chlorophyll/C ratio for greens (mgChl/mgDW), default = 0.02
       cChDBlueMin: 0.005                                         # minimum chlorophyll/C ratio for blue-greens (mgChl/mgDW), default = 0.005
       cChDBlueMax: 0.015                                         # maximum chlorophyll/C ratio for blue-greens (mgChl/mgDW), default = 0.015
-      cVSetDiat: -0.5                                            # sedimentation velocity diatoms (m/d), default = -0.5
-      cVSetGren: -0.2                                            # sedimentation velocity greens (m/d), default = -0.2
-      cVSetBlue: -0.06                                           # sedimentation velocity blue-greens (m/d), default = -0.06
+      cVSetDiat: -0.5                                            # settling rate of diatoms (m/d), default = -0.5
+      cVSetGren: -0.2                                            # settling rate of greens (m/d), default = -0.2
+      cVSetBlue:  0.06                                           # settling rate of blue-greens (m/d), default = 0.06
       cExtSpDiat: 0.25                                           # specific extinction of diatoms (m2/gDW), default = 0.25
-      cExtSpGren: 0.25                                           # specific_extinction of greens (m2/gDW), default = 0.25
+      cExtSpGren: 0.25                                           # specific extinction of greens (m2/gDW), default = 0.25
       cExtSpBlue: 0.35                                           # specific extinction of blue-greens (m2/gDW), default = 0.35
       UseLightMethodGren: 2                                      # lightmethod,1,without photoinhibition,Chalker(1980)model,2,with photoinhibition,Klepperetal.(1988)/Ebenhohetal.(1997)model. ([-]), default = 1
       UseLightMethodBlue: 2                                      # lightmethod,1,without photoinhibition,Chalker(1980)model,2,with photoinhibition,Klepperetal.(1988)/Ebenhohetal.(1997)model. ([-]), default = 2
@@ -207,8 +207,8 @@ instances:
       sPGrenW: 0.001                                             # green phosphorus content (gP m-3)
       sNGrenW: 0.05                                              # green nitrogen content (gN m-3)
       sDBlueW: 0.1                                               # blue-green dry weight (gDW m-3)
-      sPBlueW: 0.003                                              # blue-green phosphorus content (gP m-3)
-      sNBlueW: 0.03                                               # blue-green nitrogen content (gN m-3)
+      sPBlueW: 0.003                                             # blue-green phosphorus content (gP m-3)
+      sNBlueW: 0.03                                              # blue-green nitrogen content (gN m-3)
     coupling:
       SiO2_pool_water: abiotic_water/sSiO2W                      # SiO2 pool water (g m-3)
       PO4_pool_water: abiotic_water/sPO4W                        # PO4 pool water (g m-3)
@@ -246,7 +246,7 @@ instances:
       kDRespBlue: 0.03                                           # maintenance respiration constant for blue-greens (d-1), default = 0.03
       cNDBlueMin: 0.03                                           # minimum N/DW ratio blue-greens (mgN/mgDW), default = 0.03
       cPDBlueMin: 0.0025                                         # minimum P/DW ratio blue-greens (mgP/mgDW), default = 0.0025
-      fDissMortPhyt: 0.01                                         # soluble nutrient fraction of died algae ([-]), default = 0.2
+      fDissMortPhyt: 0.01                                        # soluble nutrient fraction of died algae ([-]), default = 0.2
       cSiDDiat: 0.15                                             # Si/D ratio of diatoms (mgSi/mgDW), default = 0.15
       cNDBlueMax: 0.15                                           # maximum N/DW ratio blue-greens (mgN/mgDW), default = 0.15
       cNDDiatMax: 0.05                                           # maximum N/DW ratio diatoms (mgN/mgDW), default = 0.05
@@ -289,9 +289,9 @@ instances:
       kMigrVeg: 0.001                                            # macrophytes migration rate (d-1), default = 0.001
       cNDVegMin: 0.01                                            # minimum N/DW ratio macrophytes (mgN/mgD), default = 0.01
       cNDVegMax: 0.035                                           # maximum N/DW ratio macrophytes (mgN/mgD), default = 0.035
-      cPDVegMin: 0.0018                                          # minimum P/DW ratio macrophytes (mgP/mg), default = 0.0008
+      cPDVegMin: 0.0008                                          # minimum P/DW ratio macrophytes (mgP/mg), default = 0.0008
       cPDVegMax: 0.0035                                          # maximum P/DW ratio macrophytes (mgP/mgD), default = 0.0035
-      cMuMaxVeg: 0.2                                             # maximum growth rate of macrophytes at 20 degree C (d-1), default = 0.2
+      cMuMaxVeg: 0.1                                             # maximum growth rate of macrophytes at 20 degree C (d-1), default = 0.2
       cDCarrVeg: 100.0                                           # maximum macrophytes standing crop (gDW m-2), default = 400.0
       kDRespVeg: 0.02                                            # dark respiration rate of macrophytes (d-1), default = 0.02
       cDayWinVeg: 259.0                                          # day of the year for the end of growing season (day of the year), default = 259.0
@@ -316,13 +316,13 @@ instances:
       fSedUptVegExp: -0.83                                       # exponent in regression for sediment fraction of nutrient uptake ([-]), default = -0.83
       cAffNUptVeg: 0.2                                           # initial N uptake affinity macrophytes (l/mgDW/d), default = 0.2
       cVNUptMaxVeg: 0.1                                          # maximum N uptake capacity of macrophytes (mgN/mgDW/d), default = 0.1
-      cDepthS: 0.2                                               # sediment depth ([m]), default = 0.1
-      bPorS: 0.918222                                            # sediment porosity ([m3waterm-3sediment]), default = 0.847947
+      cDepthS: 0.1                                               # sediment depth ([m]), default = 0.1
+      bPorS: 0.85                                                # sediment porosity ([m3waterm-3sediment]), default = 0.847947
       UseEmpUpt: 0                                               # false=do not use this empirical relation ([-]), default = 0
       cAffPUptVeg: 0.2                                           # initial P uptake affinity macrophytes (l/mgDW/d), default = 0.2
       cVPUptMaxVeg: 0.01                                         # maximum P uptake capacity of macrophytes (mgP/mgDW/d), default = 0.01
       fDissMortVeg: 0.0                                          # fraction dissolved nutrients from dead plants ([-]), default = 0.25
-      cCPerDW: 0.45                                               # C content of organic matter (gC/gDW), default = 0.4
+      cCPerDW: 0.45                                              # C content of organic matter (gC/gDW), default = 0.4
       fTOMWMortVeg: 0.0                                          # fraction of shoot mortality becoming water organic matter ([-]), default = 0.1
       hO2BOD: 1.0                                                # half-saturation constant for oxygen conc. on BOD (mgO2/l), default = 1.0
       cHeightVeg: 1.0                                            # macrophytes height (m), default = 1.0
@@ -366,7 +366,7 @@ instances:
       kDRespZoo: 0.15                                            # maintenance respiration constant for zooplankton (d-1), default = 0.15
       cPrefDiat: 0.75                                            # selection factor for diatoms ([-]), default = 0.75
       cPrefGren: 0.75                                            # selection factor for greens ([-]), default = 0.75
-      cPrefBlue: 0.125                                            # selection factor for blue-greens ([-]), default = 0.125
+      cPrefBlue: 0.125                                           # selection factor for blue-greens ([-]), default = 0.125
       cPrefPOM: 0.25                                             # selection factor for particulate organic matter ([-]), default = 0.25
       hFilt: 1.0                                                 # half-saturation constant for food conc. on zooplankton (gDW m-3), default = 1.0
       fDAssZoo: 0.35                                             # dry weight assimilation efficiency of zooplankton ([-]), default = 0.35
@@ -545,8 +545,8 @@ instances:
     long_name: extra_processes
     model: pclake/auxiliary
     parameters:
-      cDepthS: 0.2                                               # sediment depth (m), default = 0.1
-      cThetaSet: 1.01                                            # temperature parameter for sedimentation (1/e^oC), default = 1.01
+      cDepthS: 0.1                                               # sediment depth (m), default = 0.1
+      cThetaSed: 1.01                                            # temperature parameter for sedimentation (1/e^oC), default = 1.01
       kVegResus: 0.01                                            # relative resuspension reduction per gram macrophytes (m2/gDW), default = 0.01
       kTurbFish: 1.0                                             # relative resuspension by adult fish browsing (g/gfish/d), default = 1.0
       cSuspRef: 0.0                                              # reference suspended matter function [-] ([-]), default = 0.0
@@ -558,14 +558,14 @@ instances:
       cFetch: 1000.0                                             # length of water body in prevailing wind direction (m), default = 1000.0
       fLutum: 0.1                                                # lutum content of inorganic matter ([-]), default = 0.1
       fLutumRef: 0.2                                             # reference lutum fraction ([-]), default = 0.2
-      bPorS: 0.918222                                            # sediment porosity (m3water/m3sediment), default = 0.847947
+      bPorS: 0.85                                                # sediment porosity (m3water/m3sediment), default = 0.847947
       cResusPhytExp: -0.379                                      # exponent parameter for phytoplankton resuspension ((gDW m-2 d-1)-1), default = -0.379
       kResusPhytMax: 0.25                                        # maximum phytoplankton resuspension rate (d-1), default = 0.25
-      cVSetIM:  1.0                                              # maximum sedimentation velocity of inorganic matter (m d-1), default = -1.0
-      cVSetPOM: 0.5                                             # maximum sedimentation velocity of POM (m d-1), default = -0.25
-      cVSetDiat: 0.5                                             # sedimentation velocity of diatoms (m d-1), default = 0.5
-      cVSetGren: 0.2                                             # sedimentation velocity of greens (m d-1), default = 0.2
-      cVSetBlue: 0.06                                            # sedimentation velocity of blue-greens (m d-1), default = 0.06
+      cVSedIM:  1.0                                              # maximum sedimentation velocity of inorganic matter (m d-1), default = 1.0
+      cVSedPOM: 0.5                                              # maximum sedimentation velocity of POM (m d-1), default = 0.25
+      cVSedDiat: 0.5                                             # sedimentation velocity of diatoms (m d-1), default = 0.5
+      cVSedGren: 0.2                                             # sedimentation velocity of greens (m d-1), default = 0.2
+      cVSedBlue: 0.06                                            # sedimentation velocity of blue-greens (m d-1), default = 0.06
       cRhoIM: 2500000.0                                          # density of sediment IM (g m-3), default = 2500000.0
       cRhoOM: 1400000.0                                          # density of sediment organic matter (g m-3), default = 1400000.0
       fDOrgSoil: 0.1                                             # fraction soil organic matter ([-]), default = 0.1
@@ -582,15 +582,15 @@ instances:
       cPDBlueMin: 0.0025                                         # minimum P/DW ratio for blue-greens (mgP/mgDW), default = 0.0025
       cNDBlueMax: 0.15                                           # maximum N/DW ratio for blue-greens (mgN/mgDW), default = 0.15
       cNDDiatMax: 0.05                                           # maximum N/DW ratio for diatoms (mgN/mgDW), default = 0.05
-      cNDGrenMax: 0.35                                           # maximum N/DW ratio for greens (mgN/mgDW), default = 0.1
+      cNDGrenMax: 0.1                                            # maximum N/DW ratio for greens (mgN/mgDW), default = 0.1
       cPDBlueMax: 0.025                                          # maximum P/DW ratio for blue-greens (mgP/mgDW), default = 0.025
       cPDDiatMax: 0.005                                          # maximum P/DW ratio for diatoms (mgP/mgDW), default = 0.005
-      cPDGrenMax: 0.035                                          # maximum P/DW ratio for greens (mgP/mgDW), default = 0.015
+      cPDGrenMax: 0.015                                          # maximum P/DW ratio for greens (mgP/mgDW), default = 0.015
       crt_shear: 0.005                                           # critical shear stress (N m-2), default = 0.005
       ref_shear: 1.0                                             # reference shear stress (N m-2), default = 1.0
       alpha: 9000.0                                              # gross rate of sediment erosion (9000-9900g m-2/d) (g m-2 d-1), default = 9000.0
       eta: 1.0                                                   # shear stress correction factor ([-]), default = 1.0
-      cVSetMain: 0.5                                             # depth averaged settling velocity (between 0.5-1.5m/d) (m d-1), default = 0.5
+      cVSedMain: 0.5                                             # depth averaged sedimentation velocity (between 0.5-1.5m/d) (m d-1), default = 0.5
       resusp_meth: 2                                             # 1=original PCLake resuspension function ([-]), default = 2
       tDDepoIM: 0.0                                              # inorganic matter atmospheric deposition (g m-2 d-1), default = 0.0
       tDDepoPOM: 0.0                                             # organic matter atmospheric deposition, dry weight (g m-2 d-1), default = 0.0
