@@ -224,8 +224,8 @@
    call self%register_state_dependency(self%id_diffPDOM,     'PDOM_diffusion_flux',             'g m-3', 'PDOM diffusion flux')
    call self%register_state_dependency(self%id_diffSiDOM,    'SiDOM_diffusion_flux',            'g m-3', 'SiDOM diffusion flux')
 !  Register diagnostic variables
-   call self%register_diagnostic_variable(self%id_afOxySed,       'afOxySed',       '[-]',       'fraction of aerobic sediment',        output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_aPEqIMS,        'aPEqIMS',        '[-]',       'equilibrium_absorbed_PO4',            output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_afOxySed,       'afOxySed',       '[-]',       'fraction of aerobic sediment',        output=output_instantaneous,domain=domain_bottom)
+   call self%register_diagnostic_variable(self%id_aPEqIMS,        'aPEqIMS',        '[-]',       'equilibrium adsorbed PO4',            output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_rPDPOMS,        'rPDPOMS',        '[-]',       'particulate organic matter P/D_ratio',output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_rNDPOMS,        'rNDPOMS',        '[-]',       'particulate organic matter N/D_ratio',output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_rPDDOMS,        'rPDDOMS',        '[-]',       'dissolved organic matter P/D_ratio',  output=output_instantaneous)
@@ -455,7 +455,7 @@
 !  oxygen_penetration_depth
    aDepthOxySed=(((2.0_rk * sO2W * akO2DifCor / tSOD) )** (0.5_rk))
 !  fraction_aerobic_sediment
-   afOxySed=aDepthOxySed/self%cDepthS
+   afOxySed=min(1.0, max(0.0_rk, aDepthOxySed/self%cDepthS))
 !  aerobic_mineralization_of POM
    tDMinOxyPOMS=afOxySed*(1.0_rk-self%fRefrPOMS)*tDMinPOMS
 !  aerobic_mineralization
