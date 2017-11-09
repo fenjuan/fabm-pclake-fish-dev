@@ -516,12 +516,12 @@
 !  case 1, without photoinhibition, Chalker (1980) model
       case(1)
 !  half-saturation light intensity at current temperature
-       uhLBlue=self%hLRefGren*uFunTmGren
+       uhLBlue=self%hLRefBlue*uFunTmBlue
 !  light limitation function for green algae, no photo-inhibition
        aLLimBlue= 1.0_rk /(extc * dz) * log((1.0_rk + uLPARSurf / uhLBlue) / (1.0_rk + aLPARBot /uhLBlue))
 !  case 2, Klepper et al. (1988) / Ebenhoh et al. (1997) model.
       case(2)
-       uOptBlue=uFunTmGren*self%cLOptRefBlue
+       uOptBlue=uFunTmBlue*self%cLOptRefBlue
        aLLimBlue = exp(1.0_rk) /(extc * dz) *(exp(- aLPARBot /uOptBlue) - exp(- uLPARSurf /uOptBlue))
    end select
 
