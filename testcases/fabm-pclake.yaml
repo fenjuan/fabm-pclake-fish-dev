@@ -419,7 +419,7 @@ instances:
       cTmOptFish: 25.0                                           # optimal temperature of zoo- and benthivorous fish (degree C), default = 25.0
       cSigTmFish: 10.0                                           # temperature constant of fish (sigma in Gaussian curve) (degree C), default = 10.0
       cDayReprFish: 120.0                                        # reproduction day of year for fish ([-]), default = 120.0
-      cDayAgeFish: 365.0                                         # aging day of year for fish ([-]), default = 365.0
+      cDayAgeFish: 360.0                                         # aging day of year for fish ([-]), default = 360.0
       fReprFish: 0.02                                            # yearly reproduction fraction of benthivorous fish, ([-]), default = 0.02
       fAgeFish: 0.5                                              # yearly ageing fraction of zooplanktivorous fish, ([-]), default = 0.5
       kDAssFiJv: 0.12                                            # maximum assimilation rate of zooplanktivorous fish (d-1), default = 0.12

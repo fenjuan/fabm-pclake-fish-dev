@@ -127,9 +127,9 @@
    call self%get_parameter(self%cSigTmFish,      'cSigTmFish',     'degree C',  'temperature constant of fish (sigma in Gaussian curve)',                         default=10.0_rk)
    call self%get_parameter(self%cDayReprFish,    'cDayReprFish',   '[-]',       'reproduction day of year for fish ',                                             default=120.0_rk)
 !  new parameter, fish aging day count: the day young fish become adult fish
-   call self%get_parameter(self%cDayAgeFish,    'cDayAgeFish',     '[-]',       'aging day of year for fish ',                                                    default=365.0_rk)
-   call self%get_parameter(self%fReprFish,       'fReprFish',      '[-]',       'yearly reproduction fraction of benthivorous fish, daily rate',                  default=0.02_rk)
-   call self%get_parameter(self%fAgeFish,        'fAgeFish',       '[-]',       'yearly ageing fraction of zooplanktivorous fish, daily rate',                    default=0.5_rk)
+   call self%get_parameter(self%cDayAgeFish,     'cDayAgeFish',     '[-]',      'aging day of year for fish ',                                                    default=360.0_rk, maximum=364.0_rk)
+   call self%get_parameter(self%fReprFish,       'fReprFish',      '[-]',       'yearly reproduction fraction of benthivorous fish, daily rate',                  default=0.02_rk,    scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%fAgeFish,        'fAgeFish',       '[-]',       'yearly ageing fraction of zooplanktivorous fish, daily rate',                    default=0.5_rk,     scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%kDAssFiJv,       'kDAssFiJv',      'd-1',       'maximum assimilation rate of zooplanktivorous fish',                             default=0.12_rk,    scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%hDZooFiJv,       'hDZooFiJv',      'g m-2',     'half-saturation zooplankton for zooplanktivorous fish predation',                default=1.25_rk)
    call self%get_parameter(self%fDAssFiJv,       'fDAssFiJv',      '[-]',       'C assimilation efficiency of zooplanktivorous fish',                             default=0.4_rk)
@@ -573,8 +573,8 @@
 !  fish reproduction
 !-----------------------------------------------------------------------
 !  Reproduction_flux_DW
-   if (Day == self%cDayReprFish) then
-      tDReprFish = self%fReprFish * sDFiAd/secs_pr_day
+   if (Day >= self%cDayReprFish .AND. Day <= self%cDayReprFish + 1.0_rk) then
+      tDReprFish = self%fReprFish * sDFiAd
    else
       tDReprFish =0.0_rk
    endif
@@ -586,8 +586,8 @@
 !  fish aging
 !-----------------------------------------------------------------------
 !  Ageing_DW
-   if (Day == self%cDayAgeFish) then
-      tDAgeFish = self%fAgeFish * sDFiJv/secs_pr_day
+   if (Day >= self%cDayAgeFish .AND. Day <= self%cDayAgeFish + 1.0_rk) then
+      tDAgeFish = self%fAgeFish * sDFiJv
    else
       tDAgeFish = 0.0_rk
    endif
