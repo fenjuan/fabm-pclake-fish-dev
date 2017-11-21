@@ -855,21 +855,6 @@
 !  chlorophyll-a_conc.
    oChlaBlue = mgPerg * rChDBlue * sDBlueW
 !-----------------------------------------------------------------------
-!  chla calculation, for output purpose
-!-----------------------------------------------------------------------
-!  chlorophyll-a/DW_ratio_Algae
-   rChDDiat = self%cChDDiatMax -(self%cChDDiatMax - self%cChDDiatMin) * aLLimDiat
-!  chlorophyll-a_conc.
-   oChlaDiat = mgPerg * rChDDiat * sDDiatW
-!  chlorophyll-a/DW_ratio_Algae
-   rChDGren = self%cChDGrenMax -(self%cChDGrenMax - self%cChDGrenMin) * aLLimGren
-!  chlorophyll-a_conc.
-   oChlaGren = mgPerg * rChDGren * sDGrenW
-!  chlorophyll-a/DW_ratio_Algae
-   rChDBlue = self%cChDBlueMax -(self%cChDBlueMax - self%cChDBlueMin) * aLLimBlue
-!  chlorophyll-a_conc.
-   oChlaBlue = mgPerg * rChDBlue * sDBlueW
-!-----------------------------------------------------------------------
 !  update local state variables
 !-----------------------------------------------------------------------
 !  updated diatom variables
