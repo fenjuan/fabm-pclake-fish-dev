@@ -247,10 +247,10 @@
    call self%register_diagnostic_variable(self%id_tPAbioHumS,     'tPAbioHumS',     'g m-2 s-1', 'abiotic_sediment_NHumS_change',       output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_tSiAbioSiO2S,   'tSiAbioSiO2S',   'g m-2 s-1', 'abiotic_sediment_SiO2_change',        output=output_instantaneous)
 #endif
-   call self%register_diagnostic_variable(self%id_tPdifPO4,       'tPdifPO4',       'g m-2 d-1', 'abiotic_sediment_PO4W_diffusion',     output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_tNdifNH4,       'tNdifNH4',       'g m-2 d-1', 'abiotic_sediment_NH4W_diffusion',     output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_tNdifNO3,       'tNdifNO3',       'g m-2 d-1', 'abiotic_sediment_NO3W_diffusion',     output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_tDAbioO2S,      'tDAbioO2S',      'g m-2 d-1', 'abiotic_sediment_O2_consumption',     output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_tPdifPO4,       'tPdifPO4',       'g m-2 d-1', 'abiotic_sediment_PO4W_diffusion',     output=output_instantaneous,domain=domain_bottom)
+   call self%register_diagnostic_variable(self%id_tNdifNH4,       'tNdifNH4',       'g m-2 d-1', 'abiotic_sediment_NH4W_diffusion',     output=output_instantaneous,domain=domain_bottom)
+   call self%register_diagnostic_variable(self%id_tNdifNO3,       'tNdifNO3',       'g m-2 d-1', 'abiotic_sediment_NO3W_diffusion',     output=output_instantaneous,domain=domain_bottom)
+   call self%register_diagnostic_variable(self%id_tDAbioO2S,      'tDAbioO2S',      'g m-2 d-1', 'abiotic_sediment_O2_consumption',     output=output_instantaneous,domain=domain_bottom)
 !  Register diagnostic variable for external dependencies
    call self%register_diagnostic_variable(self%id_tDAbioPOMS,     'tDAbioPOMS',     'g m-2 s-1', 'particulate organic matter change',   output=output_none)
    call self%register_diagnostic_variable(self%id_tDAbioHumS,     'tDAbioHumS',     'g m-2 s-1', 'Humus change',                        output=output_none)
@@ -584,9 +584,9 @@
 !  output diagnostic values for external usage
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tDAbioPOMS,tDAbioPOMS)
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tDAbioHumS,tDAbioHumS)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tPdifPO4,tPdifPO4/dz*secs_pr_day)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tNdifNH4,tNdifNH4/dz*secs_pr_day)
-   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tNdifNO3,tNdifNO3/dz*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tPdifPO4,tPdifPO4*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tNdifNH4,tNdifNH4*secs_pr_day)
+   _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tNdifNO3,tNdifNO3*secs_pr_day)
    _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tDAbioO2S,(-tO2MinTOMS - tO2NitrS)*secs_pr_day)
 #ifdef _DEVELOPMENT_
 !  output diagnostic variables for modular fluxes

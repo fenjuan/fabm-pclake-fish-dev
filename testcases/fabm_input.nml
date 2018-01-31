@@ -14,30 +14,7 @@
 !-------------------------------------------------------------------------------
 
 &observations
-   variable = 'abiotic_water_sNPOMW_inflow',
-   file = 'inflow_chem.dat',
-   index = 3,
-   relax_tau = 1e+15,
-!    constant_value = 3.0
-/
-
-!-------------------------------------------------------------------------------
-! scalar or profile data
-!-------------------------------------------------------------------------------
-! variable       [string]
-!                  name of variable - instance_varname[_streamname]
-! file           [string]
-!                  file name
-! index          [integer]
-!                  column # in file
-! relax_tau      [float, unit = s]
-!                  relaxation time
-! constant_value [float]
-!                  constant variable value
-!-------------------------------------------------------------------------------
-
-&observations
-   variable = 'abiotic_water_sNO3W_inflow',
+   variable = 'abiotic_water_sPPOMW_inflow',
    file = 'inflow_chem.dat',
    index = 1,
    relax_tau = 1e+15,
@@ -59,7 +36,7 @@
 !-------------------------------------------------------------------------------
 
 &observations
-   variable = 'abiotic_water_sNH4W_inflow',
+   variable = 'abiotic_water_sPDOMW_inflow',
    file = 'inflow_chem.dat',
    index = 2,
    relax_tau = 1e+15,
@@ -81,7 +58,51 @@
 !-------------------------------------------------------------------------------
 
 &observations
-   variable = 'abiotic_water_sPPOMW_inflow',
+   variable = 'abiotic_water_sPO4W_inflow',
+   file = 'inflow_chem.dat',
+   index = 3,
+   relax_tau = 1e+15,
+/
+
+!-------------------------------------------------------------------------------
+! scalar or profile data
+!-------------------------------------------------------------------------------
+! variable       [string]
+!                  name of variable - instance_varname[_streamname]
+! file           [string]
+!                  file name
+! index          [integer]
+!                  column # in file
+! relax_tau      [float, unit = s]
+!                  relaxation time
+! constant_value [float]
+!                  constant variable value
+!-------------------------------------------------------------------------------
+
+&observations
+   variable = 'abiotic_water_sNPOMW_inflow',
+   file = 'inflow_chem.dat',
+   index = 4,
+   relax_tau = 1e+15,
+/
+
+!-------------------------------------------------------------------------------
+! scalar or profile data
+!-------------------------------------------------------------------------------
+! variable       [string]
+!                  name of variable - instance_varname[_streamname]
+! file           [string]
+!                  file name
+! index          [integer]
+!                  column # in file
+! relax_tau      [float, unit = s]
+!                  relaxation time
+! constant_value [float]
+!                  constant variable value
+!-------------------------------------------------------------------------------
+
+&observations
+   variable = 'abiotic_water_sNDOMW_inflow',
    file = 'inflow_chem.dat',
    index = 5,
    relax_tau = 1e+15,
@@ -103,9 +124,9 @@
 !-------------------------------------------------------------------------------
 
 &observations
-   variable = 'abiotic_water_sPO4W_inflow',
+   variable = 'abiotic_water_sNO3W_inflow',
    file = 'inflow_chem.dat',
-   index = 4,
+   index = 6,
    relax_tau = 1e+15,
 /
 
@@ -123,10 +144,10 @@
 ! constant_value [float]
 !                  constant variable value
 !-------------------------------------------------------------------------------
-!&observations
-!   variable = 'abiotic_water_sO2W',
-!   file = 'DO_profile_obs.dat',
-!   index = 1,
-!   relax_tau = 86400.0,
-!/
 
+&observations
+   variable = 'abiotic_water_sNH4W_inflow',
+   file = 'inflow_chem.dat',
+   index = 7,
+   relax_tau = 1e+15,
+/
