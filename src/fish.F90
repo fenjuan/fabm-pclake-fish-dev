@@ -74,7 +74,9 @@
    real(rk)   :: cDFiJvMin,cDFiAdMin,cDPiscMin
 !  dissolved organic fraction from fish
    real(rk)   :: fFisDOMW
-
+!  piscvorous fish predtion methods
+   integer :: PredPisc
+   
    contains
 
 !  Model procedures
@@ -168,6 +170,8 @@
    call self%get_parameter(self%cRelVegFish,  'cRelVegFish',  '[-]',      'decrease of fish feeding per macrophytes cover (max. 0.01)',                           default=0.009_rk)
    call self%get_parameter(self%kDAssFiAd,    'kDAssFiAd',    'd-1',      'maximum assimilation rate of adult fish',                                              default=0.06_rk,   scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%hDBentFiAd,   'hDBentFiAd',   'g m-2',    'half-saturation constant for zoobenthos on adult fish',                                default=2.5_rk)
+!  Piscvorous predation method
+   call self%get_parameter(self%PredPisc,   'PredPisc',   '[-]',    'predation methods for piscvorous fish: 1 for pclake, 2 for foraging arena method',                                default=1)
 !  Register local state variable
 !  zooplanktivorous fish, transportation is turned off
    call self%register_state_variable(self%id_sDFiJv,'sDFiJv','gDW m-2','zooplanktivorous fish DW',     &
@@ -598,6 +602,8 @@
 !---------------------------------------------------------------------------
 !  Piscivorous fish assimilation 
 !---------------------------------------------------------------------------
+! Modification Nov.22nd, 2017, Fenjuan Hu(fenjuan@bios.au.dk)
+if (self%PredPisc == 1) then
 !  macrophytes_dependence_of_Pisc_growth_rate
    aFunVegPisc = aDSubVeg /(self%hDVegPisc + aDSubVeg + NearZero)
 !  food_limitation_function_of_Pisc
@@ -610,6 +616,9 @@
    tDEnvPisc = max(0.0_rk,akDIncrPisc / aDCarrPisc * sDPisc*sDPisc)
 !  assimilation_of_Pisc
    tDAssPisc = aDSatPisc *(self%kDAssPisc * aFunVegPisc * uFunTmPisc * sDPisc - tDEnvPisc)
+else
+    tDAssPisc = 0.0_rk
+endif   
 !-----------------------------------------------------------------------
 !  Piscivorous fish consumption
 !-----------------------------------------------------------------------

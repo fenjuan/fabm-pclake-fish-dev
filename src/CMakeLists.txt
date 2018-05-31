@@ -14,6 +14,7 @@ add_library(fabm_models_pclake OBJECT
             utility.F90
             zoobenthos.F90
             zooplankton.F90
+			foraging_arena.F90
            )
 
 add_dependencies(fabm_models_pclake fabm_base)

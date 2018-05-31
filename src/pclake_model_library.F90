@@ -18,6 +18,7 @@ module pclake_model_library
    use pclake_fish
    use pclake_zoobenthos
    use pclake_auxiliary
+   use foraging_arena
 
    implicit none
 
@@ -53,6 +54,7 @@ contains
          case ('fish');                   allocate(type_pclake_fish::model);
          case ('zoobenthos');             allocate(type_pclake_zoobenthos::model);
          case ('auxiliary');              allocate(type_pclake_auxiliary::model);
+         case ('foraging_arena');         allocate(type_foraging_arena::model);
          case default
             call self%type_base_model_factory%create(name,model)
        end select
