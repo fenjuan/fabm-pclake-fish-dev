@@ -22,6 +22,8 @@
    type (type_horizontal_diagnostic_variable_id)       :: id_aVulPrey, id_tPred
 !  foraging arena theory parameters
    real(rk)   :: cEffPred,cVulPrey
+!  the assimilation efficiency parameter
+   real(rk)   :: fAssPred
 
    contains
 
@@ -66,6 +68,8 @@
 !  definition of vulnerable factor for prey: prey exchange between the vulnerable and invulnerable states at instantaneous rates v, so vulerable status prey gains 
 !  biomass at rate of v*(N-V), where N is the total prey, and V is the vulnerable part of prey, here v = cVulPrey
    call self%get_parameter(self%cVulPrey,     'cVulPrey',     '/day',          'vulnerable factor of prey',                                                default=1.0_rk)
+!  The assimilation efficiency factor is the percentage of how much biomass flow get into the predator. ranging from 0.0 to 1.0
+   call self%get_parameter(self%fAssPred,     'fAssPred',     '[-]',          'the assimilation effieciency of predator',                                  default=1.0_rk)
 !  Register local state variable
 !  register prey pointer and predator pointer
    call self%register_state_dependency(self%id_prey,     'forgaing_arena_prey',     'g m-2', 'forgaing arena prey')
@@ -114,7 +118,7 @@
 
 !  update abiotic variables in water
    _SET_ODE_BEN_(self%id_prey, -tPred)
-   _SET_ODE_BEN_(self%id_predator, tPred)
+   _SET_ODE_BEN_(self%id_predator, tPred * self%fAssPred)
 !-----------------------------------------------------------------------
 !  output diagnostic variables for external links
 !-----------------------------------------------------------------------

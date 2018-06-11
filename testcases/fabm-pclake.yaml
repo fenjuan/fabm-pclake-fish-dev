@@ -459,10 +459,6 @@ instances:
       kDAssFiAd: 0.06                                            # maximum assimilation rate of adult fish (d-1), default = 0.06
       hDBentFiAd: 2.5                                            # half-saturation constant for zoobenthos on adult fish (g m-2), default = 2.5
       PredPisc: 2
-#      PredPisc: 1
-#      cEffPisc: 0.01
-#      cVulFiJv: 0.9
-#      cVulFiAd: 0.9
     initialization:
       sDFiJv: 0.25                                               # zooplanktivorous fish dry weight (gDW m-2)
       sPFiJv: 0.0055                                             # zooplanktivorous fish phosphorus content (gP m-2)
@@ -470,7 +466,7 @@ instances:
       sDFiAd: 1.0                                                # benthivorous fish dry weight (gDW m-2)
       sPFiAd: 0.022                                              # benthivorous fish phosphorus content (gP m-2)
       sNFiAd: 0.1                                                # benthivorous fish nitrogen content (gN m-2)
-      sDPisc: 0.05                                              # piscivorous fish dry weight (gDW m-2)
+      sDPisc: 0.5                                              # piscivorous fish dry weight (gDW m-2)
     coupling:
       POM_DW_pool_water: abiotic_water/sDPOMW                    # POM DW pool in water (g m-3)
       POM_N_pool_water: abiotic_water/sNPOMW                     # POM N pool in water (g m-3)
@@ -488,33 +484,36 @@ instances:
       zoobenthos_P_Food: zoobenthos/sPBent                       # zoobenthos P Food (g m-3)
       macrophytes_coverage: macrophytes/aCovVeg                  # macrophytes coverage ([-])
       submerged_macrophytes: macrophytes/aDSubVeg                # submerged macrophytes dry weight (g m-2)
-#  foraging_arena_dry_weight:
-#    long_name: foraging_arena_dry-weight
-#    model: pclake/foraging_arena
-#    parameters:
-#      cEffPred: 0.01 
-#      cVulPrey: 0.9
-#    coupling:
-#      forgaing_arena_prey: fish/sDFiJv
-#      foraging_arena_predator: fish/sDPisc
-#  foraging_arena_nitrogen:
-#    long_name: foraging_arena_nitrogen
-#    model: pclake/foraging_arena
-#    parameters:
-#      cEffPred: 0.001 
-#      cVulPrey: 0.9
-#    coupling:
-#      forgaing_arena_prey: fish/sNFiJv
-#      foraging_arena_predator: fish/sDPisc
-#  foraging_arena_phsphorus:
-#    long_name: foraging_arena_phosphorus
-#    model: pclake/foraging_arena
-#    parameters:
-#      cEffPred: 0.0001 
-#      cVulPrey: 0.9
-#    coupling:
-#      forgaing_arena_prey: fish/sPFiJv
-#      foraging_arena_predator: fish/sDPisc
+  foraging_arena_dry_weight:
+    long_name: foraging_arena_dry-weight
+    model: pclake/foraging_arena
+    parameters:
+      cEffPred: 0.01
+      cVulPrey: 0.9
+      fAssPred: 0.5
+    coupling:
+      forgaing_arena_prey: fish/sDFiJv
+      foraging_arena_predator: fish/sDPisc
+  foraging_arena_nitrogen:
+    long_name: foraging_arena_nitrogen
+    model: pclake/foraging_arena
+    parameters:
+      cEffPred: 0.01 
+      cVulPrey: 0.9
+      fAssPred: 0.5
+    coupling:
+      forgaing_arena_prey: fish/sNFiJv
+      foraging_arena_predator: fish/sDPisc
+  foraging_arena_phsphorus:
+    long_name: foraging_arena_phosphorus
+    model: pclake/foraging_arena
+    parameters:
+      cEffPred: 0.01 
+      cVulPrey: 0.9
+      fAssPred: 0.5
+    coupling:
+      forgaing_arena_prey: fish/sPFiJv
+      foraging_arena_predator: fish/sDPisc
   zoobenthos:
     long_name: zoobenthos
     model: pclake/zoobenthos

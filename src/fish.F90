@@ -603,7 +603,8 @@
 !  Piscivorous fish assimilation 
 !---------------------------------------------------------------------------
 ! Modification Nov.22nd, 2017, Fenjuan Hu(fenjuan@bios.au.dk)
-if (self%PredPisc == 1) then
+! Modification June 11th, 2018. use select case instead of if, that user can use other defined predation methods
+! for example, foraging arena, IBM(individual based model) etc. 
 !  macrophytes_dependence_of_Pisc_growth_rate
    aFunVegPisc = aDSubVeg /(self%hDVegPisc + aDSubVeg + NearZero)
 !  food_limitation_function_of_Pisc
@@ -614,11 +615,13 @@ if (self%PredPisc == 1) then
    aDCarrPisc = max(self%cDCarrPiscMin,min(self%cDCarrPiscMax,self%cDCarrPiscBare))
 !  environmental_correction_of_Pisc
    tDEnvPisc = max(0.0_rk,akDIncrPisc / aDCarrPisc * sDPisc*sDPisc)
+select case(self%PredPisc)
+   case(1) 
 !  assimilation_of_Pisc
-   tDAssPisc = aDSatPisc *(self%kDAssPisc * aFunVegPisc * uFunTmPisc * sDPisc - tDEnvPisc)
-else
-    tDAssPisc = 0.0_rk
-endif   
+      tDAssPisc = aDSatPisc *(self%kDAssPisc * aFunVegPisc * uFunTmPisc * sDPisc - tDEnvPisc)
+   case(2)
+      tDAssPisc = 0.0000001_rk/secs_pr_day
+end select
 !-----------------------------------------------------------------------
 !  Piscivorous fish consumption
 !-----------------------------------------------------------------------
