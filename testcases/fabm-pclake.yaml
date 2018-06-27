@@ -458,7 +458,6 @@ instances:
       cRelVegFish: 0.009                                         # decrease of fish feeding per macrophytes cover (max. 0.01) ([-]), default = 0.009
       kDAssFiAd: 0.06                                            # maximum assimilation rate of adult fish (d-1), default = 0.06
       hDBentFiAd: 2.5                                            # half-saturation constant for zoobenthos on adult fish (g m-2), default = 2.5
-      PredPisc: 2
     initialization:
       sDFiJv: 0.25                                               # zooplanktivorous fish dry weight (gDW m-2)
       sPFiJv: 0.0055                                             # zooplanktivorous fish phosphorus content (gP m-2)
@@ -484,8 +483,9 @@ instances:
       zoobenthos_P_Food: zoobenthos/sPBent                       # zoobenthos P Food (g m-3)
       macrophytes_coverage: macrophytes/aCovVeg                  # macrophytes coverage ([-])
       submerged_macrophytes: macrophytes/aDSubVeg                # submerged macrophytes dry weight (g m-2)
-  foraging_arena_dry_weight:
-    long_name: foraging_arena_dry-weight
+# the module name is defined based on the predator
+  foraging_arena_pisc_dw:
+    long_name: piscvorous_predation_dry-weight
     model: pclake/foraging_arena
     parameters:
       cEffPred: 0.01
@@ -494,8 +494,8 @@ instances:
     coupling:
       forgaing_arena_prey: fish/sDFiJv
       foraging_arena_predator: fish/sDPisc
-  foraging_arena_nitrogen:
-    long_name: foraging_arena_nitrogen
+  foraging_arena_pisc_n:
+    long_name: piscvorous_predation_nitrogen
     model: pclake/foraging_arena
     parameters:
       cEffPred: 0.01 
@@ -504,8 +504,8 @@ instances:
     coupling:
       forgaing_arena_prey: fish/sNFiJv
       foraging_arena_predator: fish/sDPisc
-  foraging_arena_phsphorus:
-    long_name: foraging_arena_phosphorus
+  foraging_arena_pisc_p:
+    long_name: piscvorous_predation_phosphorus
     model: pclake/foraging_arena
     parameters:
       cEffPred: 0.01 

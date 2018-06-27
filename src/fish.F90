@@ -74,8 +74,7 @@
    real(rk)   :: cDFiJvMin,cDFiAdMin,cDPiscMin
 !  dissolved organic fraction from fish
    real(rk)   :: fFisDOMW
-!  piscvorous fish predtion methods
-   integer :: PredPisc
+
    
    contains
 
@@ -170,8 +169,6 @@
    call self%get_parameter(self%cRelVegFish,  'cRelVegFish',  '[-]',      'decrease of fish feeding per macrophytes cover (max. 0.01)',                           default=0.009_rk)
    call self%get_parameter(self%kDAssFiAd,    'kDAssFiAd',    'd-1',      'maximum assimilation rate of adult fish',                                              default=0.06_rk,   scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%hDBentFiAd,   'hDBentFiAd',   'g m-2',    'half-saturation constant for zoobenthos on adult fish',                                default=2.5_rk)
-!  Piscvorous predation method
-   call self%get_parameter(self%PredPisc,   'PredPisc',   '[-]',    'predation methods for piscvorous fish: 1 for pclake, 2 for foraging arena method',                                default=1)
 !  Register local state variable
 !  zooplanktivorous fish, transportation is turned off
    call self%register_state_variable(self%id_sDFiJv,'sDFiJv','gDW m-2','zooplanktivorous fish DW',     &
@@ -442,6 +439,9 @@
    tDEnvFiJv = max(0.0_rk,ukDIncrFiJv /(self%cDCarrFish - sDFiAd) * sDFiJv*sDFiJv)
 !  assimilation_of_fish
    tDAssFiJv = aDSatFiJv *(self%kDAssFiJv * uFunTmFish * sDFiJv - tDEnvFiJv)
+#ifdef _FORAGING_ARENA_
+   tDAssFiJv = 0.0000001_rk/secs_pr_day
+#endif
 !-----------------------------------------------------------------------
 !  zooplankton predated by fish
 !-----------------------------------------------------------------------
@@ -517,6 +517,9 @@
    tDEnvFiAd = max(0.0_rk,ukDIncrFiAd /(self%cDCarrFish - sDFiJv) * sDFiAd*sDFiAd)
 !  assimilation_of_fish
    tDAssFiAd = aDSatFiAd *(self%kDAssFiAd * uFunTmFish * sDFiAd - tDEnvFiAd)
+#ifdef _FORAGING_ARENA_
+   tDAssFiAd = 0.0000001_rk/secs_pr_day
+#endif
 !-----------------------------------------------------------------------
 !  benthivorous fish assimilation_P
 !-----------------------------------------------------------------------
@@ -615,13 +618,11 @@
    aDCarrPisc = max(self%cDCarrPiscMin,min(self%cDCarrPiscMax,self%cDCarrPiscBare))
 !  environmental_correction_of_Pisc
    tDEnvPisc = max(0.0_rk,akDIncrPisc / aDCarrPisc * sDPisc*sDPisc)
-select case(self%PredPisc)
-   case(1) 
 !  assimilation_of_Pisc
-      tDAssPisc = aDSatPisc *(self%kDAssPisc * aFunVegPisc * uFunTmPisc * sDPisc - tDEnvPisc)
-   case(2)
-      tDAssPisc = 0.0000001_rk/secs_pr_day
-end select
+   tDAssPisc = aDSatPisc *(self%kDAssPisc * aFunVegPisc * uFunTmPisc * sDPisc - tDEnvPisc)
+#ifdef _FORAGING_ARENA_
+   tDAssPisc = 0.0000001_rk/secs_pr_day
+#endif
 !-----------------------------------------------------------------------
 !  Piscivorous fish consumption
 !-----------------------------------------------------------------------
@@ -726,7 +727,6 @@ end select
    tNFiAd = tNMigrFiAd - tNExcrFiAd - tNMortFiAd - tNReprFish - tNConsFiAdPisc + tNAgeFish 
 !  total_fish_flux_of_DW_in_predatory_fish
    tDPisc = tDMigrPisc + tDAssPisc - tDRespPisc - tDMortPisc
-
 !=======================================================================
 !  fish processes relating to other modules
 !=======================================================================

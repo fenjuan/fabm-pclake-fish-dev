@@ -31,6 +31,9 @@ if(FABM_EMBED_VERSION)
   add_dependencies(fabm_models_pclake fabm_models_pclake_version)
 endif()
 
+
+# added by F.Hu, for foraging arena test
+add_definitions(-D_FORAGING_ARENA_)
 #-----------------------------------------------------------------------
 # Copyright (C) 2017 - AU
 #-----------------------------------------------------------------------
