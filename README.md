@@ -19,9 +19,29 @@ The original PCLake model was published in:
 * Karsten Bolding: bolding@bios.au.dk
 * Anders Nielsen: an@bios.au.dk
 
+## The foraging arena function implementation in FABM-PCLake
+In CMakeList.txt, added switches for turning on foraging arena functions, as followed:
+```
+# turn on foraging arena connection between piscvorous fish and zooplanktivorous and zoobenthivorous fish
+add_definitions(-D_FORAGING_ARENA_Pisc_)
+# turn on foraging arena connection between zooplankton and zooplanktivorous fish
+add_definitions(-D_FORAGING_ARENA_FiJv_)
+# turn on foraging arena connection between zoobenthos and benthivorous fish
+add_definitions(-D_FORAGING_ARENA_FiAd_)
+# turn on foraging arena connection between phytoplankton and zooplankton
+add_definitions(-D_FORAGING_ARENA_Zoo_)
+```
+If the lines are activated, the foraging arena functions are turned on.
+In zooplankton.F90 and fish.F90, added lines that's needed for Foraging arena and wrapped with the switchers, such as 
+`
+#ifdef _FORAGING_ANENA_ZOO_
+lines for foraging arena functions
+#endif 
+`
 
 
-## Revision history
+
+## Revision history for FABM-PCLake
 Original implementation of FABM-PCLake: xx Dec. 2016, by Fenjuan Hu and AU developer team
 
 
