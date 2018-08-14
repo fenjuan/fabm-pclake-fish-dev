@@ -56,7 +56,14 @@
    real(rk)   :: cDZooMin
 !  dissolved fraction of organic matter
    real(rk)   :: fZooDOMW
-
+#ifdef _FORAGING_ARENA_Zoo_
+!  output diagnotic variables of foraging arena
+  type (type_horizontal_diagnostic_variable_id)   :: id_aVulPhyto, id_wDPredZoo
+!  foraging arena parametes
+   real(rk)   :: cEffZoo, cVulPhyto
+#endif
+   
+   
    contains
 
 !  Model procedures
@@ -128,7 +135,12 @@
 !  the user defined minumun value for state variables
    call self%get_parameter(self%cDZooMin,      'cDZooMin',      'gDW/m3',    'minimum zooplankton biomass in system',                                   default=0.00001_rk)
    call self%get_parameter(self%fZooDOMW,   'fZooDOMW',   '[-]',       'dissolved organic fraction from zooplankton',                                   default=0.5_rk)
-   
+#ifdef _FORAGING_ARENA_Zoo_
+   call self%get_parameter(self%cEffZoo,   'cEffZoo',     '[-]',    'effective search rate of zooplankton',                                       default=1.0_rk)
+   call self%get_parameter(self%cVulPhyto,     'cVulPhyto',     '/day',          'vulnerable factor of phytoplankton',                                    default=1.0_rk)
+   call self%register_diagnostic_variable(self%id_wDPredZoo,    'wPredZoo',      'g m-2 day-1','zooplanktivorous fish predation rate, foraging arena', output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aVulPhyto, 'aVulPhyto',   'g m-2',      'vulnerable phytoplanktons',               output=output_instantaneous)
+#endif
 !  Register local state variable
 !  zooplankton
    call self%register_state_variable(self%id_sDZoo,'sDZoo','gDW m-3','zooplankton DW',     &
@@ -264,6 +276,10 @@
    real(rk)     :: wDZooGrenW,wNZooGrenW,wPZooGrenW
 !  variables for exchange of green algae
    real(rk)     :: wDZooBlueW,wNZooBlueW,wPZooBlueW
+#ifdef _FORAGING_ARENA_Zoo_
+   real(rk)     :: aVulPhyto, wDPredZoo
+#endif
+
 !EOP
 !-----------------------------------------------------------------------
 !BOC
@@ -384,6 +400,14 @@
    wDEnvZoo = max(0.0_rk,ukDIncrZoo / self%cDCarrZoo * sDZoo*sDZoo)
 !  assimilation_of_zooplankton
    wDAssZoo = aDSatZoo *(ukDAssTmZoo * sDZoo - wDEnvZoo)
+#ifdef _FORAGING_ARENA_Zoo_
+!  the vulnerable fraction of juvenile fish
+   aVulPhyto = oDPhytW * self%cVulPhyto/(2.0_rk * self%cVulPhyto + self%cEffZoo * sDZoo)
+!  the predation rate of piscvorous fish on juvenile fish
+   wDPredZoo = self%cEffZoo * aVulPhyto * sDZoo/secs_pr_day
+   wDAssZoo = wDPredZoo
+!   print *, 'Im foraging arena in zoo'
+#endif
 !-----------------------------------------------------------------------
 !  zooplankton assimilation N
 !-----------------------------------------------------------------------
@@ -622,6 +646,12 @@
    _SET_DIAGNOSTIC_(self%id_wNZooBlueW, wNZooBlueW*secs_pr_day)
    _SET_DIAGNOSTIC_(self%id_wPZooBlueW, wPZooBlueW*secs_pr_day)
 #endif
+#ifdef _FORAGING_ARENA_
+      _SET_HORIZONTAL_DIAGNOSTIC_(self%id_aVulPhyto, aVulPhyto)
+      _SET_HORIZONTAL_DIAGNOSTIC_(self%id_wDPredZoo, wDPredZoo * 86400.0_rk)
+#endif
+
+
 ! Spatial loop end
    _LOOP_END_
 

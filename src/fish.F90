@@ -74,7 +74,24 @@
    real(rk)   :: cDFiJvMin,cDFiAdMin,cDPiscMin
 !  dissolved organic fraction from fish
    real(rk)   :: fFisDOMW
-
+#ifdef _FORAGING_ARENA_Pisc_
+!  output diagnotic variables of foraging arena
+  type (type_horizontal_diagnostic_variable_id)   :: id_aVulFiJv, id_aVulFiAd, id_tDPredPisc
+!  foraging arena parametes
+   real(rk)   :: cEffPisc, cVulFiAd, cVulFiJv
+#endif
+#ifdef _FORAGING_ARENA_FiJv_
+!  output diagnotic variables of foraging arena
+  type (type_horizontal_diagnostic_variable_id)   :: id_aVulZoo, id_tDPredFiZo
+!  foraging arena parametes
+   real(rk)   :: cEffFiJv, cVulZoo
+#endif
+#ifdef _FORAGING_ARENA_FiAd_
+!  output diagnotic variables of foraging arena
+  type (type_horizontal_diagnostic_variable_id)   :: id_aVulBen, id_tDPredFiBe
+!  foraging arena parametes
+   real(rk)   :: cEffFiAd, cVulBen
+#endif
    
    contains
 
@@ -169,6 +186,26 @@
    call self%get_parameter(self%cRelVegFish,  'cRelVegFish',  '[-]',      'decrease of fish feeding per macrophytes cover (max. 0.01)',                           default=0.009_rk)
    call self%get_parameter(self%kDAssFiAd,    'kDAssFiAd',    'd-1',      'maximum assimilation rate of adult fish',                                              default=0.06_rk,   scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%hDBentFiAd,   'hDBentFiAd',   'g m-2',    'half-saturation constant for zoobenthos on adult fish',                                default=2.5_rk)
+#ifdef _FORAGING_ARENA_Pisc_
+   call self%get_parameter(self%cEffPisc,   'cEffPisc',     '[-]',    'effective search rate of piscvorous fish',                                       default=0.1_rk)
+   call self%get_parameter(self%cVulFiJv,     'cVulFiJv',     '/day',          'vulnerable factor of juvenile fish',                                    default=0.5_rk)
+   call self%get_parameter(self%cVulFiAd,     'cVulFiAd',     '/day',          'vulnerable factor of adult fish',                                       default=0.5_rk)
+   call self%register_diagnostic_variable(self%id_tDPredPisc,    'tPredPisc',      'g m-2 day-1','piscvorous predation rate, foraging arena', output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aVulFiJv, 'aVulFiJv',   'g m-2',      'vulnerable juvenile fish',               output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aVulFiAd, 'aVulFiAd',   'g m-2',      'vulnerable adult fish',               output=output_instantaneous)
+#endif
+#ifdef _FORAGING_ARENA_FiJv_
+   call self%get_parameter(self%cEffFiJv,   'cEffFiJv',     '[-]',    'effective search rate of zooplankivorous fish',                                       default=0.1_rk)
+   call self%get_parameter(self%cVulZoo,     'cVulZoo',     '/day',          'vulnerable factor of zooplankton',                                    default=0.5_rk)
+   call self%register_diagnostic_variable(self%id_tDPredFiZo,    'tPredFiZo',      'g m-2 day-1','zooplanktivorous fish predation rate, foraging arena', output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aVulZoo, 'aVulZoo',   'g m-2',      'vulnerable zooplanktons',               output=output_instantaneous)
+#endif
+#ifdef _FORAGING_ARENA_FiAd_
+   call self%get_parameter(self%cEffFiAd,   'cEffFiAd',     '[-]',    'effective search rate of benthivorous fish',                                       default=0.1_rk)
+   call self%get_parameter(self%cVulBen,     'cVulBen',     '/day',          'vulnerable factor of zoobenthos',                                    default=0.5_rk)
+   call self%register_diagnostic_variable(self%id_tDPredFiBe,    'tPredFiBe',      'g m-2 day-1','benthivorous fish predation rate, foraging arena', output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aVulBen, 'aVulBen',   'g m-2',      'vulnerable zoobenthos',               output=output_instantaneous)
+#endif
 !  Register local state variable
 !  zooplanktivorous fish, transportation is turned off
    call self%register_state_variable(self%id_sDFiJv,'sDFiJv','gDW m-2','zooplanktivorous fish DW',     &
@@ -345,6 +382,16 @@
    real(rk)     :: tDEgesFiAd,tNEgesFiAd,tPEgesFiAd
    real(rk)     :: tNEgesFiAdNH4,tPEgesFiAdPO4,tNEgesFiAdTOM,tPEgesFiAdTOM
 
+#ifdef _FORAGING_ARENA_Pisc_
+   real(rk)     :: aVulFiJv, tDPredPiJv,aVulFiAd, tDPredPiAd,tDPredPisc
+#endif
+#ifdef _FORAGING_ARENA_FiJv_
+   real(rk)     :: aVulZoo, tDPredFiZo
+#endif
+#ifdef _FORAGING_ARENA_FiJv_
+   real(rk)     :: aVulBen, tDPredFiBe
+#endif
+   
 #ifdef _DEVELOPMENT_
    integer, save :: n=0
 #endif
@@ -439,8 +486,13 @@
    tDEnvFiJv = max(0.0_rk,ukDIncrFiJv /(self%cDCarrFish - sDFiAd) * sDFiJv*sDFiJv)
 !  assimilation_of_fish
    tDAssFiJv = aDSatFiJv *(self%kDAssFiJv * uFunTmFish * sDFiJv - tDEnvFiJv)
-#ifdef _FORAGING_ARENA_
-   tDAssFiJv = 0.0000001_rk/secs_pr_day
+#ifdef _FORAGING_ARENA_FiJv_
+!  the vulnerable fraction of juvenile fish
+   aVulZoo = sDZoo * self%cVulZoo/(2.0_rk * self%cVulZoo + self%cEffFiJv * sDFiJv)
+!  the predation rate of piscvorous fish on juvenile fish
+   tDPredFiZo = self%cEffFiJv * aVulZoo * sDFiJv/secs_pr_day
+   tDAssFiJv = tDPredFiZo
+!   print *, ' Im foraging arena of Jv'
 #endif
 !-----------------------------------------------------------------------
 !  zooplankton predated by fish
@@ -517,8 +569,13 @@
    tDEnvFiAd = max(0.0_rk,ukDIncrFiAd /(self%cDCarrFish - sDFiJv) * sDFiAd*sDFiAd)
 !  assimilation_of_fish
    tDAssFiAd = aDSatFiAd *(self%kDAssFiAd * uFunTmFish * sDFiAd - tDEnvFiAd)
-#ifdef _FORAGING_ARENA_
-   tDAssFiAd = 0.0000001_rk/secs_pr_day
+#ifdef _FORAGING_ARENA_FiAd_
+!  the vulnerable fraction of juvenile fish
+   aVulBen = sDBent * self%cVulBen/(2.0_rk * self%cVulBen + self%cEffFiAd * sDFiAd)
+!  the predation rate of piscvorous fish on juvenile fish
+   tDPredFiBe = self%cEffFiAd * aVulBen * sDFiAd/secs_pr_day
+   tDAssFiAd = tDPredFiBe
+!   print *, ' Im foraging arena of Ad'
 #endif
 !-----------------------------------------------------------------------
 !  benthivorous fish assimilation_P
@@ -620,8 +677,19 @@
    tDEnvPisc = max(0.0_rk,akDIncrPisc / aDCarrPisc * sDPisc*sDPisc)
 !  assimilation_of_Pisc
    tDAssPisc = aDSatPisc *(self%kDAssPisc * aFunVegPisc * uFunTmPisc * sDPisc - tDEnvPisc)
-#ifdef _FORAGING_ARENA_
-   tDAssPisc = 0.0000001_rk/secs_pr_day
+#ifdef _FORAGING_ARENA_Pisc_
+!  the vulnerable fraction of juvenile fish
+   aVulFiJv = sDFiJv * self%cVulFiJv/(2.0_rk * self%cVulFiJv + self%cEffPisc * sDPisc)
+!  the predation rate of piscvorous fish on juvenile fish
+   tDPredPiJv = self%cEffPisc * aVulFiJv * sDPisc/secs_pr_day
+!  the vulnerable fraction of adult fish
+   aVulFiAd = sDFiAd * self%cVulFiAd/(2.0_rk * self%cVulFiAd + self%cEffPisc * sDPisc)
+!  the predation rate of piscvorous fish on adult fish
+   tDPredPiAd = self%cEffPisc * aVulFiAd * sDPisc/secs_pr_day
+! the total predation rate of piscvorous fish
+   tDPredPisc = tDPredPiJv + tDPredPiAd
+   tDAssPisc = tDPredPisc
+!   print *, ' Im foraging arena of Pisc'
 #endif
 !-----------------------------------------------------------------------
 !  Piscivorous fish consumption
@@ -844,7 +912,7 @@
    _SET_ODE_BEN_(self%id_sDFiAd,tDFiAd)
    _SET_ODE_BEN_(self%id_sPFiAd,tPFiAd)
    _SET_ODE_BEN_(self%id_sNFiAd,tNFiAd)
-   _SET_ODE_BEN_(self%id_sDPisc,tDPisc)   
+   _SET_ODE_BEN_(self%id_sDPisc,tDPisc)
 !-----------------------------------------------------------------------
 !  Update external state variables
 !-----------------------------------------------------------------------
@@ -901,6 +969,15 @@
       _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tPFishPOMW, 0.0_rk)
    endif
    n=n+1
+#endif
+#ifdef _FORAGING_ARENA_Pisc_
+      _SET_HORIZONTAL_DIAGNOSTIC_(self%id_aVulFiAd, aVulFiAd)
+      _SET_HORIZONTAL_DIAGNOSTIC_(self%id_aVulFiJv, aVulFiJv)
+      _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tDPredPisc, tDPredPisc * 86400.0_rk)
+#endif
+#ifdef _FORAGING_ARENA_FiJv_
+      _SET_HORIZONTAL_DIAGNOSTIC_(self%id_aVulZoo, aVulZoo)
+      _SET_HORIZONTAL_DIAGNOSTIC_(self%id_tDPredFiZo, tDPredFiZo * 86400.0_rk)
 #endif
 ! Horizontal loop end
 !   _LOOP_END_

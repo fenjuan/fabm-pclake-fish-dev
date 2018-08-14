@@ -14,7 +14,7 @@ add_library(fabm_models_pclake OBJECT
             utility.F90
             zoobenthos.F90
             zooplankton.F90
-			foraging_arena.F90
+#			foraging_arena.F90
            )
 
 add_dependencies(fabm_models_pclake fabm_base)
@@ -33,7 +33,14 @@ endif()
 
 
 # added by F.Hu, for foraging arena test
-add_definitions(-D_FORAGING_ARENA_)
+# turn on foraging arena connection between piscvorous fish and zooplanktivorous and zoobenthivorous fish
+add_definitions(-D_FORAGING_ARENA_Pisc_)
+# turn on foraging arena connection between zooplankton and zooplanktivorous fish
+add_definitions(-D_FORAGING_ARENA_FiJv_)
+# turn on foraging arena connection between zoobenthos and benthivorous fish
+add_definitions(-D_FORAGING_ARENA_FiAd_)
+# turn on foraging arena connection between phytoplankton and zooplankton
+add_definitions(-D_FORAGING_ARENA_Zoo_)
 #-----------------------------------------------------------------------
 # Copyright (C) 2017 - AU
 #-----------------------------------------------------------------------
