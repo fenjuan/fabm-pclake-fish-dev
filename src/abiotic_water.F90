@@ -343,6 +343,8 @@
    wNMinPOMW = self%kNMinPOMW * uFunTmMinPOMW * sNPOMW
 !  particulate_OM_Si mineralization
    wSiMinPOMW = self%kSiMinPOMW * uFunTmMinPOMW * sSiPOMW
+!  correction_of_O2_demand_in_water_at_low_oxygen_conc.
+   aCorO2BOD = sO2W / (self%hO2BOD + sO2W)
 !  O2 comsuption for step POM to DOM
    wO2MinPOMW = molO2molC * self%cCPerDW * aCorO2BOD * wDMinPOMW
 !-----------------------------------------------------------------------
@@ -361,8 +363,6 @@
 !-----------------------------------------------------------------------
 !  Phosphorus adsorption
 !-----------------------------------------------------------------------
-!  correction_of_O2_demand_in_water_at_low_oxygen_conc.
-   aCorO2BOD = sO2W / (self%hO2BOD + sO2W)
 !  max._P_adsorption_per_g_inorg._matter_in_water
    aPAdsMaxW = self%cRelPAdsD+aCorO2BOD*self%cRelPAdsFe*self%fFeDIM+ &
    & self%cRelPAdsAl*self%fAlDIM
