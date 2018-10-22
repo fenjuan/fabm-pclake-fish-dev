@@ -184,7 +184,7 @@
                                     initial_value=0.002_rk,minimum=self%cDVegMin * self%cPDVegMin)
 !  register diagnostic variables
    call self%register_diagnostic_variable(self%id_aDSubVeg,       'aDSubVeg',       'gDW m-2',    'aDSubVeg',                         output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_aCovVeg,        'aCovVeg',        '%',          'aCovVeg',                          output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_aCovVeg,        'aCovVeg',        '%',          'aCovVeg',                          output=output_instantaneous,domain=domain_bottom)
    call self%register_diagnostic_variable(self%id_afCovSurfVeg,   'afCovSurfVeg',   '[-]',        'afCovSurfVeg',                     output=output_none)
    call self%register_diagnostic_variable(self%id_aDayInitVeg,    'aDayInitVeg',    'd',          'aDayInitVeg',                      output=output_none)
    call self%register_diagnostic_variable(self%id_aNutLimVeg,     'aNutLimVeg',     '[-]',        'nutrient limitation factor',       output=output_instantaneous,domain=domain_bottom)
