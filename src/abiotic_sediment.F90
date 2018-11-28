@@ -458,12 +458,12 @@
    afOxySed=min(1.0, max(0.0_rk, aDepthOxySed/self%cDepthS))
 !  aerobic_mineralization_of POM
    tDMinOxyPOMS=afOxySed*(1.0_rk-self%fRefrPOMS)*tDMinPOMS
-!  aerobic_mineralization
+!  aerobic_mineralization of DOM
    tDMinOxyDOMS=afOxySed*tDMinDOMS
 !  sediment_oxygen_demand
 !  The original equation (before splitting OM in POM and DOM fraction)
 !   tO2MinTOMS=molO2molC*self%cCPerDW*tDMinOxyDetS
-   tO2MinTOMS=molO2molC*self%cCPerDW*(tDMinOxyDOMS+tDMinOxyDOMS)
+   tO2MinTOMS=molO2molC*self%cCPerDW*(tDMinOxyPOMS+tDMinOxyDOMS)
 !-----------------------------------------------------------------------
 !  denitrification flux
 !-----------------------------------------------------------------------

@@ -423,7 +423,7 @@ instances:
       fReprFish: 0.02                                            # yearly reproduction fraction of benthivorous fish, ([-]), default = 0.02
       fAgeFish: 0.5                                              # yearly ageing fraction of zooplanktivorous fish, ([-]), default = 0.5
       kDAssFiJv: 0.12                                            # maximum assimilation rate of zooplanktivorous fish (d-1), default = 0.12
-      hDZooFiJv: 1.25                                            # half-saturation zooplankton for zooplanktivorous fish predation (g m-2), default = 1.25
+      hDZooFiJv: 0.5                                             # half-saturation zooplankton for zooplanktivorous fish predation (g m-3), default = 0.5
       fDAssFiJv: 0.4                                             # C assimilation efficiency of zooplanktivorous fish ([-]), default = 0.4
       kDRespFiJv: 0.01                                           # maintenance respiration constant of zooplanktivorous fish (d-1), default = 0.01
       kMortFiJv: 0.00137                                         # specific mortality of zooplanktivorous fish (d-1), default = 0.00137

@@ -149,7 +149,7 @@
    call self%get_parameter(self%fReprFish,       'fReprFish',      '[-]',       'yearly reproduction fraction of benthivorous fish, daily rate',                  default=0.02_rk,    scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%fAgeFish,        'fAgeFish',       '[-]',       'yearly ageing fraction of zooplanktivorous fish, daily rate',                    default=0.5_rk,     scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%kDAssFiJv,       'kDAssFiJv',      'd-1',       'maximum assimilation rate of zooplanktivorous fish',                             default=0.12_rk,    scale_factor=1.0_rk/secs_pr_day)
-   call self%get_parameter(self%hDZooFiJv,       'hDZooFiJv',      'g m-2',     'half-saturation zooplankton for zooplanktivorous fish predation',                default=1.25_rk)
+   call self%get_parameter(self%hDZooFiJv,       'hDZooFiJv',      'g m-3',     'half-saturation zooplankton for zooplanktivorous fish predation',                default=1.25_rk)
    call self%get_parameter(self%fDAssFiJv,       'fDAssFiJv',      '[-]',       'C assimilation efficiency of zooplanktivorous fish',                             default=0.4_rk)
    call self%get_parameter(self%kDRespFiJv,      'kDRespFiJv',     'd-1',       'maintenance respiration constant of zooplanktivorous fish',                      default=0.01_rk,    scale_factor=1.0_rk/secs_pr_day)
    call self%get_parameter(self%kMortFiJv,       'kMortFiJv',      'd-1',       'specific mortality of zooplanktivorous fish',                                    default=0.00137_rk, scale_factor=1.0_rk/secs_pr_day)
@@ -478,8 +478,7 @@
 !  zooplanktivorous fish assimilation_DW
 !-----------------------------------------------------------------------
 !  food_limitation_function_of_young_fish
-   aDSatFiJv = (sDZoo * dz) *(sDZoo * dz) /(self%hDZooFiJv * &
-   &self%hDZooFiJv + (sDZoo * dz) *(sDZoo * dz))
+   aDSatFiJv = (sDZoo * sDZoo) /(self%hDZooFiJv * self%hDZooFiJv + sDZoo * sDZoo)
 !  intrinsic_net_increase_rate_of_fish
    ukDIncrFiJv = (self%kDAssFiJv - self%kDRespFiJv) * uFunTmFish - self%kMortFiJv
 !  environmental_correction_of_fish
