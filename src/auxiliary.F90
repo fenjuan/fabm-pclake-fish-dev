@@ -38,7 +38,7 @@
    type (type_bottom_state_variable_id)     :: id_WSDGren,id_WSNGren,id_WSPGren
 !  dependencies to zooplankton
    type (type_state_variable_id)            :: id_DTranZoo,id_NTranZoo,id_PTranZoo
-   type (type_bottom_state_variable_id)     :: id_TurbFish
+   type (type_state_variable_id)     :: id_TurbFish
 !  dependencies to macrophytes state variables
    type (type_horizontal_dependency_id)     :: id_DragVeg
 !   type (type_bottom_state_variable_id)     :: id_DragVeg
@@ -441,7 +441,7 @@
 !  vegatation influence on macrophytes
    _GET_HORIZONTAL_(self%id_DragVeg,sDVeg)
 !  fish predation influence on resuspension
-   _GET_HORIZONTAL_(self%id_TurbFish,sDFiAd)
+   _GET_(self%id_TurbFish,sDFiAd)
 !  retrieve environmental dependencies
    _GET_(self%id_uTm,uTm)
    _GET_(self%id_dz,dz)

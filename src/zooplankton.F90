@@ -37,7 +37,7 @@
    type (type_state_variable_id)            :: id_DDOMpoolW, id_NDOMpoolW,id_PDOMpoolW,id_SiDOMpoolW
    type (type_state_variable_id)            :: id_NH4poolW,id_NO3poolW,id_PO4poolW
 !  environmental dependencies
-   type (type_dependency_id)                :: id_uTm ,id_dz
+   type (type_dependency_id)                :: id_uTm ,id_dz, id_dens
    type (type_horizontal_dependency_id)     :: id_sDepthW
    type (type_global_dependency_id)         :: id_Day
 !  Model parameters
@@ -62,13 +62,18 @@
 !  foraging arena parametes
    real(rk)   :: cEffZoo, cVulPhyto
 #endif
-   
+
+!  parameters for vertical movement
+   integer  :: movement
+   real(rk) :: vzoo, denszoo
    
    contains
 
 !  Model procedures
    procedure :: initialize
    procedure :: do
+!  Fenjuan Hu: implement vertical movement for Zooplankton, 31st, Jan, 2019
+   procedure :: get_vertical_movement
 
    end type type_pclake_zooplankton
 
@@ -141,6 +146,10 @@
    call self%register_diagnostic_variable(self%id_wDPredZoo,    'wPredZoo',      'g m-2 day-1','zooplanktivorous fish predation rate, foraging arena', output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_aVulPhyto, 'aVulPhyto',   'g m-2',      'vulnerable phytoplanktons',               output=output_instantaneous)
 #endif
+   call self%get_parameter(self%movement,   'movement',   '[-]',       'vertical movement methods:0 -- no movment,1--constant movement, 2--temperature and water viscocity corrected movement, &
+                                           & 3 -- settling rate based on stoker law and cell density ',                                   default=0)
+   call self%get_parameter(self%vzoo,   'vzoo',   'm/s',       'vertical movement rate, negative for sinking, positive for floating', default=0.5_rk,scale_factor=1.0_rk/secs_pr_day)
+   call self%get_parameter(self%denszoo,   'denszoo',   'cell/l',       'zooplankton cell density',      default=1400.0_rk)
 !  Register local state variable
 !  zooplankton
    call self%register_state_variable(self%id_sDZoo,'sDZoo','gDW m-3','zooplankton DW',     &
@@ -199,7 +208,8 @@
    call self%register_dependency(self%id_Day,    standard_variables%number_of_days_since_start_of_the_year)
    call self%register_dependency(self%id_dz,     standard_variables%cell_thickness)
    call self%register_dependency(self%id_sDepthW,standard_variables%bottom_depth)
-
+   call self%register_dependency(self%id_dens,    standard_variables%density)
+   
    return
 
 
@@ -289,6 +299,7 @@
    _GET_(self%id_sDZoo,sDZoo)
    _GET_(self%id_sNZoo,sNZoo)
    _GET_(self%id_sPZoo,sPZoo)
+!   print *, 'sDZoo=', sDZoo
 !-----------------------------------------------------------------------
 !  Retrieve dependencies  
 !-----------------------------------------------------------------------
@@ -660,6 +671,104 @@
 !-----------------------------------------------------------------------
 
    end subroutine do
+!  Fenjuan Hu: implement vertical movement for zooplankton, 31st, Jan, 2019
+   subroutine get_vertical_movement(self,_ARGUMENTS_GET_VERTICAL_MOVEMENT_)
+   class (type_pclake_zooplankton),intent(in) :: self
+   _DECLARE_ARGUMENTS_GET_VERTICAL_MOVEMENT_
+   
+   real(rk)      :: tm, density, sDZoo
+   real(rk)      :: v_zoo, mu
+   real(rk)      :: mu20, dens20
+   
+
+   _LOOP_BEGIN_
+   _GET_(self%id_uTm,tm)
+   _GET_(self%id_dens,density)
+   _GET_(self%id_sDZoo,sDZoo)
+
+!  calculate water viscocity, if this is used in second place, then will be moved to utility afterwards
+!  adopted from aed2_util
+!
+! From Table A.1b, FLUID_MECHANICS With Engineering Applications
+! by Robert L. Daugherty and Joseph B. Franzini,
+! however, note these values are common in most fluid mechanics texts.
+! NOTE: N s / m^2  = kg / m / s
+!
+!  Temp (C)     Viscosity (N s / m^2) x 10^3
+!  --------     ---------
+!      0          1.781
+!      5          1.518
+!     10          1.307
+!     15          1.139
+!     20          1.002
+!     25          0.890
+!     30          0.798
+!     40          0.653
+!     50          0.547
+!     60          0.466
+!     70          0.404
+!     80          0.354
+!     90          0.315
+!    100          0.282
+!
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+!BEGIN
+   !-- Check for non-sensical temperatures
+   IF( tm < 0.0_rk) tm = 0.0
+   IF( tm > 100.0_rk ) tm = 100.0
+
+   IF( tm <= 20.0 ) THEN
+!  0C to 20C
+!  y = 0.0008 * x^2 - 0.0556 * x + 1.7789
+!  r^2 = 0.9999
+     mu = 0.0008 * tm**2. - 0.0556 * tm + 1.7789
+   ELSEIF(tm <= 60) THEN
+!  20C to 60C
+!  y = 0.0002 * x^2 - 0.0323 * x + 1.5471
+!  r^2 = 0.9997
+     mu = 0.0002 * tm**2. - 0.0323 * tm + 1.5471
+   ELSE
+!  60C to 100C
+!  y = 0.00006 * x^2 - 0.0141 * x + 1.1026
+!  r^2 = 0.9995
+     mu = 0.00006 * tm**2. - 0.0141 * tm + 1.1026
+   ENDIF
+!   Now convert to units of: N s / m^2
+   mu = mu / 1e3
+
+!  END OF WATER VISCOCITY CALCULATION
+
+   
+   
+   SELECT CASE (self%movement)
+!  select the movement methods
+!  case 0: no vertical movement
+   case (0)
+       v_zoo = 0.0_rk
+!  case 1: constant movement
+   case (1)
+       v_zoo = self%vzoo
+!  case 2: ! constant settling velocity @20C corrected for density changes
+   case (2)
+        mu20 = 0.001002  ! N s/m2
+        dens20 = 998.2000  ! kg/m3 (assuming freshwater)
+        v_zoo = self%vzoo * mu20 * density / ( mu*dens20 )
+!  settling velocity based on Stokes Law calculation and cell density
+!  this case will be suspended due to _STATE_VAR_(data%id_rho(phy_i)) need to be clarified
+!    case (3) 
+!         v_zoo = -9.807*(data%phytos(phy_i)%d_phy**2.)*( rho_p-pw ) / ( 18.*mu )
+!     case(MOB_MOTTLE) is for phytoplankton mortality and behavior, should have one for zooplankton as well
+    case default
+       v_zoo = 0.0_rk
+
+   END SELECT
+   
+   _SET_VERTICAL_MOVEMENT_(self%id_sDZoo,v_zoo)
+   _LOOP_END_
+   end subroutine get_vertical_movement
+
 !EOC
 !-----------------------------------------------------------------------
 !
