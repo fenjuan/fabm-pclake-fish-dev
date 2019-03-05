@@ -706,11 +706,11 @@
 !  total_fish_flux_of_N_in_Young_fish
    tNFiJv = tNMigrFiJv + tNReprFish + tNAssFiJv - tNExcrFiJv - tNMortFiJv - tNConsFiJvPisc - tNAgeFish 
 !  total_fish_flux_of_DW_in_Adult_fish
-   tDFiAd = tDMigrFiAd - tDRespFiAd - tDMortFiAd - tDReprFish - tDConsFiAdPisc + tDAgeFish
+   tDFiAd = tDMigrFiAd + tDAssFiAd - tDRespFiAd - tDMortFiAd - tDReprFish - tDConsFiAdPisc + tDAgeFish
 !  total_fish_flux_of_P_in_Adult_fish
-   tPFiAd = tPMigrFiAd  - tPExcrFiAd - tPMortFiAd - tPReprFish - tPConsFiAdPisc + tPAgeFish 
+   tPFiAd = tPMigrFiAd + tPAssFiAd - tPExcrFiAd - tPMortFiAd - tPReprFish - tPConsFiAdPisc + tPAgeFish 
 !  total_fish_flux_of_N_in_Adult_fish
-   tNFiAd = tNMigrFiAd - tNExcrFiAd - tNMortFiAd - tNReprFish - tNConsFiAdPisc + tNAgeFish 
+   tNFiAd = tNMigrFiAd + tNAssFiAd - tNExcrFiAd - tNMortFiAd - tNReprFish - tNConsFiAdPisc + tNAgeFish 
 !  total_fish_flux_of_DW_in_predatory_fish
    tDPisc = tDMigrPisc + tDAssPisc - tDRespPisc - tDMortPisc
 
