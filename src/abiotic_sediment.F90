@@ -386,11 +386,11 @@
 !  dissolved nutrients concentration in sediment (converting)
 !-----------------------------------------------------------------------
 !  conc._dissolved_N-NO3_in_interstitial_water
-   oNO3S = sNO3S / self%cDepthS / self%bPorS
+   oNO3S = max(0.0_rk, sNO3S / self%cDepthS / self%bPorS)
 !  conc._dissolved_N-NH4_in_interstitial_water
-   oNH4S=sNH4S/self%cDepthS/self%bPorS
+   oNH4S=max(0.0_rk, sNH4S/self%cDepthS/self%bPorS)
 !  conc._dissolved_P_in_interstitial_water
-   oPO4S = sPO4S / self%cDepthS / self%bPorS
+   oPO4S = max(0.0_rk, sPO4S / self%cDepthS / self%bPorS)
 !-----------------------------------------------------------------------
 !  mineralization from POM to DOM
 !-----------------------------------------------------------------------
@@ -462,7 +462,7 @@
    tDMinOxyDOMS=afOxySed*tDMinDOMS
 !  sediment_oxygen_demand
 !  The original equation (before splitting OM in POM and DOM fraction)
-!   tO2MinTOMS=molO2molC*self%cCPerDW*tDMinOxyDetS
+!  tO2MinTOMS=molO2molC*self%cCPerDW*tDMinOxyDetS
    tO2MinTOMS=molO2molC*self%cCPerDW*(tDMinOxyPOMS+tDMinOxyDOMS)
 !-----------------------------------------------------------------------
 !  denitrification flux
@@ -511,7 +511,7 @@
 !  total_abiotic/microbial_P_POM_flux_in_sediment
    tPAbioPOMS =-tPMinPOMS
 !  total_abiotic/microbial_dissolved_P_flux_in_sediment
-   tPAbioPO4S= tPMinDOMS + tPMinHumS -tPDifPO4-tPSorpIMS  -tPChemPO4
+   tPAbioPO4S= tPMinDOMS + tPMinHumS - tPDifPO4 - tPSorpIMS - tPChemPO4
 !  total_abiotic/microbial_P_absorbed_onto_inorganic_matter_flux_in_sediment
    tPAbioAIMS=tPSorpIMS
 !  total_abiotic/microbial_N_NH4_flux_in_sediment
