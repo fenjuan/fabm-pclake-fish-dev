@@ -74,19 +74,14 @@
    real(rk)   :: cDFiJvMin,cDFiAdMin,cDPiscMin
 !  dissolved organic fraction from fish
    real(rk)   :: fFisDOMW
-!  Vertical movement variables
-   integer    :: movement_methods
-   real(rk)   :: vFiJv, rCDFiJv, cQFiJvMax, cIFiJv
-   real(rk)   :: vFiAd, rCDFiAd, cQFiAdMax, cIFiAd
-   real(rk)   :: f1, f2
+
 !  diagnotic varibles related to vertical movement
-   type (type_diagnostic_variable_id)       :: id_wFiJv, id_wFiAd
+   type (type_diagnostic_variable_id)       :: id_wFiJv !, id_wFiAd
    contains
 
 !  Model procedures
    procedure :: initialize
    procedure :: do
-   procedure :: get_vertical_movement
 
    end type type_pclake_fish
 
@@ -175,18 +170,6 @@
 !   call self%get_parameter(self%cRelVegFish,  'cRelVegFish',  '[-]',      'decrease of fish feeding per macrophytes cover (max. 0.01)',                           default=0.009_rk)
 !   call self%get_parameter(self%kDAssFiAd,    'kDAssFiAd',    'd-1',      'maximum assimilation rate of adult fish',                                              default=0.06_rk,   scale_factor=1.0_rk/secs_pr_day)
 !   call self%get_parameter(self%hDBentFiAd,   'hDBentFiAd',   'g m-2',    'half-saturation constant for zoobenthos on adult fish',                                default=2.5_rk)
-!  pars for fish vertical movement
-   call self%get_parameter(self%movement_methods,'movement_methods','[-]', '0 - no vertical movement, 1 - constant swimming speed, 2 - Ross&Sharples 2007',          default= 0 )
-   call self%get_parameter(self%f1,  'f1', '[-]',   'correction ratio of maximun nutrient quota for fish to swim up,0.6 < f1 < 0.8 ',   default= 0.675_rk)
-   call self%get_parameter(self%f2,  'f2', '[-]',   'correction ratio of maximun nutrient quota for fish to swim down,0.6 < f2 < 0.9 ',   default= 0.75_rk)
-   call self%get_parameter(self%vFiJv,    'vFiJv',  'm/s',   'juvenile fish swimming speed',     default=0.000012_rk)
-   call self%get_parameter(self%rCDFiJv,  'rCDFiJv', '[-]',   'carbon/dry-weight ratio for juvenile fish, 0.4 - 0.5',   default=0.5_rk)
-   call self%get_parameter(self%cQFiJvMax,  'cQFiJvMax', '[-]',   'maximun nutrient quota for juvenile fish',   default=0.28_rk)  ! need to adjust to fish
-   call self%get_parameter(self%cIFiJv,  'cIFiJv', '',   'critical light intensity for juvenile fish',   default=0.1_rk)
-   call self%get_parameter(self%vFiAd,    'vFiAd',  'm/s',   'adult fish swimming speed',     default=0.000012_rk)
-   call self%get_parameter(self%rCDFiAd,  'rCDFiAd', '[-]',   'carbon/dry-weight ratio for adult fish, 0.4 - 0.5',   default=0.5_rk)
-   call self%get_parameter(self%cQFiAdMax,  'cQFiAdMax', '[-]',   'maximun nutrient quota for adult fish',   default=0.28_rk)  ! need to adjust to fish
-   call self%get_parameter(self%cIFiAd,  'cIFiAd', '',   'critical light intensity for adult fish',   default=0.1_rk)
    !  Register local state variable
 !  Register local state variable
 !  zooplanktivorous fish, transportation is turned off
@@ -217,8 +200,8 @@
 !  Register diagnostic variables for dependencies in other modules
    call self%register_diagnostic_variable(self%id_aNPisc,    'aNPisc',      'g m-3',     'piscivorous fish nitrogen content',   output=output_instantaneous)
    call self%register_diagnostic_variable(self%id_aPPisc,    'aPPisc',      'g m-3',     'piscivorous fish phosphorus content', output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_wFiJv,    'wFiJv',      'm/s',     'vertical movement speed of juvenile fish', output=output_instantaneous)
-   call self%register_diagnostic_variable(self%id_wFiAd,    'wFiAd',      'm/s',     'vertical movement speed of adult fish', output=output_instantaneous)
+   call self%register_diagnostic_variable(self%id_wFiJv,    'wFiJv',      'm/s',     'vertical movement speed of juvenile fish', output=output_none)
+ !  call self%register_diagnostic_variable(self%id_wFiAd,    'wFiAd',      'm/s',     'vertical movement speed of adult fish', output=output_none)
 #ifdef _DEVELOPMENT_
 !  register diagnostic variables for modular fluxes
    call self%register_diagnostic_variable(self%id_wDFiJv,     'wDFiJv',     'g m-3 s-1', 'fish_DFiJv_change',                   output=output_instantaneous)
@@ -945,104 +928,6 @@
 
    end subroutine do
 
-!EOC
-!-----------------------------------------------------------------------
-   
-!BOP
-   subroutine get_vertical_movement(self,_ARGUMENTS_GET_VERTICAL_MOVEMENT_)
-   class (type_pclake_fish),intent(in) :: self
-   _DECLARE_ARGUMENTS_GET_VERTICAL_MOVEMENT_
-   
-   real(rk)    :: w_FiJv, w_FiAd
-   real(rk)    :: par, I_0
-   real(rk)    :: sDFiJv, sDFiAd, sNFiJv, sNFiAd
-   real(rk)    :: aNDFiJv, aNDFiAd
-   real(rk)    :: QFiJv, QFiAd
-
-   _LOOP_BEGIN_
-!  retrieve environmental dependencies
-   _GET_(self%id_par,par)
-   _GET_(self%id_I_0,I_0)
-   
-!  get the fish state
-   _GET_(self%id_sDFiJv,sDFiJv)
-!   _GET_(self%id_sPFiJv,sPFiJv)
-   _GET_(self%id_sNFiJv,sNFiJv)
-   _GET_(self%id_sDFiAd,sDFiAd)
-!   _GET_(self%id_sPFiAd,sPFiAd)
-   _GET_(self%id_sNFiAd,sNFiAd)
-   SELECT CASE (self%movement_methods)
-!  select the movement methods
-!  case 0: no vertical movement
-   case (0)
-       w_FijV = 0.0_rk
-       w_FiAd = 0.0_rk
-!  case 1: constant movement
-   case (1)
-       w_FiJv = self%vFiJv
-       w_FiAd = self%vFiAd
-!  case 2: 
-!   Ross&Sharples 2007
-   case (2)
-!!!! Keep in mind that the light units in this mehtods is uE m-2 s-1
-! par and I_0 need to convert to uEm-2 -1
-!  we will use W/m2 for fish condition
-       ! strategy 1, adopted phytoplankton from the paper
-!   the current N/dry-weight ratio of junenile fish 
-     aNDFiJv = sNFiJv / sDFiJv +NearZero
-!   convert to N/C ratio, used in the equation adopted
-     QFiJv = aNDFiJv * self%rCDFiJv
-!    calculate maximun nutrient qouta Qmax of juvenile fish
-     if (QFiJv < self%cQFiJvMax * self%f1) then
-         ! juvenile fish will swimming down
-        w_FiJv = - self%vFiJv
-     elseif (QFiJv > self%cQFiJvMax * self%f2) then
-         if (par > self%cIFiJv) then   !  * 3.445_rk
-             w_FiJv = self%vFiJv   
-         else    ! low light
-             w_FiJv = 0.0_rk  !  ?? if the light is critically low, shouldn't phy swim up?
-         ENDIF
-     else
-         w_FiJv = 0.0_rk
-     endif
-     if (par > 0.95_rk * I_0)  w_FiJv = 0.0_rk ! already at surface
-!    calculate maximun nutrient qouta Qmax of adult fish
-     aNDFiAd = sNFiAd / sDFiAd + NearZero
-!   convert to N/C ratio, used in the equation adopted
-     QFiAd = aNDFiAd * self%rCDFiAd
-!    calculate maximun nutrient qouta Qmax of juvenile fish
-     if (QFiAd < self%cQFiAdMax * self%f1) then
-         ! adult fish will swimming down
-        w_FiAd = - self%vFiAd
-     elseif (QFiAd > self%cQFiAdMax * self%f2) then
-         if (par > self%cIFiAd) then   !  * 3.445_rk
-             w_FiAd = self%vFiAd
-         else    ! low light
-             w_FiAd = 0.0_rk  !  ?? if the light is critically low, shouldn't phy swim up? maybe it's in the night
-         endif
-     else
-         w_FiAd = 0.0_rk
-     endif
-     if (par > 0.95_rk * I_0) w_FiAd = 0.0_rk ! already at surface
-     
-!     print *, 'QFiJv', QFiJv
-!     print *, 'QFiAd', QFiAd
-     
-   END SELECT
-!  Set vertical movement for juvenile fish
-   _SET_VERTICAL_MOVEMENT_(self%id_sDFiJv,w_FiJv)
-   _SET_VERTICAL_MOVEMENT_(self%id_sNFiJv,w_FiJv)
-   _SET_VERTICAL_MOVEMENT_(self%id_sPFiJv,w_FiJv)
-!  set vertical movement for adult fish
-   _SET_VERTICAL_MOVEMENT_(self%id_sDFiAd,w_FiAd)
-   _SET_VERTICAL_MOVEMENT_(self%id_sNFiAd,w_FiAd)
-   _SET_VERTICAL_MOVEMENT_(self%id_sPFiAd,w_FiAd)
-!  updated diagnostic variables
-    _SET_DIAGNOSTIC_(self%id_wFiJv, W_FiJv)
-    _SET_DIAGNOSTIC_(self%id_wFiAd, W_FiAd)
-
-   _LOOP_END_
-   end subroutine get_vertical_movement
 !EOC
 !-----------------------------------------------------------------------
 

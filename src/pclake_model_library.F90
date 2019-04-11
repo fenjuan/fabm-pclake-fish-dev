@@ -18,6 +18,8 @@ module pclake_model_library
    use pclake_fish
    use pclake_zoobenthos
    use pclake_auxiliary
+!  added by Fen, 19/3, 2019
+   use pclake_diel_vertical_movement
 
    implicit none
 
@@ -53,6 +55,7 @@ contains
          case ('fish');                   allocate(type_pclake_fish::model);
          case ('zoobenthos');             allocate(type_pclake_zoobenthos::model);
          case ('auxiliary');              allocate(type_pclake_auxiliary::model);
+         case ('diel_vertical_movement'); allocate(type_pclake_diel_vertical_movement::model);
          case default
             call self%type_base_model_factory%create(name,model)
        end select
